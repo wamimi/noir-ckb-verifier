@@ -70,6 +70,37 @@ The artifact is excluded from Git by `circuits/**/target/`. Its digest is retain
 
 ## Execution witness
 
-Status: **Pending `nargo execute witness`**
+Producer command:
 
-The witness artifact will be inspected only after the execution command succeeds. It may contain private witness values and will remain excluded from Git.
+```bash
+cd /Users/xiaomao/noir-ckb-verifier/circuits/square-root
+nargo execute witness
+```
+
+Retained Nargo output:
+
+```text
+[square_root] Circuit witness successfully solved
+[square_root] Witness saved to target/witness.gz
+exit_code=0
+```
+
+Generated artifact:
+
+| Property | Observed value |
+|---|---|
+| Path | `circuits/square-root/target/witness.gz` |
+| Size | 47 bytes compressed; gzip footer reports 108 bytes uncompressed |
+| SHA-256 | `77a911f41c3e6844ba2e66a68a693eca08aa3711dad4a274038f0c0d11dde554` |
+| Integrity check | `gzip -t` returned exit code 0 |
+| Git status | Ignored by the repository's `target/` rule |
+
+The macOS `file` command described this very small stream as `gzip compressed data, max compression, truncated`. That description is retained as an observation, but the dedicated gzip integrity check returned success and Nargo reported successful witness solving and output.
+
+### Interpretation
+
+The execution witness contains the concrete assignment used to solve the circuit. It is an input to a proving backend; it is not itself a cryptographic proof.
+
+This development fixture uses an intentionally non-secret `x = 7`, but future execution witnesses may contain genuinely private values. Witness artifacts therefore remain excluded from Git by default.
+
+This Noir execution witness must not be confused with a CKB transaction witness. A future CKB `WitnessArgs.input_type` may carry a zero-knowledge proof and public inputs, but it must not expose the private Noir witness.

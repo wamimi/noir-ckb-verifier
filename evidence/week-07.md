@@ -11,7 +11,7 @@
 | Repository | `wamimi/noir-ckb-verifier` | Scaffolded locally; no success claim beyond file inspection |
 | License | Apache-2.0 | Scaffolded |
 | Circuit | private `x`, public `y`, assert `x*x == y` | Check and compilation passed 2026-07-15 |
-| Fixture | `x=7`, `y=49` | Scaffolded; execution pending |
+| Fixture | `x=7`, `y=49` | Witness solved successfully 2026-07-15 |
 
 ## 2. Noir toolchain and artifacts
 
@@ -101,11 +101,29 @@ cd /Users/xiaomao/noir-ckb-verifier/circuits/square-root
 nargo execute witness
 ```
 
-Retained output: **Pending**
+Retained output:
 
-Expected witness path: `target/witness.gz` (must be confirmed)
+```text
+[square_root] Circuit witness successfully solved
+[square_root] Witness saved to target/witness.gz
+exit_code=0
+```
 
-Inspection and SHA-256: **Pending**
+Status: **Passed 15 July 2026**
+
+Confirmed witness path: `target/witness.gz`
+
+Inspection:
+
+```text
+compressed size: 47 bytes
+gzip-reported uncompressed size: 108 bytes
+SHA-256: 77a911f41c3e6844ba2e66a68a693eca08aa3711dad4a274038f0c0d11dde554
+gzip integrity test: exit code 0
+Git ignore rule: target/
+```
+
+The macOS `file` utility described the small stream as `gzip compressed data, max compression, truncated`; this observation is retained. The dedicated `gzip -t` integrity check returned 0, and Nargo reported successful witness generation.
 
 ### Optional Barretenberg control
 

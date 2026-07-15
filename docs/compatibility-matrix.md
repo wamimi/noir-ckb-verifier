@@ -5,9 +5,9 @@ Status is evidence-based. “Pending” means the interface is planned or resear
 | Layer | Artifact | Producer | Consumer | Format / assumptions | Week 7 status |
 |---|---|---|---|---|---|
 | Circuit source | `src/main.nr` | Developer | Nargo beta.18 | Noir source; `x` private, `y` public | Check and compilation passed 2026-07-15 |
-| Development input | `Prover.toml` | Developer | Nargo/ACVM | TOML fixture; `x=7`, `y=49`; intentionally public test data | Accepted by `nargo check`; execution pending |
+| Development input | `Prover.toml` | Developer | Nargo/ACVM | TOML fixture; `x=7`, `y=49`; intentionally public test data | Accepted and executed 2026-07-15 |
 | Compiled program | `target/square_root.json` | Nargo/noirc beta.18 | ACIR-aware backend | Version-sensitive JSON containing bytecode and ABI metadata | Generated and inspected 2026-07-15; ignored by Git |
-| Execution witness | `target/square_root.gz` or named witness | Nargo/ACVM beta.18 | Proving backend | Compressed witness; may contain private values | Not generated |
+| Execution witness | `target/witness.gz` | Nargo/ACVM beta.18 | Proving backend | Gzip-compressed witness; may contain private values | Generated and integrity-checked 2026-07-15; ignored by Git |
 | Control proof | Barretenberg proof/VK | `bb` | Barretenberg | Honk/Barretenberg path; not a CKB Groth16 artifact | Optional; not generated |
 | Groth16 constraint system | R1CS or backend-native constraint system | Week 8 backend | Groth16 setup/prover | Must represent supported ACIR semantics exactly | Deferred to Week 8 |
 | Proposed proof set | BN254 Groth16 proof, VK, public inputs | Week 8 backend | Source verifier and Rust adapter | Source representation may be snarkjs JSON, gnark objects, or another typed format | Deferred to Week 8 |
