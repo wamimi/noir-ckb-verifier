@@ -104,3 +104,55 @@ The execution witness contains the concrete assignment used to solve the circuit
 This development fixture uses an intentionally non-secret `x = 7`, but future execution witnesses may contain genuinely private values. Witness artifacts therefore remain excluded from Git by default.
 
 This Noir execution witness must not be confused with a CKB transaction witness. A future CKB `WitnessArgs.input_type` may carry a zero-knowledge proof and public inputs, but it must not expose the private Noir witness.
+
+## Barretenberg control proof
+
+This optional control checks that the compiled Noir artifact and execution witness are accepted by the installed Barretenberg backend. It does not produce Groth16 artifacts and does not establish compatibility with `groth16-ckb`.
+
+Producer command:
+
+```bash
+cd /Users/xiaomao/noir-ckb-verifier/circuits/square-root
+mkdir -p target/bb-control
+bb prove \
+  -b target/square_root.json \
+  -w target/witness.gz \
+  --write_vk \
+  --verify \
+  -o target/bb-control
+```
+
+Barretenberg reported the `ultra_honk` scheme and returned exit code 0 after writing the artifacts below:
+
+| Artifact | Size | SHA-256 |
+|---|---:|---|
+| `target/bb-control/proof` | 16,256 bytes | `f3007837a3d59f95c44edf82f670b0e3380d1079a6e7567792134aa6e46df2bd` |
+| `target/bb-control/public_inputs` | 32 bytes | `218cd422fe6a50299655006c5c9a13a4a06d5d815f4c929b876885dda1fd4652` |
+| `target/bb-control/vk` | 3,680 bytes | `c8d90d34eea356934ba880b5e5ab907540cc71602059dcbf9dd9b1ea75a5e89f` |
+| `target/bb-control/vk_hash` | 32 bytes | `4f896232c4a944d89a7c63b65e5de1797c514bcc02d8b93ac4a89c19414d45d1` |
+
+Because the combined prove command did not print an explicit verification result, verification was rerun as a separate evidence gate:
+
+```bash
+bb verify \
+  -p target/bb-control/proof \
+  -k target/bb-control/vk \
+  -i target/bb-control/public_inputs
+```
+
+Retained result:
+
+```text
+Scheme is: ultra_honk, num threads: 12 (mem: 13.83 MiB)
+Proof verified successfully (mem: 15.72 MiB)
+exit_code=0
+```
+
+All control artifacts are under the ignored circuit `target/` directory.
+
+### Compatibility conclusion
+
+```text
+Noir artifact + witness -> Barretenberg UltraHonk proof -> Barretenberg verification: established
+Noir artifact + witness -> BN254 Groth16 -> groth16-ckb: not established in Week 7
+```
