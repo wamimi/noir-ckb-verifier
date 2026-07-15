@@ -1,21 +1,25 @@
 # Compatibility matrix
 
+**Reporting period:** Week ending Sunday, 12 July 2026
+
+**Evidence reproduced and finalized:** 15 July 2026 as Week 7 catch-up
+
 Status is evidence-based. “Pending” means the interface is planned or researched but has not yet been reproduced in the retained Week 7 command record.
 
 | Layer | Artifact | Producer | Consumer | Format / assumptions | Week 7 status |
 |---|---|---|---|---|---|
-| Circuit source | `src/main.nr` | Developer | Nargo beta.18 | Noir source; `x` private, `y` public | Check and compilation passed 2026-07-15 |
-| Development input | `Prover.toml` | Developer | Nargo/ACVM | TOML fixture; `x=7`, `y=49`; intentionally public test data | Accepted and executed 2026-07-15 |
-| Compiled program | `target/square_root.json` | Nargo/noirc beta.18 | ACIR-aware backend | Version-sensitive JSON containing bytecode and ABI metadata | Generated and inspected 2026-07-15; ignored by Git |
-| Execution witness | `target/witness.gz` | Nargo/ACVM beta.18 | Proving backend | Gzip-compressed witness; may contain private values | Generated and integrity-checked 2026-07-15; ignored by Git |
-| Control proof | Barretenberg proof/VK | `bb` | Barretenberg | Honk/Barretenberg path; not a CKB Groth16 artifact | Optional; not generated |
+| Circuit source | `src/main.nr` | Developer | Nargo beta.18 | Noir source; `x` private, `y` public | Week 7 check and compilation passed |
+| Development input | `Prover.toml` | Developer | Nargo/ACVM | TOML fixture; `x=7`, `y=49`; intentionally public test data | Week 7 fixture accepted and executed |
+| Compiled program | `target/square_root.json` | Nargo/noirc beta.18 | ACIR-aware backend | Version-sensitive JSON containing bytecode and ABI metadata | Week 7 artifact generated and inspected; ignored by Git |
+| Execution witness | `target/witness.gz` | Nargo/ACVM beta.18 | Proving backend | Gzip-compressed witness; may contain private values | Week 7 witness generated and integrity-checked; ignored by Git |
+| Control proof | UltraHonk proof/VK/public inputs | Barretenberg `3.0.0-nightly.20260102` | Barretenberg | Barretenberg path; not a CKB Groth16 artifact | Week 7 control generated and explicitly verified; ignored by Git |
 | Groth16 constraint system | R1CS or backend-native constraint system | Week 8 backend | Groth16 setup/prover | Must represent supported ACIR semantics exactly | Deferred to Week 8 |
 | Proposed proof set | BN254 Groth16 proof, VK, public inputs | Week 8 backend | Source verifier and Rust adapter | Source representation may be snarkjs JSON, gnark objects, or another typed format | Deferred to Week 8 |
 | Validated crypto objects | arkworks BN254 proof, VK, `Fr` inputs | Rust artifact adapter | arkworks host verifier and wire encoder | Curve/subgroup validated; public-input order preserved | Deferred to Week 9 |
 | Canonical bytes | arkworks compressed serialization | Rust artifact adapter | `groth16-ckb` Molecule encoder/decoder | arkworks 0.5-compatible encoding | Deferred to Week 9 |
-| CKB VK payload | Molecule VK data | Host encoder | VK Cell / `groth16-ckb` | Cell data hash committed in script args | Existing endpoint; reproduction pending |
-| CKB proof payload | Molecule proof + public inputs | Host encoder | `WitnessArgs.input_type` / `groth16-ckb` | Public transaction witness, not a private Noir witness | Existing endpoint; reproduction pending |
-| Mathematical verification | Boolean verifier result | `groth16-ckb` | Capsule protocol | `verify(vk, public_inputs, proof)` | Existing endpoint; reproduction pending |
+| CKB VK payload | Molecule VK data | Host encoder | VK Cell / `groth16-ckb` | Cell data hash committed in script args | Existing endpoint build and tests passed, including missing/wrong VK rejection |
+| CKB proof payload | Molecule proof + public inputs | Host encoder | `WitnessArgs.input_type` / `groth16-ckb` | Public transaction witness, not a private Noir witness | Existing endpoint build and tests passed, including malformed/version/count rejection |
+| Mathematical verification | Boolean verifier result | `groth16-ckb` | Capsule protocol | `verify(vk, public_inputs, proof)` | Normal suite: 39 passed; ignored suite: 2 passed including 1,000-sample differential test and cycle benchmark |
 | Application semantics | Transition-bound public inputs | Capsule Type Script | CKB validation | Commitments to actual old/new state, identity, action, and replay domain | Design only; Week 10 |
 
 ## Week 8 backend candidates (research only)
