@@ -1,0 +1,26 @@
+.DS_Store
+.idea/
+.vscode/
+
+# Noir compilation and execution outputs
+circuits/**/target/
+
+# Rust build outputs
+target/
+
+# JavaScript package outputs
+node_modules/
+
+# Local/private prover inputs
+**/Prover.private.toml
+
+# Development trusted-setup and generated proof material
+*.ptau
+*.zkey
+**/proof.json
+**/public.json
+**/verification_key.json
+
+# Fuzzing output is not part of the Week 7 baseline
+fuzz/artifacts/
+fuzz/corpus/
