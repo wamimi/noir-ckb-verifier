@@ -1,6 +1,6 @@
 # artifact-adapter
 
-Reserved for the Week 9 typed Rust adapter that will:
+Week 9 typed Rust adapter that will:
 
 1. parse the selected Groth16 backend's proof, verification key, and public inputs;
 2. validate BN254 field elements and curve points;
