@@ -68,7 +68,7 @@ The development fixture uses `x = 7` and `y = 49`. It is intentionally non-secre
 
 No command is recorded as successful until its complete output has been retained and reviewed. Generated proofs, benchmarks, binary hashes, test totals, and screenshots must never be inferred from documentation or a previous run.
 
-See [`docs/artifact-inspection.md`](docs/artifact-inspection.md) for artifact structure and [`evidence/week-07.md`](evidence/week-07.md) for the baseline checklist and result status.
+See [`docs/artifact-inspection.md`](docs/artifact-inspection.md) for Noir artifact structure, [`docs/ckb-endpoint.md`](docs/ckb-endpoint.md) for the CKB verifier reproduction, and [`evidence/week-07.md`](evidence/week-07.md) for the baseline checklist and result status.
 
 ## References
 

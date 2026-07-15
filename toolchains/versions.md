@@ -21,12 +21,20 @@ The Noir and Barretenberg values below were reproduced by Nelly on 15 July 2026.
 | Nargo | `1.0.0-beta.18` | compile and execute Noir | Verified 2026-07-15 |
 | noirc | embedded `1.0.0-beta.18+99bb8b5cf33d7669adbdef096b12d80f30b4c0c9` reported by `nargo --version` | compile Noir to ACIR | Verified 2026-07-15; source reported clean |
 | Barretenberg | `3.0.0-nightly.20260102` | optional non-Groth16 control path | Verified 2026-07-15 |
-| Rust | `rustc 1.95.0` | reproduce CKB verifier and future adapter | Pending |
-| Cargo | `cargo 1.95.0` | reproduce CKB verifier and future adapter | Pending |
-| Node.js | `v24.3.0` | TypeScript SDK/example tests | Pending |
+| Rust | `rustc 1.95.0 (59807616e 2026-04-14)` | reproduce CKB verifier and future adapter | Verified 2026-07-15 |
+| Cargo | `cargo 1.95.0 (f2d3ce0bd 2026-03-21)` | reproduce CKB verifier and future adapter | Verified 2026-07-15 |
+| Node.js | `v24.3.0` | TypeScript SDK/example tests | Verified 2026-07-15 |
 | npm | `11.4.2` | host tooling if needed | Pending |
-| pnpm | Not recorded in preflight | verifier SDK/example tests | Pending |
-| RISC-V Rust target | Not recorded in preflight | CKB-VM build | Pending |
+| pnpm | `10.12.4` | verifier SDK/example tests | Verified 2026-07-15 |
+| RISC-V Rust target | `riscv64imac-unknown-none-elf` | CKB-VM build | Verified installed 2026-07-15 |
+
+The `groth16-ckb` endpoint baseline is pinned to commit:
+
+```text
+d64c769ffe2d2edb5eb308dc59058efda77c2f83
+```
+
+Its worktree was clean when the Week 7 reproduction began.
 
 There is no standalone `noirc` executable in the current `PATH`. The embedded compiler version is reported by `nargo --version`, so `noirc --version` is not part of the command record.
 
