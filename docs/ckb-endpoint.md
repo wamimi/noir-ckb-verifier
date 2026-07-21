@@ -96,7 +96,7 @@ cd /Users/xiaomao/groth16-ckb
 cargo test --workspace -- --ignored --nocapture
 ```
 
-Result: **Passed 15 July 2026, exit code 0.**
+Result: **Passed, exit code 0.**
 
 | Test | Result | Duration |
 |---|---|---:|
