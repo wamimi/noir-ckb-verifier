@@ -1,0 +1,6 @@
+[package]
+name = "square_root_public_first"
+type = "bin"
+authors = ["Nelly Njeri"]
+
+[dependencies]
