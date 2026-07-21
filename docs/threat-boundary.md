@@ -74,6 +74,20 @@ The Week 7 `x = 7` fixture is intentionally public, non-sensitive test data.
 
 Conversion must construct validated typed objects and then use arkworks canonical serialization. Manual byte reversal is not a sufficient interoperability strategy.
 
+## Public-wire semantic boundary
+
+A proof can be valid for the emitted R1CS while the R1CS exposes or binds different public values than the Noir ABI declared. Public/private counts do not repair incorrect wire placement.
+
+Before setup or proof generation, the toolchain must establish that:
+
+- public outputs occupy the required leading output wires in deterministic order;
+- public inputs immediately follow them in deterministic Noir semantic order;
+- private inputs are not placed in any public position;
+- constraint references and materialized witness values use the same remapping; and
+- the exported public vector exactly matches values derived from the Noir ABI.
+
+If the toolchain cannot prove those properties, it must reject the artifact. A proof that verifies with an accidentally public private witness is a security failure even when the fixture value is non-secret.
+
 ## Verification-key binding
 
 The application must commit to the intended VK Cell data, not merely load any CellDep containing a syntactically valid key. A wrong or substituted VK Cell must fail before or during proof verification.

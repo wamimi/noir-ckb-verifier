@@ -51,7 +51,34 @@ Noir describes the statement and which inputs are private or public. Nargo compi
 
 ### Groth16 backend
 
-The selected backend will lower the supported ACIR program into a Groth16-compatible constraint system, solve or import the witness, and produce BN254 proof material. Backend selection and execution are Week 8 work.
+The selected experiment backend lowers supported ACIR programs into Groth16-compatible constraint systems, solves or imports witnesses, and produces BN254 proof material. Week 8 confirmed that these mechanical stages can succeed while public-wire semantics still fail, so the backend cannot be accepted without the boundary checks below.
+
+### ACIR witness to R1CS wire boundary
+
+An R1CS header records counts for public outputs, public inputs, and private inputs. Those counts are meaningful only if the corresponding values occupy the target format's required wire positions. Copying ACIR witnesses to R1CS wires by index while separately copying only the visibility counts is not a semantic conversion.
+
+Week 8 demonstrated the failure concretely:
+
+```text
+Noir private-first ACIR: [w0=x=7 private, w1=y=49 public]
+identity R1CS wires:     [wire1=7 public, wire2=49 private]
+result:                  proof verifies with [7], rejects [49]
+```
+
+The public-first control happened to align with identity mapping:
+
+```text
+Noir public-first ACIR:  [w0=y=49 public, w1=x=7 private]
+identity R1CS wires:     [wire1=49 public, wire2=7 private]
+result:                  proof verifies with [49], rejects [7]
+```
+
+The adapter/backend boundary must therefore implement one of two policies before setup or proving:
+
+1. Soundly remap public outputs, public inputs, private inputs, remaining witnesses, constraint terms, and materialized witness values into the target R1CS order.
+2. Fail closed unless the ACIR witness layout already exactly matches the required R1CS order.
+
+Source parameter reordering is acceptable as a labeled compatibility fixture, not as a general conversion algorithm.
 
 ### Artifact adapter
 
@@ -102,7 +129,9 @@ CKB Groth16 compatibility: not established
 
 - deliberately select and pin a backend
 - produce a development-only BN254 Groth16 setup
-- prove and verify the minimal circuit in the source backend
+- preserve the private-first semantic failure as a regression fixture
+- prove and verify a public-first compatibility control in the source backend
+- require a fail-closed layout policy before general use
 
 ### Week 9: cross-library interoperability
 
