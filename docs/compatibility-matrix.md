@@ -31,7 +31,7 @@ Status is evidence-based. “Pending” means the interface is planned or resear
 
 ### Noir-Groth16
 
-The first experiment selected Noir-Groth16 commit `4b7caace1f2128e454c8d0fe50cac1ec46b1e272`. Manifest and lockfile inspection confirmed a beta.19 ACIR/ACVM runtime plus an explicit legacy beta.18 parser matching the Week 7 compiler source revision. User-run gates confirmed parsing, solving, strict lowering, setup, proving, and source verification, while also exposing the public-wire incompatibility described above.
+The first experiment selected Noir-Groth16 commit `4b7caace1f2128e454c8d0fe50cac1ec46b1e272`. Manifest and lockfile inspection confirmed a beta.19 ACIR/ACVM runtime plus an explicit legacy beta.18 parser matching the Week 7 compiler source revision. Retained execution gates confirmed parsing, solving, strict lowering, setup, proving, and source verification, while also exposing the public-wire incompatibility described above.
 
 Strengths for this project:
 

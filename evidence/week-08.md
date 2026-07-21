@@ -1,6 +1,6 @@
 # Week 8 evidence record
 
-**Policy:** A result remains pending until Nelly runs the command, retains its complete output, and the output is reviewed. Research observations are not recorded as execution results.
+**Policy:** A result remains pending until complete command output is retained and reviewed. Source inspection is identified separately from execution evidence.
 
 ## Scope
 
@@ -124,8 +124,8 @@ The final `git status --short` in the backend checkout produced no output. This 
 
 ## Gate 4: pedantic witness solving and strict interop
 
-Witness-solving status: **Passed 21 July 2026**  
-Strict interop status: **Passed 21 July 2026**
+- Witness-solving status: **Passed 21 July 2026**
+- Strict interop status: **Passed 21 July 2026**
 
 Use the committed ABI-shaped development input:
 
@@ -180,8 +180,8 @@ The final backend `git status --short` again produced no output. Strict lowering
 
 ## Gate 5: R1CS/WTNS inspection and witness check
 
-Binary consistency status: **Passed 21 July 2026**  
-Noir public-input semantic status: **Failed at the R1CS boundary**
+- Binary consistency status: **Passed 21 July 2026**
+- Noir public-input semantic status: **Failed at the R1CS boundary**
 
 Record at minimum:
 
@@ -273,16 +273,16 @@ Together with `[wire0, wire1, wire2, wire3] = [1,7,49,49]`, these constraints co
 
 ## Gate 6: development-only Groth16
 
-Initial Powers of Tau creation: **Passed 21 July 2026**  
-Initial Phase 2 preparation: **Passed 21 July 2026**  
-Initial transcript verification: **Failed as expected for an uncontributed transcript**  
-Contributed transcript verification: **Passed 21 July 2026**  
-Circuit-specific Groth16 setup: **Passed 21 July 2026**  
-Circuit-specific contribution: **Passed 21 July 2026**  
-ZKey/R1CS/PTAU binding verification: **Passed on corrected rerun 21 July 2026**  
-Verification-key export: **Passed 21 July 2026**  
-Groth16 diagnostic proof generation: **Passed 21 July 2026**  
-Noir public-input semantic gate: **Failed conclusively at proof export**
+- Initial Powers of Tau creation: **Passed 21 July 2026**
+- Initial Phase 2 preparation: **Passed 21 July 2026**
+- Initial transcript verification: **Failed as expected for an uncontributed transcript**
+- Contributed transcript verification: **Passed 21 July 2026**
+- Circuit-specific Groth16 setup: **Passed 21 July 2026**
+- Circuit-specific contribution: **Passed 21 July 2026**
+- ZKey/R1CS/PTAU binding verification: **Passed on corrected rerun 21 July 2026**
+- Verification-key export: **Passed 21 July 2026**
+- Groth16 diagnostic proof generation: **Passed 21 July 2026**
+- Noir public-input semantic gate: **Failed conclusively at proof export**
 
 Record the exact Powers of Tau power, snarkjs version, setup/contribution commands, proof-generation result, and source verification result. The transcript and proving keys are disposable development artifacts, not a trusted production setup.
 
@@ -396,9 +396,9 @@ The final backend `git status --short` produced no output. The proof and generat
 
 ## Gate 7: semantic and negative checks
 
-Generated-vector source verification: **Passed 21 July 2026**  
-Intended-Noir-vector verification: **Rejected 21 July 2026, confirming the incompatibility**  
-Overall Noir semantic compatibility: **Failed**
+- Generated-vector source verification: **Passed 21 July 2026**
+- Intended-Noir-vector verification: **Rejected 21 July 2026, confirming the incompatibility**
+- Overall Noir semantic compatibility: **Failed**
 
 The expected exported public input vector contains one field element representing decimal `49`. Verification success with a different vector does not pass this gate.
 
@@ -454,13 +454,13 @@ The inventory includes both the rejected uncontributed transcript and the accept
 
 ## Gate 9: public-first compatibility control
 
-Nargo check and compilation: **Passed 21 July 2026**  
-Nargo execution: **Passed 21 July 2026**  
-Backend parse and pedantic witness solving: **Passed 21 July 2026**  
-Strict interop and snarkjs witness validation: **Passed 21 July 2026**  
-Circuit-specific setup, contribution, binding verification, and VK export: **Passed 21 July 2026**  
-Control proof generation and public export: **Passed 21 July 2026**  
-Control positive/negative verification: **Passed 21 July 2026**
+- Nargo check and compilation: **Passed 21 July 2026**
+- Nargo execution: **Passed 21 July 2026**
+- Backend parse and pedantic witness solving: **Passed 21 July 2026**
+- Strict interop and snarkjs witness validation: **Passed 21 July 2026**
+- Circuit-specific setup, contribution, binding verification, and VK export: **Passed 21 July 2026**
+- Control proof generation and public export: **Passed 21 July 2026**
+- Control positive/negative verification: **Passed 21 July 2026**
 
 The original private-first artifact remains unchanged as regression evidence. A second circuit declares public `y` before private `x` while preserving `x * x = y` and the same non-secret values.
 
@@ -660,6 +660,6 @@ For this circuit, placing public `y` first produces an ACIR witness order that h
 
 This is a constrained compatibility result, not general support. The original private-first regression proves that arbitrary valid Noir parameter layouts can silently produce a source-verifiable Groth16 proof for the wrong public interface. Until a general wire remapper exists, tooling must fail closed unless all public output/input witnesses occupy exactly the leading R1CS positions required by the target format.
 
-## Claim gate
+## Claim provenance
 
-Until all relevant output is reviewed, the Week 8 report must not say that Nelly built the backend, converted ACIR to R1CS, generated Groth16 artifacts, verified a proof, preserved public-input semantics, or completed negative tests.
+The completion claims in this record are limited to reviewed command output. The original private-first path completed parsing, solving, lowering, setup, proving, and source verification but failed public-input semantic preservation. The public-first control completed the same stages, preserved public input `49`, and passed the positive/negative verification pair. Neither result establishes general Noir compatibility, production setup security, arkworks interoperability, or CKB execution.

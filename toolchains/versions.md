@@ -20,7 +20,7 @@ The selected Noir-Groth16 experiment targets source revision:
 4b7caace1f2128e454c8d0fe50cac1ec46b1e272
 ```
 
-Assistant source inspection observed the following dependency boundary at that revision:
+Source inspection identified the following dependency boundary at that revision:
 
 ```text
 runtime ACIR/ACVM: Noir v1.0.0-beta.19
@@ -29,7 +29,7 @@ locked beta.18 source: 99bb8b5cf33d7669adbdef096b12d80f30b4c0c9
 locked beta.19 source: 74d6be658e1ad252f87943292ba09bdd4da80bd4
 ```
 
-Nelly reproduced these pins from the checked-out manifests and lockfile on 20 July 2026. The checkout was detached at the expected revision and `git status --short` was empty. `snarkjs` was subsequently pinned to `0.7.5` for R1CS/WTNS inspection and the development-only Groth16 experiment.
+The pins were reproduced from the checked-out manifests and lockfile on 20 July 2026. The checkout was detached at the expected revision and `git status --short` was empty. `snarkjs` was subsequently pinned to `0.7.5` for R1CS/WTNS inspection and the development-only Groth16 experiment.
 
 Week 8 host-tool evidence currently includes:
 
@@ -47,9 +47,9 @@ Week 8 host-tool evidence currently includes:
 
 ## Evidence status
 
-The Noir and Barretenberg values below were reproduced by Nelly on 15 July 2026. The remaining values were observed during assistant preflight but are not yet retained user-run evidence for the Week 7 report.
+The Noir and Barretenberg values below were reproduced on 15 July 2026. Items marked pending were observed during initial environment inspection but were not part of the retained Week 7 execution record.
 
-| Tool | Preflight observation | Week 7 role | Retained user evidence |
+| Tool | Environment observation | Week 7 role | Retained evidence |
 |---|---|---|---|
 | Nargo | `1.0.0-beta.18` | compile and execute Noir | Verified 2026-07-15 |
 | noirc | embedded `1.0.0-beta.18+99bb8b5cf33d7669adbdef096b12d80f30b4c0c9` reported by `nargo --version` | compile Noir to ACIR | Verified 2026-07-15; source reported clean |

@@ -2,7 +2,7 @@
 
 **Nominal week ending:** 12 July 2026  
 **Catch-up execution/finalization date:** 15 July 2026  
-**Policy:** A result remains pending until Nelly runs the command, retains its complete output, and the output is reviewed.
+**Policy:** A result remains pending until complete command output is retained and reviewed.
 
 ## 1. Standalone repository
 
@@ -273,8 +273,8 @@ Status: **Build validation passed and binary inspected 15 July 2026.** Cargo reu
 - indefinite fuzzing: not run
 - devnet deployment: not run
 
-## 4. Report claims gate
+## 4. Reporting provenance
 
-The Week 7 report must not say “I rebuilt,” “I ran,” “all tests passed,” quote a binary size/hash, or quote a cycle count until the corresponding result above is populated from retained user-run output.
+Completion claims, binary measurements, hashes, test totals, and cycle counts are supported only by the retained output above. The build record is described as incremental validation because Cargo reused existing outputs; it is not described as a clean rebuild.
 
-The report must disclose that implementation and evidence collection were completed as catch-up after the nominal 12 July week ending.
+The reporting timeline distinguishes the nominal week ending on 12 July from the catch-up implementation and evidence collection completed on 15 July 2026.

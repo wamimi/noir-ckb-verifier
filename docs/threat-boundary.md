@@ -94,7 +94,7 @@ The application must commit to the intended VK Cell data, not merely load any Ce
 
 ## Resource and liveness boundary
 
-The CKB-VM verifier has finite cycle and memory limits. Exact Week 7 binary size and cycle evidence will be recorded from a fresh user-run build. Indefinite fuzzing and deployment are explicitly outside the baseline.
+The CKB-VM verifier has finite cycle and memory limits. The Week 7 evidence record contains the reproduced binary size and cycle measurements, including the distinction between an incremental build validation and a clean rebuild. Indefinite fuzzing and deployment are explicitly outside the baseline.
 
 ## Out of scope for Week 7
 

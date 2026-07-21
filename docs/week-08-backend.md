@@ -32,7 +32,7 @@ This revision was selected for evaluation because it exposes the intermediate bo
 - snarkjs-compatible Groth16 artifacts
 - explicit failure for unsupported or underconstrained behavior
 
-The revision's workspace uses Noir beta.19 ACIR/ACVM dependencies and also carries a beta.18 legacy ACIR parser pinned to `99bb8b5cf33d7669adbdef096b12d80f30b4c0c9`. The latter matches the source revision embedded in the Week 7 artifact. Nelly reproduced those pins, and the backend parsed, solved, and lowered the existing artifact. The later public-input gate showed why those successes alone were insufficient.
+The revision's workspace uses Noir beta.19 ACIR/ACVM dependencies and also carries a beta.18 legacy ACIR parser pinned to `99bb8b5cf33d7669adbdef096b12d80f30b4c0c9`. The latter matches the source revision embedded in the Week 7 artifact. The retained environment record confirms those pins, and the execution gates show that the backend parsed, solved, and lowered the existing artifact. The later public-input gate demonstrates why those successes alone were insufficient.
 
 The backend is consumed from a separate checkout. Its source is not vendored into this repository and will not be modified during the baseline.
 
