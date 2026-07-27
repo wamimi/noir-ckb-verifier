@@ -21,6 +21,11 @@ node_modules/
 **/public.json
 **/verification_key.json
 
+# Non-secret, provenance-recorded cross-library fixtures
+!tests/fixtures/week-09-public-first/proof.json
+!tests/fixtures/week-09-public-first/public.json
+!tests/fixtures/week-09-public-first/verification_key.json
+
 # Fuzzing output is not part of the Week 7 baseline
 fuzz/artifacts/
 fuzz/corpus/

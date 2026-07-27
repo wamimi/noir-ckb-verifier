@@ -18,3 +18,19 @@ intended Noir vector [49]   -> same proof is rejected
 The result was reproduced with snarkjs 0.7.5 on 21 July 2026: generated `[7]` verified with exit code `0`, while this intended `[49]` vector was rejected with `Invalid proof` and exit code `1`. This demonstrates the incompatibility; it does not make the diagnostic R1CS acceptable. The fixture contains no private or setup material.
 
 `week-08-private-value-as-public.json` contains `["7"]`. It is the inverse negative fixture for the public-first control. If that control exports and verifies intended public `[49]`, the same proof must reject `[7]`. Together, the fixtures distinguish mathematical proof validity from the intended Noir public interface in both directions.
+
+## Week 9 cross-library fixture
+
+`week-09-public-first/` retains the non-secret proof, verification key, intended
+public vector, negative public vector, and provenance manifest from the Week 8
+public-first control. It is the input corpus for the arkworks and CKB Molecule
+adapter.
+
+The fixture deliberately excludes the proving key, witness, R1CS, WTNS, and
+Powers of Tau files. Its setup was development-only, so successful conversion
+does not imply production setup security.
+
+On 27 July 2026, the committed proof, VK, and public vector were semantically
+compared with the retained Week 8 files, then hashed before and after the
+independent snarkjs recheck. snarkjs 0.7.5 and the Rust adapter both accepted
+`[49]` and rejected `[7]`; the fixture hashes did not change.

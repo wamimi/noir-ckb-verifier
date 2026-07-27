@@ -1,0 +1,36 @@
+{
+  "fixture": "week-09-public-first",
+  "purpose": "Non-secret cross-library compatibility fixture for the constrained public-first path",
+  "relation": "x * x = y",
+  "private_development_value": {
+    "x": "7",
+    "note": "Intentionally public test data; not a real secret"
+  },
+  "public_inputs": [
+    "49"
+  ],
+  "producer": {
+    "noirc": "1.0.0-beta.18+99bb8b5cf33d7669adbdef096b12d80f30b4c0c9",
+    "noir_groth16": "4b7caace1f2128e454c8d0fe50cac1ec46b1e272",
+    "snarkjs": "0.7.5",
+    "curve": "bn128",
+    "protocol": "groth16"
+  },
+  "source_verification": {
+    "public_49": "accepted",
+    "public_7": "rejected"
+  },
+  "source_sha256": {
+    "verification_key.json": "19654ceb85017d4ce4b36c41acaabebb2421d42916aba57d4918944e8e1acc3d",
+    "proof.json": "0487979648c2f7819a3544a2da7f8a2407057a15a6aaaa1d8b2fbc91933d715a",
+    "public.json": "8d683c14535896df9e3f636c1cb3fa5483cb8cb950f4fd1e50f200077fcfb64b"
+  },
+  "normalization": "The committed JSON files add one trailing LF byte; numeric strings, array order, and JSON values are unchanged from the retained Week 8 artifacts.",
+  "committed_sha256": {
+    "verification_key.json": "c886ff510808ee21f354f9e16ede7405418276abe44c4992041be5f767612d81",
+    "proof.json": "40a963fae6ae05b22547adab882e5bb3f318e850729ded606e342980ee7e62d4",
+    "public.json": "ff43072fcc95627d49160362f3b7023c10aa1456bb1758fd524d1b5185d5cd23",
+    "wrong-public.json": "6b76b7114eb9596b5a55eafb0a3d664e777806d53e5016c1f74b939d1a58b9f0"
+  },
+  "security": "Development-only setup and proof. No production setup, audit, or arbitrary-Noir compatibility claim. The proving key, witness, and Powers of Tau files are not included."
+}
