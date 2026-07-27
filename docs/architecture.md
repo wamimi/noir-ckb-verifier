@@ -135,9 +135,11 @@ CKB Groth16 compatibility: not established
 
 ### Week 9: cross-library interoperability
 
-- typed conversion into arkworks objects
-- canonical serialization and Molecule encoding
-- source-backend and arkworks host verification of the same proof
+- typed conversion into arkworks objects completed for the retained public-first fixture
+- canonical serialization and version-1 Molecule encoding completed
+- snarkjs and arkworks agree that `[49]` accepts and `[7]` rejects
+- pinned endpoint decode and host verification completed
+- CKB-VM execution remains outside this milestone
 
 ### Week 10: proof-bound Capsule
 

@@ -83,3 +83,43 @@ For every generated fixture, retain:
 - verification results from each implementation that consumed it
 
 NB: Do not commit proving keys, toxic-waste inputs, private application witnesses, or large generated build directories.
+
+## Week 9 adapter pins
+
+The Week 9 Rust workspace requests arkworks `0.5` and pins its CKB wire boundary
+to `groth16-ckb` revision:
+
+```text
+d64c769ffe2d2edb5eb308dc59058efda77c2f83
+```
+
+The pinned packages are `groth16-schema`, `wire-decode`, and `verifier-core`.
+`Cargo.lock` was generated and reviewed on 27 July 2026. It resolved:
+
+| Package | Locked version/source |
+|---|---|
+| `ark-bn254` | `0.5.0` |
+| `ark-ec` | `0.5.0` |
+| `ark-ff` | `0.5.0` |
+| `ark-groth16` | `0.5.0` |
+| `ark-serialize` | `0.5.0` |
+| `ark-snark` | `0.5.1` |
+| `groth16-schema` | Git revision `d64c769ffe2d2edb5eb308dc59058efda77c2f83` |
+| `wire-decode` | Git revision `d64c769ffe2d2edb5eb308dc59058efda77c2f83` |
+| `verifier-core` | Git revision `d64c769ffe2d2edb5eb308dc59058efda77c2f83` |
+
+The lockfile is 26,320 bytes with SHA-256
+`165c4f85eb3f36949a0ef24a02a79f16e734f5dd934376201347c88c40d19d61`.
+
+The locked release build completed on 27 July 2026. The resulting
+`noir-ckb-adapter` binary was a 2,025,776-byte arm64 Mach-O executable with
+SHA-256:
+
+```text
+ed0f37ff16ad5c80323a3bf72bb7b81e0a22d7365bc65b421d85ac14b81d6576
+```
+
+The pinned snarkjs invocation identified itself as `snarkjs@0.7.5`. Its
+`--version` form also printed the full command help and returned exit code 99,
+so the evidence records that output as version identification rather than a
+successful version command.

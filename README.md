@@ -6,14 +6,16 @@ An experimental toolchain for turning Noir circuits into CKB-deployable Groth16 
 
 This repository is research infrastructure. It is pre-audit, incomplete, and not suitable for production or mainnet use.
 
-Week 7 established the two ends of the proposed pipeline without running an ACIR-to-Groth16 backend. Week 8 now evaluates a pinned backend in evidence-gated stages:
+Week 7 established the two ends of the proposed pipeline. Week 8 evaluated a
+pinned ACIR-to-Groth16 backend and isolated a public-wire ordering failure.
+Week 9 implements and verifies the constrained cross-library adapter path:
 
 ```text
 Noir source
   -> version-pinned ACIR artifact and execution witness
-  -> [Week 8: pinned ACIR-to-R1CS and BN254 Groth16 experiment]
-  -> typed arkworks conversion
-  -> Molecule-encoded VK Cell and transaction witness
+  -> pinned ACIR-to-R1CS and BN254 Groth16 experiment
+  -> [Week 9: typed arkworks conversion and Molecule host artifacts]
+  -> Molecule-encoded VK Cell data and transaction witness payload
   -> generic groth16-ckb verifier in CKB-VM
   -> application-specific Capsule transition binding
 ```
@@ -57,12 +59,36 @@ The pinned backend produced a valid Groth16 proof for the original private-first
 
 A separate public-first control assigned `y = 49` to leading ACIR witness `w0`. Its generated proof exported and verified with `[49]` and rejected `[7]`. This establishes a constrained working path and a regression case, not general Noir compatibility. Until witness-to-R1CS remapping is implemented, the toolchain must reject any artifact whose public witnesses do not already occupy the required leading wire positions.
 
+## Week 9 scope
+
+Week 9 implements the constrained cross-library path for the retained
+public-first control:
+
+```text
+snarkjs BN254 Groth16 JSON
+  -> validated arkworks 0.5 proof, VK, and public input
+  -> arkworks positive/negative verification
+  -> canonical compressed serialization
+  -> groth16-ckb v1 Molecule VK and witness objects
+  -> pinned endpoint decode and host verification
+```
+
+The retained fixture verified with `[49]` and rejected `[7]` in both snarkjs
+0.7.5 and arkworks 0.5. The adapter emitted canonical bytes, version-1 Molecule
+objects, and the VK data hash; the pinned `wire-decode` and `verifier-core`
+host path decoded and accepted the positive payload. These results are limited
+to one public-first compatibility fixture.
+
+Week 9 stops before CKB-VM transaction execution and Capsule transition
+binding. See [`docs/week-09-adapter.md`](docs/week-09-adapter.md) and
+[`evidence/week-09.md`](evidence/week-09.md).
+
 ## Repository layout
 
 ```text
 circuits/square-root/              Minimal compatibility circuit and development inputs
 circuits/square-root-public-first/ Week 8 public-wire compatibility control
-crates/artifact-adapter/    Reserved for the future typed Rust conversion layer
+crates/artifact-adapter/    Typed snarkjs-to-arkworks and CKB wire adapter
 docs/                       Architecture, compatibility, and threat-boundary notes
 evidence/                   Reproducible command/result records
 schemas/                    Reserved for Molecule schemas used by the adapter
@@ -87,7 +113,12 @@ The development fixture uses `x = 7` and `y = 49`. It is intentionally non-secre
 
 No command is recorded as successful until its complete output has been retained and reviewed. Generated proofs, benchmarks, binary hashes, test totals, and screenshots must never be inferred from documentation or a previous run.
 
-See [`docs/artifact-inspection.md`](docs/artifact-inspection.md) for Noir artifact structure, [`docs/ckb-endpoint.md`](docs/ckb-endpoint.md) for the CKB verifier reproduction, [`evidence/week-07.md`](evidence/week-07.md) for the endpoint baseline, and [`evidence/week-08.md`](evidence/week-08.md) for the Groth16 experiment.
+See [`docs/artifact-inspection.md`](docs/artifact-inspection.md) for Noir
+artifact structure, [`docs/ckb-endpoint.md`](docs/ckb-endpoint.md) for the CKB
+verifier reproduction, [`evidence/week-07.md`](evidence/week-07.md) for the
+endpoint baseline, [`evidence/week-08.md`](evidence/week-08.md) for the
+Groth16 experiment, and [`evidence/week-09.md`](evidence/week-09.md) for the
+adapter and host wire-boundary results.
 
 ## References
 

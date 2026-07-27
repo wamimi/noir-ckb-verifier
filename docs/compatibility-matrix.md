@@ -6,6 +6,8 @@
 
 **Week 8 backend experiment:** executed and reviewed 20–21 July 2026
 
+**Week 9 adapter experiment:** executed and reviewed 27 July 2026
+
 Status is evidence-based. “Pending” means the interface is planned or researched but has not yet been reproduced in a retained command record.
 
 | Layer | Artifact | Producer | Consumer | Format / assumptions | Evidence status |
@@ -19,11 +21,12 @@ Status is evidence-based. “Pending” means the interface is planned or resear
 | Control proof | UltraHonk proof/VK/public inputs | Barretenberg `3.0.0-nightly.20260102` | Barretenberg | Barretenberg path; not a CKB Groth16 artifact | Week 7 control generated and explicitly verified; ignored by Git |
 | Groth16 constraint system | iden3 `.r1cs` | Pinned Noir-Groth16 experiment | snarkjs Groth16 setup/prover | BN254; strict lowering; public/private wire placement must preserve Noir semantics | Structurally valid and satisfiable, but semantic gate failed: wire 1 contains private `x=7` while the R1CS marks one leading public input |
 | Groth16 witness | iden3 `.wtns` | Pinned Noir-Groth16 experiment | snarkjs witness checker/prover | Pedantic ACVM solving; development fixture only | snarkjs 0.7.5 reports witness correct; exported vector is `[1,7,49,49]` |
-| Proposed proof set | snarkjs `proof.json`, `verification_key.json`, `public.json` | Pinned Noir-Groth16 + snarkjs | Source verifier and future Rust adapter | Development-only BN254 Groth16; intended public vector is exactly `[49]` | Generated `[7]` verifies; intended `[49]` is rejected; artifact is mathematically valid but Noir-incompatible |
-| Validated crypto objects | arkworks BN254 proof, VK, `Fr` inputs | Rust artifact adapter | arkworks host verifier and wire encoder | Curve/subgroup validated; public-input order preserved | Deferred to Week 9 |
-| Canonical bytes | arkworks compressed serialization | Rust artifact adapter | `groth16-ckb` Molecule encoder/decoder | arkworks 0.5-compatible encoding | Deferred to Week 9 |
-| CKB VK payload | Molecule VK data | Host encoder | VK Cell / `groth16-ckb` | Cell data hash committed in script args | Existing endpoint build and tests passed, including missing/wrong VK rejection |
-| CKB proof payload | Molecule proof + public inputs | Host encoder | `WitnessArgs.input_type` / `groth16-ckb` | Public transaction witness, not a private Noir witness | Existing endpoint build and tests passed, including malformed/version/count rejection |
+| Private-first diagnostic proof set | snarkjs `proof.json`, `verification_key.json`, `public.json` | Pinned Noir-Groth16 + snarkjs | Source verifier | Development-only BN254 Groth16; Noir-intended public vector is `[49]` | Generated `[7]` verifies; intended `[49]` is rejected; proof is mathematically valid but Noir-incompatible |
+| Public-first compatibility proof set | retained snarkjs JSON fixture | Pinned Noir-Groth16 + snarkjs | snarkjs 0.7.5 and Rust adapter | Development-only BN254 Groth16; constrained identity wire layout | Both implementations accept `[49]` and reject `[7]`; fixture hashes unchanged by recheck |
+| Validated crypto objects | arkworks BN254 proof, VK, `Fr` inputs | Rust artifact adapter | arkworks host verifier and wire encoder | Strict decimal bounds; curve/subgroup validation; public-input count and order preserved | Week 9 retained fixture converted; arkworks accepts `[49]` and rejects `[7]` |
+| Canonical bytes | arkworks compressed serialization | Rust artifact adapter | `groth16-ckb` Molecule encoder/decoder | arkworks 0.5 canonical compressed encoding | Week 9 emitted 296-byte VK, 128-byte proof, and 36-byte one-input buffer; exact endpoint round trip passed |
+| CKB VK payload | version-1 Molecule VK data | Rust artifact adapter | VK Cell / `groth16-ckb` | Cell data hash committed in script args | 334-byte host payload emitted and decoded; CKB data hash `1fa6f0c18ff7b0d32abcd01ddf2ddcc3e4190be99add55bbf2418f045eb32715`; not yet exercised in CKB-VM |
+| CKB proof payload | version-1 Molecule proof + public inputs | Rust artifact adapter | `WitnessArgs.input_type` / `groth16-ckb` | Public transaction witness, not a private Noir witness | 194-byte host payload emitted; pinned decoder round trip and host verifier passed; malformed version/witness and wrong public input rejected |
 | Mathematical verification | Boolean verifier result | `groth16-ckb` | Capsule protocol | `verify(vk, public_inputs, proof)` | Normal suite: 39 passed; ignored suite: 2 passed including 1,000-sample differential test and cycle benchmark |
 | Application semantics | Transition-bound public inputs | Capsule Type Script | CKB validation | Commitments to actual old/new state, identity, action, and replay domain | Design only; Week 10 |
 
@@ -47,7 +50,9 @@ Required Week 8 checks:
 - development setup provenance and reproducibility
 - positive and negative source-verification behavior
 
-Arkworks conversion is deferred to Week 9.
+Arkworks conversion and pinned host wire interoperability were completed for the
+separate public-first compatibility fixture in Week 9. The private-first
+diagnostic remains an intentional rejection case.
 
 ### Sunspot
 

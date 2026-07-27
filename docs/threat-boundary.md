@@ -74,6 +74,12 @@ The Week 7 `x = 7` fixture is intentionally public, non-sensitive test data.
 
 Conversion must construct validated typed objects and then use arkworks canonical serialization. Manual byte reversal is not a sufficient interoperability strategy.
 
+The Week 9 public-first fixture crossed this boundary through strict typed
+parsing, arkworks verification, canonical compressed serialization, version-1
+Molecule encoding, pinned endpoint decoding, exact byte comparison, and pinned
+host verification. This is evidence for one fixture, not evidence of arbitrary
+Noir compatibility or CKB-VM execution.
+
 ## Public-wire semantic boundary
 
 A proof can be valid for the emitted R1CS while the R1CS exposes or binds different public values than the Noir ABI declared. Public/private counts do not repair incorrect wire placement.
@@ -96,15 +102,16 @@ The application must commit to the intended VK Cell data, not merely load any Ce
 
 The CKB-VM verifier has finite cycle and memory limits. The Week 7 evidence record contains the reproduced binary size and cycle measurements, including the distinction between an incremental build validation and a clean rebuild. Indefinite fuzzing and deployment are explicitly outside the baseline.
 
-## Out of scope for Week 7
+## Current stopping point
 
 - production trusted setup ceremony
 - audited soundness claims
-- ACIR-to-Groth16 execution
-- cross-library proof conversion
 - CKB devnet deployment
 - indefinite fuzzing
 - final Capsule commitment design
+- CKB-VM execution of the Noir-derived proof
+- transaction-derived Capsule public inputs
+- correct-transition acceptance and wrong-transition rejection
 
 ## Reference
 
