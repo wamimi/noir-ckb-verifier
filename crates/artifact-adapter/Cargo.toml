@@ -1,0 +1,32 @@
+[package]
+name = "artifact-adapter"
+version = "0.1.0"
+description = "Fail-closed snarkjs BN254 Groth16 to arkworks and CKB Molecule adapter"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+ark-bn254.workspace = true
+ark-ec.workspace = true
+ark-ff.workspace = true
+ark-groth16.workspace = true
+ark-serialize.workspace = true
+ark-snark.workspace = true
+ckb-hash.workspace = true
+clap.workspace = true
+groth16-schema.workspace = true
+hex.workspace = true
+molecule.workspace = true
+num-bigint.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+verifier-core.workspace = true
+wire-decode.workspace = true
+
+[[bin]]
+name = "noir-ckb-adapter"
+path = "src/main.rs"
