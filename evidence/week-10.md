@@ -497,6 +497,19 @@ This corrected rerun is the retained expanded-matrix result. The earlier
 compile error remains documented because it explains why that first invocation
 provides no CKB-VM evidence.
 
+## Pre-push executable-bit diagnostic
+
+The first final pre-push invocation of `./scripts/build-capsule-binding.sh`
+returned shell exit code `126` with `permission denied`. Inspection showed that
+Git had recorded the script as mode `100644`; the script body and previously
+built Capsule binary were unchanged. The same pre-push run still completed all
+12 explicit CKB-VM cases successfully, and the existing Capsule and verifier
+binaries matched their retained hashes.
+
+The repository correction records the build script as executable and requires
+a direct rerun to return exit code `0` before push. This diagnostic is a script
+file-mode failure, not a Rust compilation, contract, proof, or CKB-VM failure.
+
 ## Intended scope
 
 - transition-aware Noir fixture
