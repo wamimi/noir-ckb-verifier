@@ -1,6 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use artifact_adapter::{build_wire_artifacts, load_and_convert, load_public_inputs, WireArtifacts};
+use ckb_integration_tests::fixture_path;
 use ckb_testtool::builtin::ALWAYS_SUCCESS;
 use ckb_testtool::ckb_error::Error as CkbError;
 use ckb_testtool::ckb_types::{
@@ -25,12 +26,6 @@ const ERROR_PUBLIC_INPUT_MISMATCH: i8 = 30;
 const ERROR_LOCK_CHANGED: i8 = 32;
 const ERROR_LOCK_GROUP_SHAPE: i8 = 33;
 
-fn fixture(name: &str) -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../tests/fixtures/week-10-capsule")
-        .join(name)
-}
-
 fn binary_from_env(variable: &str) -> Bytes {
     let path = std::env::var_os(variable)
         .map(PathBuf::from)
@@ -42,13 +37,13 @@ fn binary_from_env(variable: &str) -> Bytes {
 
 fn wire_with_public(public_file: &str) -> WireArtifacts {
     let converted = load_and_convert(
-        &fixture("verification_key.json"),
-        &fixture("proof.json"),
-        &fixture("public.json"),
+        &fixture_path("verification_key.json"),
+        &fixture_path("proof.json"),
+        &fixture_path("public.json"),
     )
     .expect("Week 10 fixture must convert");
     let public_inputs =
-        load_public_inputs(&fixture(public_file)).expect("public vector must parse");
+        load_public_inputs(&fixture_path(public_file)).expect("public vector must parse");
     build_wire_artifacts(&converted.verifying_key, &converted.proof, &public_inputs)
         .expect("Week 10 fixture must encode")
 }

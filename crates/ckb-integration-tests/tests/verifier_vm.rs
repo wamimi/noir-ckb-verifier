@@ -1,6 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use artifact_adapter::{build_wire_artifacts, load_and_convert, load_public_inputs, WireArtifacts};
+use ckb_integration_tests::fixture_path;
 use ckb_testtool::builtin::ALWAYS_SUCCESS;
 use ckb_testtool::ckb_error::Error as CkbError;
 use ckb_testtool::ckb_types::{
@@ -14,12 +15,6 @@ use ckb_testtool::context::Context;
 const MAX_CYCLES: u64 = 250_000_000;
 const ERROR_VERIFICATION_FAILED: i8 = 5;
 
-fn fixture(name: &str) -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../tests/fixtures/week-10-capsule")
-        .join(name)
-}
-
 fn verifier_binary() -> Bytes {
     let path = std::env::var_os("GROTH16_CKB_SCRIPT_BIN")
         .map(PathBuf::from)
@@ -31,9 +26,9 @@ fn verifier_binary() -> Bytes {
 
 fn intended_wire() -> WireArtifacts {
     let converted = load_and_convert(
-        &fixture("verification_key.json"),
-        &fixture("proof.json"),
-        &fixture("public.json"),
+        &fixture_path("verification_key.json"),
+        &fixture_path("proof.json"),
+        &fixture_path("public.json"),
     )
     .expect("Week 10 fixture must convert");
     build_wire_artifacts(
@@ -46,12 +41,12 @@ fn intended_wire() -> WireArtifacts {
 
 fn wrong_new_state_wire() -> WireArtifacts {
     let converted = load_and_convert(
-        &fixture("verification_key.json"),
-        &fixture("proof.json"),
-        &fixture("public.json"),
+        &fixture_path("verification_key.json"),
+        &fixture_path("proof.json"),
+        &fixture_path("public.json"),
     )
     .expect("Week 10 fixture must convert");
-    let wrong = load_public_inputs(&fixture("wrong-new-state-public.json"))
+    let wrong = load_public_inputs(&fixture_path("wrong-new-state-public.json"))
         .expect("negative public vector must parse");
     build_wire_artifacts(&converted.verifying_key, &converted.proof, &wrong)
         .expect("negative vector must remain structurally encodable")
