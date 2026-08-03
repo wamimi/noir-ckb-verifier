@@ -1,0 +1,6 @@
+[package]
+name = "proof_bound_capsule"
+type = "bin"
+authors = ["Nelly Njeri"]
+
+[dependencies]

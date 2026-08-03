@@ -1,0 +1,9 @@
+# Public, non-secret development fixture.
+capsule_id = "11"
+old_state_commitment = "65"
+old_nullifier = "5"
+new_state_commitment = "66"
+action_id = "1"
+new_nullifier = "96"
+replay_domain = "13"
+authorization_secret = "7"

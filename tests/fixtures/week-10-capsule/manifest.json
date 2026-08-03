@@ -1,0 +1,42 @@
+{
+  "fixture": "week-10-proof-bound-capsule",
+  "purpose": "Public seven-input Groth16 fixture for CKB-VM and Capsule transition-binding tests",
+  "public_inputs": [
+    "11",
+    "65",
+    "5",
+    "66",
+    "1",
+    "96",
+    "13"
+  ],
+  "private_development_value": {
+    "authorization_secret": "7",
+    "note": "Intentionally public test data; not a credential"
+  },
+  "producer": {
+    "noirc": "1.0.0-beta.18+99bb8b5cf33d7669adbdef096b12d80f30b4c0c9",
+    "noir_groth16": "4b7caace1f2128e454c8d0fe50cac1ec46b1e272",
+    "snarkjs": "0.7.5",
+    "protocol": "groth16",
+    "curve": "bn128"
+  },
+  "source_verification": {
+    "intended_public": "accepted",
+    "wrong_new_state": "rejected",
+    "wrong_capsule_id": "rejected",
+    "wrong_replay_domain": "rejected"
+  },
+  "source_sha256": {
+    "verification_key.json": "75402addb04f0d27264b3d807a7ae4ac3b7ce115161fb9ed0a22971c3e186ff0",
+    "proof.json": "119e7276ec5aa4a8ef54502bb86cea41fe6b91302a8ba1074271714677de8e72",
+    "public.json": "ad6f5ea7390ce0b72d6741fd1f24299008f992f6da56dd9ffa5e184c90cd2b08"
+  },
+  "normalization": "The committed JSON files add one trailing LF byte; numeric strings, array order, and JSON values are unchanged from the retained Week 10 artifacts.",
+  "committed_sha256": {
+    "verification_key.json": "d96ceaee485227824b492c891593c27013b41dd8b1e45156e9535642f9a8ec5e",
+    "proof.json": "6c763e8657bb46eafb4b38cd66f3c57618a24e402031b12c0ae0c6e8f5b53c2c",
+    "public.json": "33b71b2b3f9fa8f09ef9f6201bd252d5cc69c2c1d663fb27735c10f75d665b57"
+  },
+  "security": "Development-only setup and proof. No production setup, general Noir compatibility, audit, deployment, or production-readiness claim."
+}
