@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/artifact-adapter"]
+members = ["crates/artifact-adapter", "crates/ckb-integration-tests"]
 
 [workspace.package]
 edition = "2021"

@@ -1,0 +1,15 @@
+[package]
+name = "ckb-integration-tests"
+version = "0.1.0"
+description = "CKB-VM integration tests for Noir-derived proof artifacts"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dev-dependencies]
+artifact-adapter = { path = "../artifact-adapter" }
+ckb-testtool = "1.1"
+
+[lib]
+path = "src/lib.rs"
