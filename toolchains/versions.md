@@ -128,7 +128,7 @@ successful version command.
 
 The Week 10 Capsule fixture retains the Week 8 and Week 9 compiler, backend,
 snarkjs, arkworks, and `groth16-ckb` revisions above. The host integration
-workspace was checked with:
+workspace is pinned by the root `rust-toolchain.toml` and was checked with:
 
 ```text
 rustc 1.95.0 (59807616e 2026-04-14)

@@ -526,3 +526,37 @@ Record the exact command, working directory, source revisions, tool versions,
 exit code, artifact size, and artifact hash for each completed gate. Retain
 failed diagnostic commands as failures and distinguish them from corrected
 reruns. Development setup material and private witnesses remain ignored by Git.
+
+## Post-finalization reviewer-path validation
+
+After the Week 10 implementation was pushed, the reviewer workflow added a
+root Rust `1.95.0` pin and an optional `NOIR_CKB_FIXTURE_DIR`. The override lets
+the CKB-VM harness consume generated proof JSON from an ignored directory
+without replacing the committed regression fixture.
+
+The retained validation reported:
+
+```text
+rustc 1.95.0 (59807616e 2026-04-14)
+cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+git diff --check:                                  exit 0
+cargo fmt --all -- --check:                       exit 0
+cargo check --locked --workspace --all-targets:   exit 0
+cargo clippy ... -D warnings:                     exit 0
+cargo test --locked --workspace:                  exit 0
+```
+
+The normal suite passed 11 host tests and listed the 12 Capsule plus two
+verifier-only binary-dependent CKB-VM tests as ignored.
+
+The generated Week 10 `verification_key.json`, `proof.json`, and `public.json`
+were then copied from the ignored generation directory into a separate ignored
+reviewer fixture directory. The three public negative vectors were copied
+beside them, and the matrix was invoked with `NOIR_CKB_FIXTURE_DIR` pointing to
+that directory. All 12 CKB-VM cases passed, the intended transaction again
+reported `101,625,705` cycles, and the command returned exit code `0`.
+
+This validates the external fixture-selection mechanism against the original
+generated Week 10 artifacts. It is not a second proof-generation run; the full
+guide requires each reviewer to record the results of their own fresh,
+randomized development proof.

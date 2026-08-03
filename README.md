@@ -32,6 +32,98 @@ proof verifies the intended CKB state transition
 
 The generic verifier can establish `verify(vk, public_inputs, proof)`. The consuming protocol must additionally prove that those public inputs commit to the exact old Cell, new Cell, Capsule identity, action, and replay domain represented by the transaction.
 
+## Try the Week 10 developer preview
+
+The fastest reviewer path uses the retained public development proof and runs
+it through the real RISC-V verifier and Capsule binding scripts in CKB-VM. It
+does not require a CKB node, wallet, devnet deployment, or trusted setup.
+
+### Prerequisites
+
+- Git
+- [`rustup`](https://rustup.rs/)
+- a Unix-like shell (`bash` or `zsh`)
+
+`git clone` creates local folders named `noir-ckb-verifier` and `groth16-ckb`.
+The parent directory can have any name and can live anywhere. Creating
+`noir-ckb-preview` below is optional; it only keeps the two repositories next
+to each other. A reviewer testing a fork changes only the first clone URL; the
+default local folder remains `noir-ckb-verifier`. Run these commands in Bash,
+zsh, Git Bash, or WSL:
+
+```bash
+mkdir -p noir-ckb-preview
+cd noir-ckb-preview
+
+git clone https://github.com/wamimi/noir-ckb-verifier.git
+git clone https://github.com/CECILIA-MULANDI/groth16-ckb.git
+
+cd groth16-ckb
+git checkout --detach \
+  d64c769ffe2d2edb5eb308dc59058efda77c2f83
+cd ..
+
+rustup toolchain install 1.95.0 --profile default
+rustup toolchain install 1.94.1 \
+  --profile default \
+  --target riscv64imac-unknown-none-elf
+```
+
+Build the two CKB scripts:
+
+```bash
+cd groth16-ckb
+./scripts/build-ckb-script.sh
+
+cd ../noir-ckb-verifier
+./scripts/build-capsule-binding.sh
+```
+
+Run the host checks. The normal suite should pass 11 host tests and list 14
+binary-dependent CKB-VM tests as ignored:
+
+```bash
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo test --locked --workspace
+```
+
+Run the explicit 12-case CKB-VM transaction matrix:
+
+```bash
+GROTH16_CKB_SCRIPT_BIN="$(cd ../groth16-ckb && pwd)/script/target/riscv64imac-unknown-none-elf/release/ckb-script" \
+CKB_CAPSULE_BINDING_SCRIPT_BIN="$PWD/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding" \
+cargo test --locked \
+  -p ckb-integration-tests \
+  --test capsule_transition \
+  -- --ignored --nocapture
+```
+
+The retained result is:
+
+```text
+valid proof + intended Capsule transition       -> accept
+valid proof + changed state/identity/domain     -> reject (binding code 30)
+invalid proof                                   -> reject (verifier code 5)
+missing VK, truncated witness, malformed data   -> reject
+changed lock or ambiguous input groups          -> reject
+
+test result: ok. 12 passed; 0 failed; 0 ignored
+week10_proof_bound_capsule_cycles=101625705
+```
+
+The cycle count is included as a retained comparison point, not a performance
+guarantee across different binaries or dependency revisions.
+
+To regenerate the Noir, R1CS, Groth16, adapter, and CKB-VM artifacts instead
+of using the retained proof fixture, follow
+[`docs/reproducing-week-10.md`](docs/reproducing-week-10.md). That guide also
+lists expected intermediate output, known limitations, and the development-only
+trusted-setup warning.
+
+Review findings and reproduction failures are welcome through
+[GitHub Issues](https://github.com/wamimi/noir-ckb-verifier/issues).
+
 ## Week 7 scope
 
 - record the exact local toolchain
@@ -117,6 +209,7 @@ schemas/                           Reserved for Molecule schemas used by the ada
 scripts/                           Reproducible build workflow scripts
 tests/fixtures/                    Reviewable cross-implementation test vectors
 toolchains/                        Pinned tool and artifact-provenance records
+rust-toolchain.toml                Pinned Rust host toolchain for adapter/tests
 ```
 
 ## Minimal circuit
