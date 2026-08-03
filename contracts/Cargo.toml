@@ -1,0 +1,16 @@
+[workspace]
+resolver = "2"
+members = ["crates/capsule-binding"]
+
+[workspace.package]
+edition = "2021"
+license = "Apache-2.0"
+
+[profile.release]
+overflow-checks = true
+strip = true
+codegen-units = 1
+debug = false
+opt-level = "z"
+lto = true
+panic = "abort"

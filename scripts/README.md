@@ -1,3 +1,11 @@
 # Scripts
 
-Reproducible automation will be added only after the manual Week 7 command sequence has been run, retained, and reviewed. This prevents scripts from hiding the artifact provenance and compatibility assumptions being established by the baseline.
+Automation is added only after the corresponding manual command sequence has
+been retained and reviewed. Scripts must preserve the toolchain, artifact
+provenance, and compatibility assumptions established by the evidence logs.
+
+## `build-capsule-binding.sh`
+
+Builds the Week 10 Capsule binding Type Script as a stripped
+`riscv64imac-unknown-none-elf` release binary using the separately pinned
+contract workspace and lockfile.

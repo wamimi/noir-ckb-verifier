@@ -1,0 +1,16 @@
+[package]
+name = "capsule-binding"
+version = "0.1.0"
+description = "CKB Type Script binding Groth16 public inputs to a Capsule Cell transition"
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+ckb-gen-types = { version = "=1.1.0", default-features = false }
+ckb-hash = { version = "=1.1.0", default-features = false, features = ["ckb-contract"] }
+ckb-std = "=1.1.0"
+wire-decode = { git = "https://github.com/CECILIA-MULANDI/groth16-ckb", rev = "d64c769ffe2d2edb5eb308dc59058efda77c2f83" }
+
+[features]
+library = []
