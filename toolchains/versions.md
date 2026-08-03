@@ -123,3 +123,34 @@ The pinned snarkjs invocation identified itself as `snarkjs@0.7.5`. Its
 `--version` form also printed the full command help and returned exit code 99,
 so the evidence records that output as version identification rather than a
 successful version command.
+
+## Week 10 CKB-VM pins
+
+The Week 10 Capsule fixture retains the Week 8 and Week 9 compiler, backend,
+snarkjs, arkworks, and `groth16-ckb` revisions above. The host integration
+workspace was checked with:
+
+```text
+rustc 1.95.0 (59807616e 2026-04-14)
+cargo 1.95.0 (f2d3ce0bd 2026-03-21)
+```
+
+The separate no-std contract workspace pins:
+
+| Component | Pinned version/source |
+|---|---|
+| Contract Rust | `1.94.1` |
+| RISC-V target | `riscv64imac-unknown-none-elf` |
+| `ckb-std` | `1.1.0` |
+| `ckb-gen-types` | `1.1.0` |
+| `ckb-hash` | `1.1.0` |
+| `wire-decode` | Git revision `d64c769ffe2d2edb5eb308dc59058efda77c2f83` |
+
+The contract lockfile is 5,835 bytes with SHA-256
+`22749bccbd156bd7a408e0c6dd8608a7c92b99b76cca181e8867b82ff2ab5aff`.
+The resulting 28,032-byte Capsule binding RISC-V binary has SHA-256
+`6ccc3e145c55c7b2b4f5eb62d79b1174b602f0adc5dab9e0196b4754ed218962`.
+
+The expanded host workspace lockfile, including `ckb-testtool`, is 67,131
+bytes with SHA-256
+`0615a881dde5a10fd62c13beef8335c532af1f152aa7051cd0467e4a9b0d1d82`.

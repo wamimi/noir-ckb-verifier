@@ -13,7 +13,7 @@ generic verifier code Cell
   + application Type Script rules
 ```
 
-## Proposed pipeline
+## Implemented experimental pipeline
 
 ```text
 Noir source (.nr)
@@ -104,6 +104,22 @@ Molecule provides deterministic framing. It does not establish cryptographic val
 
 The application layer derives the expected public inputs from the actual transaction. A valid proof is accepted only if its public inputs match the consumed and created Capsule Cells and the chosen replay domain.
 
+The Week 10 prototype composes two scripts on the same Capsule input:
+
+```text
+lock: pinned groth16-ckb verifier
+  -> verifies the proof against the public vector and VK data hash
+
+type: capsule-binding
+  -> derives that public vector from type args and old/new Cell data
+  -> requires one Capsule group input and one group output
+  -> requires one transaction input and output with the verifier lock
+```
+
+Both scripts decode the same `WitnessArgs.input_type` payload. The additional
+group-shape checks prevent a second same-lock input or second Capsule input from
+creating ambiguity about which transaction input owns that witness.
+
 ## Why the Barretenberg path is only a control
 
 The installed Barretenberg toolchain can demonstrate that the Noir artifact and witness are usable by Noir's common proving path. That result is useful as a control, but it does not produce the BN254 Groth16/arkworks interface consumed by `groth16-ckb`.
@@ -143,9 +159,11 @@ CKB Groth16 compatibility: not established
 
 ### Week 10: proof-bound Capsule
 
-- CKB-VM verification through the production wire decoder
-- transaction-derived public inputs
-- accept the correct transition and reject a valid proof attached to the wrong transition
+- CKB-VM verification through the production wire decoder completed
+- transaction-derived seven-field public tuple completed for the fixed fixture
+- correct transition accepted and valid-proof/wrong-transition cases rejected
+- malformed encodings, missing VK dependency, changed lock, invalid proof, and
+  ambiguous input groups rejected in the expanded 12-case CKB-VM matrix
 
 ## Primary references
 

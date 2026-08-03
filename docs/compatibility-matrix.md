@@ -8,6 +8,8 @@
 
 **Week 9 adapter experiment:** executed and reviewed 27 July 2026
 
+**Week 10 proof-bound Capsule experiment:** executed and reviewed 3 August 2026
+
 Status is evidence-based. “Pending” means the interface is planned or researched but has not yet been reproduced in a retained command record.
 
 | Layer | Artifact | Producer | Consumer | Format / assumptions | Evidence status |
@@ -28,7 +30,10 @@ Status is evidence-based. “Pending” means the interface is planned or resear
 | CKB VK payload | version-1 Molecule VK data | Rust artifact adapter | VK Cell / `groth16-ckb` | Cell data hash committed in script args | 334-byte host payload emitted and decoded; CKB data hash `1fa6f0c18ff7b0d32abcd01ddf2ddcc3e4190be99add55bbf2418f045eb32715`; not yet exercised in CKB-VM |
 | CKB proof payload | version-1 Molecule proof + public inputs | Rust artifact adapter | `WitnessArgs.input_type` / `groth16-ckb` | Public transaction witness, not a private Noir witness | 194-byte host payload emitted; pinned decoder round trip and host verifier passed; malformed version/witness and wrong public input rejected |
 | Mathematical verification | Boolean verifier result | `groth16-ckb` | Capsule protocol | `verify(vk, public_inputs, proof)` | Normal suite: 39 passed; ignored suite: 2 passed including 1,000-sample differential test and cycle benchmark |
-| Application semantics | Transition-bound public inputs | Capsule Type Script | CKB validation | Commitments to actual old/new state, identity, action, and replay domain | Design only; Week 10 |
+| Capsule statement | `proof-bound-capsule` ACIR/R1CS and seven public inputs | Nargo beta.18 + pinned Noir-Groth16 | snarkjs 0.7.5 | Public-first constrained layout; one private authorization witness | Week 10 public vector `[11,65,5,66,1,96,13]` preserved; snarkjs accepts intended vector and rejects three single-field changes |
+| Week 10 CKB wire payload | 526-byte VK Molecule data and 386-byte witness payload | Rust artifact adapter | Pinned `groth16-ckb` decoder and CKB-VM verifier | Seven canonical arkworks `Fr` inputs in fixed semantic order | Host round trip and verification passed; production CKB-VM accepted the Noir-derived proof in `101,576,496` cycles |
+| Capsule binding script | 28,032-byte stripped RISC-V ELF | Rust `1.94.1`, `ckb-std 1.1.0` | CKB-VM | Fixed 65-byte args/data; exact group shapes; preserved verifier lock; transaction-derived public tuple | Built and executed; SHA-256 `6ccc3e145c55c7b2b4f5eb62d79b1174b602f0adc5dab9e0196b4754ed218962` |
+| Application semantics | Transition-bound public inputs | Capsule Type Script | CKB validation | Actual old/new state, Capsule ID, action, nullifiers, and replay domain | Fixed Week 10 fixture completed: correct transition accepted; 11 malformed, invalid, ambiguous, or wrong-transition cases rejected; combined transaction `101,625,705` cycles |
 
 ## Week 8 backend selection
 

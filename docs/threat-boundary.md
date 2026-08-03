@@ -36,7 +36,11 @@ The final Capsule circuit and Type Script design must agree on commitments cover
 - nullifier or equivalent one-time authorization value
 - replay domain, potentially including network/script identity and the consumed OutPoint
 
-The precise hash function, field encoding, domain separators, and OutPoint policy remain design work. They must be specified before Week 10 implementation.
+The Week 10 fixture binds seven explicit field elements using fixed-width
+canonical arkworks scalar encodings. Its arithmetic state fixture and numeric
+replay domain are deliberately minimal. A production hash function, commitment
+scheme, domain separator, network/script identity policy, and consumed-OutPoint
+policy remain design work.
 
 ## Required acceptance tests
 
@@ -78,7 +82,17 @@ The Week 9 public-first fixture crossed this boundary through strict typed
 parsing, arkworks verification, canonical compressed serialization, version-1
 Molecule encoding, pinned endpoint decoding, exact byte comparison, and pinned
 host verification. This is evidence for one fixture, not evidence of arbitrary
-Noir compatibility or CKB-VM execution.
+Noir compatibility. Week 10 separately exercised the seven-input Capsule
+fixture in CKB-VM.
+
+## Witness and script-group ambiguity
+
+The verifier lock and Capsule Type Script intentionally read the same
+`WitnessArgs.input_type` entry. That association would become ambiguous if a
+transaction could add another Capsule group input or another input with the
+same verifier lock. The binding script therefore requires exactly one Capsule
+group input/output and exactly one transaction input/output using that lock.
+The expanded CKB-VM matrix confirmed rejection of both duplicate-input shapes.
 
 ## Public-wire semantic boundary
 
@@ -109,9 +123,9 @@ The CKB-VM verifier has finite cycle and memory limits. The Week 7 evidence reco
 - CKB devnet deployment
 - indefinite fuzzing
 - final Capsule commitment design
-- CKB-VM execution of the Noir-derived proof
-- transaction-derived Capsule public inputs
-- correct-transition acceptance and wrong-transition rejection
+- network- and OutPoint-bound replay-domain construction
+- general ACIR public/private witness remapping
+- substituted, well-formed wrong-VK testing for the Week 10 Capsule fixture
 
 ## Reference
 

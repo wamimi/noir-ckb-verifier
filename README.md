@@ -8,16 +8,18 @@ This repository is research infrastructure. It is pre-audit, incomplete, and not
 
 Week 7 established the two ends of the proposed pipeline. Week 8 evaluated a
 pinned ACIR-to-Groth16 backend and isolated a public-wire ordering failure.
-Week 9 implements and verifies the constrained cross-library adapter path:
+Week 9 implemented the constrained cross-library adapter path. Week 10 carries
+the retained fixture through production CKB-VM verification and a
+transaction-aware Capsule binding Type Script:
 
 ```text
 Noir source
   -> version-pinned ACIR artifact and execution witness
   -> pinned ACIR-to-R1CS and BN254 Groth16 experiment
-  -> [Week 9: typed arkworks conversion and Molecule host artifacts]
+  -> typed arkworks conversion and Molecule host artifacts
   -> Molecule-encoded VK Cell data and transaction witness payload
   -> generic groth16-ckb verifier in CKB-VM
-  -> application-specific Capsule transition binding
+  -> application-specific Capsule transition binding in CKB-VM
 ```
 
 The central design rule is:
@@ -83,18 +85,38 @@ Week 9 stops before CKB-VM transaction execution and Capsule transition
 binding. See [`docs/week-09-adapter.md`](docs/week-09-adapter.md) and
 [`evidence/week-09.md`](evidence/week-09.md).
 
+## Week 10: proof-bound Capsule
+
+Week 10 completed the first retained transaction-level vertical slice: a
+Noir-derived proof executes through the production CKB-VM verifier while an
+application Type Script derives the same ordered public inputs from the
+consumed and created Capsule Cells. The decisive security test keeps the proof
+valid while changing the Cell transition and requires the transaction to fail.
+
+The intended transition was accepted, while all 11 negative CKB-VM cases were
+rejected at the expected verifier or binding boundary. This includes changed
+state, identity, and replay-domain fields; invalid proof and malformed data;
+and ambiguous Capsule or verifier-lock input groups. The explicit public tuple
+and design are specified in
+[`docs/week-10-proof-bound-capsule.md`](docs/week-10-proof-bound-capsule.md),
+with exact commands, exit codes, hashes, and cycle evidence in
+[`evidence/week-10.md`](evidence/week-10.md).
+
 ## Repository layout
 
 ```text
 circuits/square-root/              Minimal compatibility circuit and development inputs
 circuits/square-root-public-first/ Week 8 public-wire compatibility control
-crates/artifact-adapter/    Typed snarkjs-to-arkworks and CKB wire adapter
-docs/                       Architecture, compatibility, and threat-boundary notes
-evidence/                   Reproducible command/result records
-schemas/                    Reserved for Molecule schemas used by the adapter
-scripts/                    Reproducible workflow scripts added after manual baselines
-tests/fixtures/             Small, reviewable cross-implementation test vectors
-toolchains/                 Pinned tool and artifact-provenance records
+circuits/proof-bound-capsule/      Week 10 transition-aware Noir fixture
+contracts/crates/capsule-binding/  CKB Type Script that binds public inputs to Cells
+crates/artifact-adapter/           Typed snarkjs-to-arkworks and CKB wire adapter
+crates/ckb-integration-tests/      CKB-VM verifier and Capsule transaction harness
+docs/                              Architecture, compatibility, and threat-boundary notes
+evidence/                          Reproducible command/result records
+schemas/                           Reserved for Molecule schemas used by the adapter
+scripts/                           Reproducible build workflow scripts
+tests/fixtures/                    Reviewable cross-implementation test vectors
+toolchains/                        Pinned tool and artifact-provenance records
 ```
 
 ## Minimal circuit
@@ -118,7 +140,9 @@ artifact structure, [`docs/ckb-endpoint.md`](docs/ckb-endpoint.md) for the CKB
 verifier reproduction, [`evidence/week-07.md`](evidence/week-07.md) for the
 endpoint baseline, [`evidence/week-08.md`](evidence/week-08.md) for the
 Groth16 experiment, and [`evidence/week-09.md`](evidence/week-09.md) for the
-adapter and host wire-boundary results.
+adapter and host wire-boundary results, and
+[`evidence/week-10.md`](evidence/week-10.md) for the proof-bound CKB-VM
+transaction matrix.
 
 ## References
 
