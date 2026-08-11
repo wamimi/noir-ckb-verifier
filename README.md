@@ -157,8 +157,12 @@ cargo +1.95.0 build --locked --release \
 ```
 
 The proof setup uses public development entropy and is unsuitable for
-production. Clean-clone and hosted CI results are not implied by the retained
-local run.
+production. The retained local run covers the complete packaged command path.
+The separate
+[hosted retained-fixture workflow](https://github.com/wamimi/noir-ckb-verifier/actions/runs/31522089140)
+passed the host checks, both RISC-V script builds, and 12-case CKB-VM matrix on
+11 August 2026. A clean-clone reviewer run of the complete `build`, `prove`,
+and `test` path remains a separate release gate.
 
 ## Week 7 scope
 

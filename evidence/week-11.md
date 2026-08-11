@@ -4,8 +4,10 @@
 
 The `noir-ckb build`, `noir-ckb prove`, and `noir-ckb test` developer-preview
 path passed an evidence-retained run on the primary macOS arm64 development
-checkout on 11 August 2026. Clean-clone and hosted CI results remain separate
-release gates and are not claimed by this record.
+checkout on 11 August 2026. The hosted retained-fixture workflow subsequently
+passed its host checks, two RISC-V builds, and CKB-VM matrix. Clean-clone
+reproduction of the complete packaged command path remains a separate release
+gate and is not claimed by this record.
 
 
 ## Evidence gate
@@ -245,8 +247,31 @@ or CKB-VM regression. It establishes that the hosted Ubuntu runner lacked the
 bare-metal RISC-V C compiler required by the pinned CKB dependency. The
 workflow now installs `gcc-riscv64-unknown-elf`, prints the compiler version,
 and builds the generic verifier and Capsule binding script in separate steps.
-The hosted CI gate remains unverified until a corrected run completes
-successfully.
+The corrected result is retained below.
+
+## Hosted CI attempt 2
+
+Status: **Passed 11 August 2026**
+
+GitHub Actions run
+[`31522089140`](https://github.com/wamimi/noir-ckb-verifier/actions/runs/31522089140)
+tested revision `4d76fabed93a87097b8383c9fbafe7b696de87b2`. GitHub recorded the
+`retained-fixture` job as successful from `18:19:12Z` through `18:21:52Z`.
+Every required step completed successfully:
+
+- checkout through the Node 24-based `actions/checkout@v6` action;
+- installation of the RISC-V bare-metal C compiler;
+- installation of the pinned Rust toolchains;
+- formatting, Clippy, and host tests;
+- checkout of the pinned generic verifier revision;
+- build of the pinned generic verifier RISC-V script;
+- build of the Capsule binding RISC-V script; and
+- execution of the retained 12-case CKB-VM matrix.
+
+This hosted result verifies the checked-in, public, non-secret retained
+fixture on GitHub's Ubuntu runner. It does not claim that CI regenerated a
+fresh trusted setup or exercised the complete `noir-ckb build`, `prove`, and
+`test` sequence from a clean clone.
 
 ## Commands to retain
 

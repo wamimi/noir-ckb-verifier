@@ -7,8 +7,10 @@ definition, and reproduction issue template are present in the working tree.
 The complete `build`, `prove`, and `test` path passed an evidence-retained run
 on the primary macOS arm64 development checkout on 11 August 2026. See
 [`../evidence/week-11.md`](../evidence/week-11.md) for exact artifacts, hashes,
-negative results, and cycle evidence. Clean-clone and hosted CI results remain
-separate gates.
+negative results, and cycle evidence. A hosted retained-fixture workflow also
+passed on 11 August 2026 after its RISC-V C compiler dependency was made
+explicit. Clean-clone reproduction of the complete packaged command path
+remains a separate gate.
 
 The implementation keeps the longer-term production-readiness roadmap outside
 the Week 11 change set. This milestone packages the already verified Week 10
