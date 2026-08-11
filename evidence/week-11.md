@@ -7,8 +7,6 @@ path passed an evidence-retained run on the primary macOS arm64 development
 checkout on 11 August 2026. Clean-clone and hosted CI results remain separate
 release gates and are not claimed by this record.
 
-The production-readiness roadmap is outside this milestone and is not part of
-the Week 11 commit set.
 
 ## Evidence gate
 
