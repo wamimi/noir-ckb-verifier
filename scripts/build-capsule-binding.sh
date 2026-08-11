@@ -4,11 +4,12 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 target="riscv64imac-unknown-none-elf"
 package="capsule-binding"
+toolchain="1.94.1"
 
 export PATH="$HOME/.cargo/bin:$PATH"
 
-if ! rustup target list --installed | grep -q "^${target}$"; then
-  echo "error: rust target ${target} is not installed" >&2
+if ! rustup target list --installed --toolchain "$toolchain" | grep -q "^${target}$"; then
+  echo "error: rust target ${target} is not installed for Rust ${toolchain}" >&2
   exit 1
 fi
 
@@ -17,7 +18,7 @@ rustup_home="${RUSTUP_HOME:-$HOME/.rustup}"
 export RUSTFLAGS="-C target-feature=-a --remap-path-prefix=${cargo_home}/registry/src=/cargo-registry --remap-path-prefix=${rustup_home}/toolchains=/rustup-toolchains --remap-path-prefix=${repo_root}=/build"
 
 cd "$repo_root/contracts"
-cargo build \
+cargo "+${toolchain}" build \
   --locked \
   --release \
   --target "$target" \

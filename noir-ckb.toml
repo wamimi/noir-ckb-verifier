@@ -1,0 +1,52 @@
+version = 1
+profile = "development-only"
+name = "proof-bound-capsule"
+output_dir = "target/noir-ckb/proof-bound-capsule"
+
+[circuit]
+package_dir = "circuits/proof-bound-capsule"
+artifact = "target/proof_bound_capsule.json"
+inputs = "inputs.json"
+expected_noir_version = "1.0.0-beta.18+99bb8b5cf33d7669adbdef096b12d80f30b4c0c9"
+expected_public_names = [
+  "capsule_id",
+  "old_state_commitment",
+  "old_nullifier",
+  "new_state_commitment",
+  "action_id",
+  "new_nullifier",
+  "replay_domain",
+]
+expected_public_values = ["11", "65", "5", "66", "1", "96", "13"]
+expected_private_names = ["authorization_secret"]
+expected_private_values = ["7"]
+
+[repositories]
+noir_groth16 = "../Noir-Groth16"
+noir_groth16_revision = "4b7caace1f2128e454c8d0fe50cac1ec46b1e272"
+groth16_ckb = "../groth16-ckb"
+groth16_ckb_revision = "d64c769ffe2d2edb5eb308dc59058efda77c2f83"
+
+[tools]
+nargo_version = "1.0.0-beta.18"
+snarkjs_version = "0.7.5"
+host_rust_toolchain = "1.95.0"
+contract_rust_toolchain = "1.94.1"
+ckb_target = "riscv64imac-unknown-none-elf"
+
+[binding]
+action = "update"
+public_sources = [
+  "type_args.capsule_id",
+  "input_cell.data.state_commitment",
+  "input_cell.data.nullifier",
+  "output_cell.data.state_commitment",
+  "constant.update_action_id",
+  "output_cell.data.nullifier",
+  "type_args.replay_domain",
+]
+negative_public = [
+  "tests/fixtures/week-10-capsule/wrong-new-state-public.json",
+  "tests/fixtures/week-10-capsule/wrong-capsule-id-public.json",
+  "tests/fixtures/week-10-capsule/wrong-replay-domain-public.json",
+]
