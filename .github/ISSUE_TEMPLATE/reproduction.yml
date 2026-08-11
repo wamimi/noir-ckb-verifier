@@ -1,0 +1,62 @@
+name: Developer-preview reproduction
+description: Report a noir-ckb build, prove, or test reproduction result.
+title: "[reproduction]: "
+labels:
+  - reproduction
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing the developer preview. Do not attach private witnesses, secrets, `.ptau` files, or `.zkey` files.
+  - type: dropdown
+    id: command
+    attributes:
+      label: Command
+      options:
+        - noir-ckb build
+        - noir-ckb prove
+        - noir-ckb test
+        - retained Week 10 matrix
+        - another repository command
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system and architecture
+      placeholder: macOS 15 arm64 or Ubuntu 24.04 x86_64
+    validations:
+      required: true
+  - type: textarea
+    id: revisions
+    attributes:
+      label: Source revisions
+      description: Include `git rev-parse HEAD` for noir-ckb-verifier, Noir-Groth16, and groth16-ckb.
+    validations:
+      required: true
+  - type: textarea
+    id: versions
+    attributes:
+      label: Tool versions
+      description: Include Nargo/noirc, Rust/Cargo, Node, and npm versions used by the failing command.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Complete command and output
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: manifest
+    attributes:
+      label: Generated manifest
+      description: Paste the relevant build, proof, or test JSON manifest after removing local-only path information if necessary. Do not include private inputs or setup material.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I have not attached private witnesses, secrets, `.ptau` files, or `.zkey` files.
+          required: true

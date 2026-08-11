@@ -1,0 +1,54 @@
+name: Developer preview
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  retained-fixture:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out noir-ckb-verifier
+        uses: actions/checkout@v4
+
+      - name: Install pinned Rust toolchains
+        run: |
+          rustup toolchain install 1.95.0 --profile minimal
+          rustup component add --toolchain 1.95.0 rustfmt clippy
+          rustup toolchain install 1.94.1 --profile minimal \
+            --target riscv64imac-unknown-none-elf
+
+      - name: Check formatting, lint, and host tests
+        run: |
+          cargo +1.95.0 fmt --all -- --check
+          cargo +1.95.0 check --locked --workspace --all-targets
+          cargo +1.95.0 clippy --locked --workspace --all-targets -- -D warnings
+          cargo +1.95.0 test --locked --workspace
+
+      - name: Check out the pinned generic verifier
+        run: |
+          git clone https://github.com/CECILIA-MULANDI/groth16-ckb.git \
+            "$RUNNER_TEMP/groth16-ckb"
+          git -C "$RUNNER_TEMP/groth16-ckb" checkout --detach \
+            d64c769ffe2d2edb5eb308dc59058efda77c2f83
+
+      - name: Build both CKB scripts
+        run: |
+          RUSTUP_TOOLCHAIN=1.94.1 \
+            "$RUNNER_TEMP/groth16-ckb/scripts/build-ckb-script.sh"
+          ./scripts/build-capsule-binding.sh
+
+      - name: Run the retained 12-case CKB-VM matrix
+        env:
+          GROTH16_CKB_SCRIPT_BIN: ${{ runner.temp }}/groth16-ckb/script/target/riscv64imac-unknown-none-elf/release/ckb-script
+          CKB_CAPSULE_BINDING_SCRIPT_BIN: ${{ github.workspace }}/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding
+        run: |
+          cargo +1.95.0 test --locked \
+            -p ckb-integration-tests \
+            --test capsule_transition \
+            -- --ignored --nocapture
