@@ -131,7 +131,7 @@ rustup target list --toolchain 1.94.1 --installed | \
 ```bash
 cd "$GROTH16_CKB_REPO"
 
-./scripts/build-ckb-script.sh
+RUSTUP_TOOLCHAIN=1.94.1 ./scripts/build-ckb-script.sh
 
 ls -lh script/target/riscv64imac-unknown-none-elf/release/ckb-script
 file script/target/riscv64imac-unknown-none-elf/release/ckb-script

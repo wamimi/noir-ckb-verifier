@@ -73,14 +73,15 @@ Build the two CKB scripts:
 
 ```bash
 cd groth16-ckb
-./scripts/build-ckb-script.sh
+RUSTUP_TOOLCHAIN=1.94.1 ./scripts/build-ckb-script.sh
 
 cd ../noir-ckb-verifier
 ./scripts/build-capsule-binding.sh
 ```
 
-Run the host checks. The normal suite should pass 11 host tests and list 14
-binary-dependent CKB-VM tests as ignored:
+Run the host checks. With the Week 11 candidate present, the normal suite is
+expected to pass 14 host tests and list 14 binary-dependent CKB-VM tests as
+ignored:
 
 ```bash
 cargo fmt --all -- --check
@@ -123,6 +124,41 @@ trusted-setup warning.
 
 Review findings and reproduction failures are welcome through
 [GitHub Issues](https://github.com/wamimi/noir-ckb-verifier/issues).
+
+## Week 11 developer preview
+
+Week 11 packages the verified Week 10 sequence behind a constrained alpha
+command surface:
+
+```bash
+noir-ckb build
+noir-ckb prove
+noir-ckb test
+```
+
+The packaged path passed an evidence-retained run on the primary macOS arm64
+development checkout. It checks the pinned repositories and tools, fails
+closed on public/private witness-order mismatches, creates a fresh
+development-only proof, converts it to the CKB wire format, and supplies it to
+the existing CKB-VM transaction matrix. The fresh-proof run accepted the
+intended transition and rejected all 11 negative cases. The checked-in project
+and binding configuration is [`noir-ckb.toml`](noir-ckb.toml); command behavior
+and output layout are documented in
+[`crates/noir-ckb-cli/README.md`](crates/noir-ckb-cli/README.md).
+
+```bash
+cargo +1.95.0 build --locked --release \
+  -p noir-ckb-cli \
+  --bin noir-ckb
+
+./target/release/noir-ckb build
+./target/release/noir-ckb prove
+./target/release/noir-ckb test
+```
+
+The proof setup uses public development entropy and is unsuitable for
+production. Clean-clone and hosted CI results are not implied by the retained
+local run.
 
 ## Week 7 scope
 
@@ -203,6 +239,7 @@ circuits/proof-bound-capsule/      Week 10 transition-aware Noir fixture
 contracts/crates/capsule-binding/  CKB Type Script that binds public inputs to Cells
 crates/artifact-adapter/           Typed snarkjs-to-arkworks and CKB wire adapter
 crates/ckb-integration-tests/      CKB-VM verifier and Capsule transaction harness
+crates/noir-ckb-cli/               Week 11 build/prove/test developer preview
 docs/                              Architecture, compatibility, and threat-boundary notes
 evidence/                          Reproducible command/result records
 schemas/                           Reserved for Molecule schemas used by the adapter
@@ -235,7 +272,8 @@ endpoint baseline, [`evidence/week-08.md`](evidence/week-08.md) for the
 Groth16 experiment, and [`evidence/week-09.md`](evidence/week-09.md) for the
 adapter and host wire-boundary results, and
 [`evidence/week-10.md`](evidence/week-10.md) for the proof-bound CKB-VM
-transaction matrix.
+transaction matrix. Week 11 packaged-command evidence is recorded in
+[`evidence/week-11.md`](evidence/week-11.md).
 
 ## References
 

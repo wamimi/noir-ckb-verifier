@@ -154,3 +154,38 @@ The resulting 28,032-byte Capsule binding RISC-V binary has SHA-256
 The expanded host workspace lockfile, including `ckb-testtool`, is 67,131
 bytes with SHA-256
 `0615a881dde5a10fd62c13beef8335c532af1f152aa7051cd0467e4a9b0d1d82`.
+
+## Week 11 developer-preview pins
+
+The Week 11 `noir-ckb` CLI retains the Week 8 through Week 10 compiler,
+backend, proof-system, adapter, and CKB endpoint pins. Its checked-in
+configuration additionally requires:
+
+| Component | Pinned version/source |
+|---|---|
+| `noir-ckb` | `0.1.0-alpha.1` |
+| host Rust | `1.95.0` |
+| contract Rust | `1.94.1` |
+| CKB target | `riscv64imac-unknown-none-elf` |
+| Nargo/noirc | `1.0.0-beta.18` / source `99bb8b5cf33d7669adbdef096b12d80f30b4c0c9` |
+| Noir-Groth16 | `4b7caace1f2128e454c8d0fe50cac1ec46b1e272` |
+| snarkjs | `0.7.5` |
+| groth16-ckb | `d64c769ffe2d2edb5eb308dc59058efda77c2f83` |
+| TOML parser | `toml 0.8.23` |
+
+The corrected macOS arm64 release binary was 2,691,568 bytes with SHA-256:
+
+```text
+239c2b376d3d16cdb5055be79f76c40fa71b60acc9822f892258139fb65cfd53
+```
+
+After adding the CLI and its TOML dependency, the root lockfile is 69,398
+bytes with SHA-256:
+
+```text
+cb64a1322e006d83f64cdcd9b2abab44e7494947a381aadba9ea2c3e0773dfb1
+```
+
+The packaged proof command uses a power-12 BN254 setup with public development
+entropy. This setup is intentionally not a production trust assumption or a
+production ceremony.

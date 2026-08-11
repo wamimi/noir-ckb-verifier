@@ -1,4 +1,18 @@
-# Week 11 developer preview plan
+# Week 11 developer preview
+
+## Implementation status
+
+The CLI, checked-in development configuration, JSON manifest types, CI
+definition, and reproduction issue template are present in the working tree.
+The complete `build`, `prove`, and `test` path passed an evidence-retained run
+on the primary macOS arm64 development checkout on 11 August 2026. See
+[`../evidence/week-11.md`](../evidence/week-11.md) for exact artifacts, hashes,
+negative results, and cycle evidence. Clean-clone and hosted CI results remain
+separate gates.
+
+The implementation keeps the longer-term production-readiness roadmap outside
+the Week 11 change set. This milestone packages the already verified Week 10
+path without changing its circuit, proof, adapter, or transaction semantics.
 
 ## Objective
 
@@ -16,7 +30,7 @@ developer preview that makes the supported path repeatable without requiring a
 reviewer to manually coordinate Nargo, Noir-Groth16, snarkjs, the Rust adapter,
 two RISC-V builds, and CKB-VM environment variables.
 
-## Proposed command contract
+## Command contract
 
 ### `noir-ckb build`
 
@@ -110,6 +124,31 @@ source = "type_args.replay_domain"
 This is a design candidate, not a committed stable schema. Week 11 should test
 whether the manifest can drive both transaction construction and negative-test
 generation before its field names are stabilized.
+
+The first checked-in draft is the `[binding]` section of
+[`../noir-ckb.toml`](../noir-ckb.toml). It records the action and ordered Cell
+or Type Script source for every public field. The alpha integration harness
+still implements the corresponding fixed Capsule transaction layout; making
+the schema generic is outside this milestone.
+
+## Output layout
+
+Each invocation uses a new run identifier instead of overwriting a previous
+result:
+
+```text
+target/noir-ckb/proof-bound-capsule/
+  current-build.json
+  current-proof.json
+  current-test.json
+  builds/<run-id>/build-manifest.json
+  proofs/<run-id>/proof-manifest.json
+  tests/<run-id>/test-report.json
+```
+
+The `current-*.json` files point to the latest completed stage. Later commands
+must load and validate the preceding manifest rather than guessing an artifact
+path.
 
 ## Deliverables
 
