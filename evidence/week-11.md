@@ -225,6 +225,29 @@ status did not expose generated setup, proof, witness, adapter, or test-report
 files because all remained below ignored `target/` paths. The separately
 drafted production-readiness roadmap remained untracked and outside Week 11.
 
+## Hosted CI attempt 1
+
+Status: **Failed at a missing runner dependency; diagnosed 11 August 2026**
+
+GitHub Actions run
+[`31521030261`](https://github.com/wamimi/noir-ckb-verifier/actions/runs/31521030261)
+tested revision `650d62f154e221c834f744626c2f81f281d9a4f6`. Repository checkout,
+Rust toolchain installation, formatting, Clippy, all host tests, and checkout
+of the pinned generic verifier passed. The combined CKB-script build step then
+returned exit code `101` while compiling `ckb-std` for the generic verifier:
+
+```text
+error occurred in cc-rs: failed to find tool "riscv64-unknown-elf-gcc"
+```
+
+The retained failure therefore does not establish a proof, adapter, contract,
+or CKB-VM regression. It establishes that the hosted Ubuntu runner lacked the
+bare-metal RISC-V C compiler required by the pinned CKB dependency. The
+workflow now installs `gcc-riscv64-unknown-elf`, prints the compiler version,
+and builds the generic verifier and Capsule binding script in separate steps.
+The hosted CI gate remains unverified until a corrected run completes
+successfully.
+
 ## Commands to retain
 
 Run from the repository root:

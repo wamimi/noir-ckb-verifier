@@ -14,7 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out noir-ckb-verifier
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Install the RISC-V bare-metal C compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes gcc-riscv64-unknown-elf
+          riscv64-unknown-elf-gcc --version
 
       - name: Install pinned Rust toolchains
         run: |
@@ -37,10 +43,13 @@ jobs:
           git -C "$RUNNER_TEMP/groth16-ckb" checkout --detach \
             d64c769ffe2d2edb5eb308dc59058efda77c2f83
 
-      - name: Build both CKB scripts
+      - name: Build the pinned generic verifier script
         run: |
           RUSTUP_TOOLCHAIN=1.94.1 \
             "$RUNNER_TEMP/groth16-ckb/scripts/build-ckb-script.sh"
+
+      - name: Build the Capsule binding script
+        run: |
           ./scripts/build-capsule-binding.sh
 
       - name: Run the retained 12-case CKB-VM matrix
