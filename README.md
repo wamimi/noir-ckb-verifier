@@ -125,6 +125,26 @@ trusted-setup warning.
 Review findings and reproduction failures are welcome through
 [GitHub Issues](https://github.com/wamimi/noir-ckb-verifier/issues).
 
+## Week 12 reviewer path
+
+Week 12 closes the CKBuilder milestone around reproducibility and external
+direction review. The shortest test is now one command after cloning the pinned
+generic verifier and installing the documented Rust toolchains:
+
+```bash
+./scripts/reviewer-smoke.sh
+```
+
+The script records provenance, runs the host checks, builds both RISC-V scripts,
+and executes the retained 12-case CKB-VM matrix. It does not regenerate private
+witness or trusted-setup material. Complete setup instructions, expected output,
+the full generated-proof alternative, and the support boundary are in the
+[`reviewer quickstart`](docs/reviewer-quickstart.md).
+
+The local Week 12 results and pending external reproduction are recorded in
+[`evidence/week-12.md`](evidence/week-12.md). Any alpha release remains gated
+on at least one successful independent clean-clone reproduction.
+
 ## Week 11 developer preview
 
 Week 11 packages the verified Week 10 sequence behind a constrained alpha
