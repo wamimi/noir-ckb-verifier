@@ -107,8 +107,12 @@ requires:
 
 - Nargo/noirc `1.0.0-beta.18`;
 - Node.js and `npx`;
-- Noir-Groth16 at
-  `4b7caace1f2128e454c8d0fe50cac1ec46b1e272` beside this repository.
+- The maintained Noir-Groth16 fork at
+  `828025f3a0090e2934940956c0f5dc8093eb5532` beside this repository.
+
+Follow the [current generated-proof setup](current-generated-proof-workflow.md)
+to obtain that exact checkout. The retained smoke path above does not use this
+backend and does not test the new layout correction.
 
 After installing those dependencies:
 
@@ -132,13 +136,16 @@ ckb_vm_cases_passed=12
 ```
 
 The generated setup uses public development entropy and must not be used in
-production. Exact setup and dependency instructions are retained in
-[`reproducing-week-10.md`](reproducing-week-10.md).
+production. Current setup instructions are in
+[the generated-proof guide](current-generated-proof-workflow.md); the original
+Week 10 procedure is retained in [`reproducing-week-10.md`](reproducing-week-10.md).
 
 ## Supported boundary
 
-The current alpha supports one checked-in, public-first
-`proof-bound-capsule` circuit and exact pinned toolchain. It deliberately rejects
-the private-first regression whose Groth16 public vector disagrees with Noir's
-ABI. It does not yet support arbitrary Noir circuits, production commitment and
+The current application harness supports the checked-in
+`proof-bound-capsule` circuit and exact pinned toolchain. The patched backend has
+additional private-first, public-first and interleaved scalar layout evidence.
+The toolkit still rejects any public vector that disagrees with the configured
+Noir statement, including the historical private-value exposure. It does not
+yet support arbitrary Noir circuits, production commitment and
 replay constructions, a production trusted setup, deployment, or an audit.

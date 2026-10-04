@@ -3,6 +3,13 @@
 `noir-ckb` coordinates the repository's pinned, development-only path from the
 supported Noir Capsule circuit to a proof-bound transaction test in CKB-VM.
 
+The active backend is the maintained `wamimi/Noir-Groth16` fork at
+`828025f3a0090e2934940956c0f5dc8093eb5532`. See the
+[current setup and migration guide](../../docs/current-generated-proof-workflow.md).
+The clean-checkout and exact-revision checks remain enabled. Historical build
+manifests from the old pin must be replaced by a fresh `build` followed by
+`prove` and `test`; existing run directories are retained.
+
 The preview requires Rust 1.95.0 for the host tools, Rust 1.94.1 with the CKB
 RISC-V target for the scripts, Nargo/noirc 1.0.0-beta.18, Node.js with `npx`,
 and clean checkouts of the two pinned external repositories. The first snarkjs

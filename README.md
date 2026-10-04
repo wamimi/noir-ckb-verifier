@@ -6,6 +6,15 @@ An experimental toolchain for turning Noir circuits into CKB-deployable Groth16 
 
 This repository is research infrastructure. It is pre-audit, incomplete, and not suitable for production or mainnet use.
 
+The active generated-proof workflow now pins the maintained
+[Noir-Groth16 fork](https://github.com/wamimi/Noir-Groth16) at
+`828025f3a0090e2934940956c0f5dc8093eb5532`. It incorporates the tested Week 14
+visibility-layout correction. Follow the [current generated-proof setup](docs/current-generated-proof-workflow.md)
+for `noir-ckb build`, `prove`, and `test`. Historical Week 8–12 pins and results
+below are retained as evidence, not instructions to replace the active pin.
+The normal application harness remains Capsule-specific; scalar ordering tests
+do not imply arbitrary Noir application support.
+
 Week 7 established the two ends of the proposed pipeline. Week 8 evaluated a
 pinned ACIR-to-Groth16 backend and isolated a public-wire ordering failure.
 Week 9 implemented the constrained cross-library adapter path. Week 10 carries
@@ -80,7 +89,7 @@ cd ../noir-ckb-verifier
 ```
 
 Run the host checks. With the Week 11 candidate present, the normal suite is
-expected to pass 14 host tests and list 14 binary-dependent CKB-VM tests as
+expected to pass the host tests and list 14 binary-dependent CKB-VM tests as
 ignored:
 
 ```bash

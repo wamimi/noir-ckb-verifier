@@ -2,6 +2,19 @@
 
 Artifact compatibility is treated as part of the protocol surface. Every retained artifact must identify the exact tool and version that produced it.
 
+## Active Week 14 generated-proof pin
+
+- Backend fork: https://github.com/wamimi/Noir-Groth16
+- Revision: `828025f3a0090e2934940956c0f5dc8093eb5532`
+- Original project: https://github.com/jamesbachini/Noir-Groth16
+- Base revision: `4b7caace1f2128e454c8d0fe50cac1ec46b1e272`
+
+The active `noir-ckb.toml` uses the fork revision. Older sections retain the
+versions used for their historical results. Noir beta.18, snarkjs 0.7.5, host
+Rust 1.95.0, contract Rust 1.94.1 and the CKB verifier revision are unchanged.
+Follow [current setup](../docs/current-generated-proof-workflow.md); regenerate
+builds, development setup keys and proofs instead of reusing old manifests.
+
 ## Week 7 pin
 
 The Week 7 Noir compatibility fixture is pinned to:

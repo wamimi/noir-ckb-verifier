@@ -1,5 +1,10 @@
 # Reproducing the Week 10 proof-bound Capsule
 
+This is a historical reproduction guide with the original backend pin. For the
+active fork-pinned CLI workflow, use [current generated-proof setup](current-generated-proof-workflow.md).
+Do not switch an active Week 14 checkout back to the historical backend to run
+the current `noir-ckb.toml` configuration.
+
 This guide reproduces the first retained Noir-to-CKB transaction-level vertical
 slice. It provides two paths:
 
