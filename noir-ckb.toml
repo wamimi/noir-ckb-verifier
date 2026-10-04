@@ -23,7 +23,8 @@ expected_private_values = ["7"]
 
 [repositories]
 noir_groth16 = "../Noir-Groth16"
-noir_groth16_revision = "4b7caace1f2128e454c8d0fe50cac1ec46b1e272"
+# Maintained fork: https://github.com/wamimi/Noir-Groth16
+noir_groth16_revision = "828025f3a0090e2934940956c0f5dc8093eb5532"
 groth16_ckb = "../groth16-ckb"
 groth16_ckb_revision = "d64c769ffe2d2edb5eb308dc59058efda77c2f83"
 

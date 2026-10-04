@@ -792,6 +792,13 @@ fn validate_contract_rust(loaded: &LoadedConfig) -> Result<(), CliError> {
 
 fn validate_noir_artifact(loaded: &LoadedConfig, path: &Path) -> Result<(), CliError> {
     let artifact: NoirArtifact = read_json(path)?;
+    validate_noir_artifact_description(loaded, &artifact)
+}
+
+fn validate_noir_artifact_description(
+    loaded: &LoadedConfig,
+    artifact: &NoirArtifact,
+) -> Result<(), CliError> {
     if artifact.noir_version != loaded.config.circuit.expected_noir_version {
         return Err(CliError::Compatibility(format!(
             "Noir artifact version mismatch: expected {}, observed {}",
@@ -1150,7 +1157,7 @@ mod tests {
     }
 
     #[test]
-    fn semantic_gate_accepts_public_first_witness() {
+    fn semantic_gate_accepts_visibility_ordered_witness() {
         let r1cs = R1csDescription {
             n_vars: 4,
             n_outputs: 0,
@@ -1163,7 +1170,7 @@ mod tests {
     }
 
     #[test]
-    fn semantic_gate_rejects_private_first_witness() {
+    fn semantic_gate_rejects_historical_private_value_exposure() {
         let r1cs = R1csDescription {
             n_vars: 4,
             n_outputs: 0,
@@ -1176,6 +1183,72 @@ mod tests {
         assert!(error
             .to_string()
             .contains("R1CS leading public wires mismatch"));
+    }
+
+    #[test]
+    fn semantic_gate_preserves_distinct_interleaved_public_values() {
+        let mut config = loaded();
+        config.config.circuit.expected_public_values = vec!["49".into(), "121".into()];
+        config.config.circuit.expected_private_values = vec!["7".into(), "11".into()];
+        let r1cs = R1csDescription {
+            n_vars: 5,
+            n_outputs: 0,
+            n_pub_inputs: 2,
+            n_prv_inputs: 2,
+            n_constraints: 4,
+        };
+        let mut witness = vec![
+            "1".into(),
+            "49".into(),
+            "121".into(),
+            "7".into(),
+            "11".into(),
+        ];
+        validate_r1cs_and_witness(&config, &r1cs, &witness).unwrap();
+        witness.swap(1, 2);
+        assert!(validate_r1cs_and_witness(&config, &r1cs, &witness).is_err());
+    }
+
+    #[test]
+    fn abi_gate_accepts_both_scalar_visibility_orders() {
+        for private_first in [false, true] {
+            let mut parameters = vec![
+                serde_json::json!({"name": "public", "visibility": "public", "type": {"kind": "field"}}),
+                serde_json::json!({"name": "private", "visibility": "private", "type": {"kind": "field"}}),
+            ];
+            if private_first {
+                parameters.reverse();
+            }
+            let artifact: NoirArtifact = serde_json::from_value(serde_json::json!({
+                "noir_version": "test",
+                "abi": {"parameters": parameters, "return_type": null}
+            }))
+            .unwrap();
+            validate_noir_artifact_description(&loaded(), &artifact).unwrap();
+        }
+    }
+
+    #[test]
+    fn abi_gate_rejects_arrays_structs_and_returns() {
+        for kind in ["array", "struct"] {
+            let artifact: NoirArtifact = serde_json::from_value(serde_json::json!({
+                "noir_version": "test", "abi": { "return_type": null,
+                "parameters": [{"name": "public", "visibility": "public", "type": {"kind": kind}}] }
+            }))
+            .unwrap();
+            assert!(validate_noir_artifact_description(&loaded(), &artifact)
+                .unwrap_err()
+                .to_string()
+                .contains("only Field"));
+        }
+        let artifact: NoirArtifact = serde_json::from_value(serde_json::json!({
+            "noir_version": "test", "abi": {"parameters": [], "return_type": {"kind": "field"}}
+        }))
+        .unwrap();
+        assert!(validate_noir_artifact_description(&loaded(), &artifact)
+            .unwrap_err()
+            .to_string()
+            .contains("return values are not supported"));
     }
 
     #[test]
