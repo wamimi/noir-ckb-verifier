@@ -124,8 +124,30 @@ The CKB-VM verifier has finite cycle and memory limits. The Week 7 evidence reco
 - indefinite fuzzing
 - final Capsule commitment design
 - network- and OutPoint-bound replay-domain construction
-- general ACIR public/private witness remapping
-- substituted, well-formed wrong-VK testing for the Week 10 Capsule fixture
+- wider Noir/ACIR support beyond the tested Week 14 scalar visibility remapping
+- deployment admission that authenticates verifier identity and executable upgrade policy
+
+## Reproduced binding limits (2026-10-06)
+
+The [protection inventory](binding-protection-inventory.md) and
+[binding evidence](../evidence/binding-review.md) supersede the former missing
+well-formed wrong-VK test item: substitution now rejects at identity lookup, and
+an old proof under a rebound different valid-point key rejects cryptographically.
+Two isolated check mutations are detected by their targeted VM tests.
+
+The same proof nevertheless accepts at another input OutPoint with the same
+statement, with altered capacity, or with an unrelated output. The numeric domain
+is not full replay protection. The Type also accepts an invalid proof if attached
+to identical always-success input/output Locks: continuity does not authenticate
+the intended verifier. The configured fixture uses the correct verifier, but
+the Type alone is not a production proof-enforcement boundary. Its initial Cell
+is injected by testtool; no supported on-chain initialization is demonstrated.
+
+A separate fresh Noir fixture confirmed that an unused declared public scalar
+is cryptographically bound in the pinned lowering/snarkjs/arkworks/CKB path.
+That result does not supply script-side context derivation, and Capsule's schema
+was not changed. Proposed context and upgrade choices are in the
+[binding specification](binding-profile-v1.md).
 
 ## Reference
 

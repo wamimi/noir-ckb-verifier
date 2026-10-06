@@ -120,6 +120,19 @@ Both scripts decode the same `WitnessArgs.input_type` payload. The additional
 group-shape checks prevent a second same-lock input or second Capsule input from
 creating ambiguity about which transaction input owns that witness.
 
+### Current composition and context limits
+
+The seven fields bind selected args/data, not the consumed OutPoint or complete
+transaction. Capacity and unrelated outputs are excluded. The Type checks that
+the successor Lock matches the input Lock, but does not authenticate that Lock
+as the intended verifier. Correct verifier/VK admission is therefore a composition
+assumption, not a property of the Type alone. Creation/destruction are unsupported.
+These limitations are now demonstrated by the
+[binding boundary tests](../evidence/binding-review.md). See the
+[proposed profile](binding-profile-v1.md) for witness ownership, exact identity
+semantics and future context choices. No Spawn/IPC integration is needed for the
+current two-script composition.
+
 ## Why the Barretenberg path is only a control
 
 The installed Barretenberg toolchain can demonstrate that the Noir artifact and witness are usable by Noir's common proving path. That result is useful as a control, but it does not produce the BN254 Groth16/arkworks interface consumed by `groth16-ckb`.

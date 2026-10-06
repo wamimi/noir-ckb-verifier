@@ -41,6 +41,26 @@ proof verifies the intended CKB state transition
 
 The generic verifier can establish `verify(vk, public_inputs, proof)`. The consuming protocol must additionally prove that those public inputs commit to the exact old Cell, new Cell, Capsule identity, action, and replay domain represented by the transaction.
 
+## Binding guarantees and current limits
+
+The [protection inventory](docs/binding-protection-inventory.md) traces the
+current statement, scripts and tests. The [binding validation](evidence/binding-review.md)
+adds explicit proof-reuse tests and two isolated RISC-V check mutations. It
+confirms selected-field comparison and cryptographic public-input binding while
+also demonstrating excluded OutPoint, capacity and unrelated-output changes.
+The Type preserves the supplied Lock but does not authenticate it as the intended
+verifier; the configured composition is essential. Creation/destruction remain
+unsupported by the Capsule Type.
+
+The [proposed v1 binding specification](docs/binding-profile-v1.md) separates the
+current seven-field profile from future context changes. The
+[Arthur–Cecilia review](docs/arthur-cecilia-binding-review.md) compares responsibilities
+at the pinned CellScript revision and recommends a bounded future Battleship
+direction. No schema, script-placement or transaction-architecture change was
+made by that work.
+The new target adds 21 explicitly run VM tests (ignored by the default host
+suite); the existing CLI transition matrix remains 12 cases.
+
 ## Try the Week 10 developer preview
 
 The fastest reviewer path uses the retained public development proof and runs
