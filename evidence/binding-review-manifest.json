@@ -1,0 +1,210 @@
+{
+  "toolkit_revision": "090461a901ac569e3331ded05fc4c3896f0457c5",
+  "backend_revision": "828025f3a0090e2934940956c0f5dc8093eb5532",
+  "verifier_revision": "d64c769ffe2d2edb5eb308dc59058efda77c2f83",
+  "cellscript_revision": "35bf983db30aae80281f97e30bbce08a878d7c58",
+  "validation": {
+    "status": "passed",
+    "protected_before": {
+      "/Users/xiaomao/noir-ckb-verifier/contracts/crates/capsule-binding/src/main.rs": "244252322841d49625b2ec431d6c2c9fe7d624a89421d8b5ad98b5227483c499",
+      "/Users/xiaomao/groth16-ckb/script/target/riscv64imac-unknown-none-elf/release/ckb-script": "9a6ed1137687a8d55037488bbdafa7d1f60aacc771d87ef82dde1a2023e011f8",
+      "/Users/xiaomao/noir-ckb-verifier/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding": "6ccc3e145c55c7b2b4f5eb62d79b1174b602f0adc5dab9e0196b4754ed218962"
+    },
+    "fixture": "/Users/xiaomao/noir-ckb-verifier/target/noir-ckb/proof-bound-capsule/proofs/1791143299589/fixture",
+    "fixture_hashes": {
+      "verification_key.json": "7b893a440f539488d0e938af03b9543ae98b3b94107d59ad7929e85c255142d8",
+      "wrong-capsule-id-public.json": "948764a87743f517e72ab115113beac0cae1db97214de10dc066ba30991accbb",
+      "wrong-new-state-public.json": "0fa76bcc458e982d4737999db88cd1d995d23853daa2e0919a6758e5ade822f1",
+      "wrong-replay-domain-public.json": "bcf49057589b5b116b679d8384df36b76a86d2de1fdb62b4d67261e4764066ce",
+      "public.json": "ad6f5ea7390ce0b72d6741fd1f24299008f992f6da56dd9ffa5e184c90cd2b08",
+      "proof.json": "57d3b27ad7f6794d00c6b0c251474048c444b594742a0e0d680dc7c71794bc9f"
+    },
+    "test_source_sha256": "0c1407e529aecc20367516ee063cf10d5eec093ac33233bb3e5c882eb24c7051",
+    "runner_sha256": "e0eb6f6fb63a4af3f1257b398e27898bdbcf8ffa3abf175dd743b542bef16987",
+    "binaries": {
+      "baseline": {
+        "path": "/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-02/baseline/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding",
+        "sha256": "6ccc3e145c55c7b2b4f5eb62d79b1174b602f0adc5dab9e0196b4754ed218962",
+        "bytes": 28032,
+        "source_sha256": "244252322841d49625b2ec431d6c2c9fe7d624a89421d8b5ad98b5227483c499",
+        "rustflags": "-C target-feature=-a --remap-path-prefix=/Users/xiaomao/.cargo/registry/src=/cargo-registry --remap-path-prefix=/Users/xiaomao/.rustup/toolchains=/rustup-toolchains --remap-path-prefix=/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-02/baseline=/build"
+      },
+      "new-state-comparison": {
+        "path": "/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-02/new-state-comparison/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding",
+        "sha256": "074bd5759af35f216ee4014be970432c4d9913a1289b5ed725ca8fcffc214f27",
+        "bytes": 28096,
+        "source_sha256": "96ec9d355e9580006415d73e581d33c5a5d5487f923db615f305c3fe5660286c",
+        "rustflags": "-C target-feature=-a --remap-path-prefix=/Users/xiaomao/.cargo/registry/src=/cargo-registry --remap-path-prefix=/Users/xiaomao/.rustup/toolchains=/rustup-toolchains --remap-path-prefix=/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-02/new-state-comparison=/build"
+      },
+      "lock-input-cardinality": {
+        "path": "/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-02/lock-input-cardinality/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding",
+        "sha256": "0ee031cc801b0fe80d0243c64f8ac3068c254afb7ea0a753807bc3fd04dfbfa7",
+        "bytes": 28024,
+        "source_sha256": "b0f264ac4e0ee5a58ab5fba639409a0873153f94bd48c61715f538a0cf9ae835",
+        "rustflags": "-C target-feature=-a --remap-path-prefix=/Users/xiaomao/.cargo/registry/src=/cargo-registry --remap-path-prefix=/Users/xiaomao/.rustup/toolchains=/rustup-toolchains --remap-path-prefix=/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-02/lock-input-cardinality=/build"
+      }
+    },
+    "mutations": [
+      {
+        "name": "new-state-comparison",
+        "test": "valid_proof_and_wrong_new_state_reject",
+        "detected": "missing check allowed transaction; expect_err failed"
+      },
+      {
+        "name": "lock-input-cardinality",
+        "test": "duplicate_verifier_lock_input_rejects_witness_ambiguity",
+        "detected": "missing check allowed transaction; expect_err failed"
+      }
+    ],
+    "revision": "090461a901ac569e3331ded05fc4c3896f0457c5",
+    "initial_status": " M README.md\n M docs/architecture.md\n M docs/threat-boundary.md\n?? crates/ckb-integration-tests/tests/binding_boundaries.rs\n?? docs/arthur-cecilia-binding-review.md\n?? docs/binding-profile-v1.md\n?? docs/binding-protection-inventory.md\n?? docs/production-readiness-roadmap.md\n?? docs/week-12-and-post-program-direction-brief.md\n?? docs/week-13-sp1-evaluation.md\n?? evidence/binding-review-manifest.json\n?? evidence/binding-review.md\n?? evidence/week-13.md\n?? scripts/check-binding-boundaries.py\n?? scripts/check-public-input-binding.py\n",
+    "protected_after": {
+      "/Users/xiaomao/noir-ckb-verifier/contracts/crates/capsule-binding/src/main.rs": "244252322841d49625b2ec431d6c2c9fe7d624a89421d8b5ad98b5227483c499",
+      "/Users/xiaomao/groth16-ckb/script/target/riscv64imac-unknown-none-elf/release/ckb-script": "9a6ed1137687a8d55037488bbdafa7d1f60aacc771d87ef82dde1a2023e011f8",
+      "/Users/xiaomao/noir-ckb-verifier/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding": "6ccc3e145c55c7b2b4f5eb62d79b1174b602f0adc5dab9e0196b4754ed218962"
+    }
+  },
+  "public_probe": {
+    "status": "passed",
+    "profile": "public-development-only-unused-public-probe",
+    "ptau": "/Users/xiaomao/noir-ckb-verifier/target/noir-ckb/proof-bound-capsule/proofs/1791143299589/groth16/pot12_final.ptau",
+    "ptau_sha256": "9f4a804834540389ff684ca19b2ad7b54648cc57750c20e8d8c8b82efcdc9b10",
+    "verifier_sha256": "9a6ed1137687a8d55037488bbdafa7d1f60aacc771d87ef82dde1a2023e011f8",
+    "backend_revision": "828025f3a0090e2934940956c0f5dc8093eb5532",
+    "nargo_version": "nargo version = 1.0.0-beta.18\nnoirc version = 1.0.0-beta.18+99bb8b5cf33d7669adbdef096b12d80f30b4c0c9\n(git version hash: 99bb8b5cf33d7669adbdef096b12d80f30b4c0c9, is dirty: false)\n",
+    "backend_binary_sha256": "91e1519440bff862cac32e912457d5cd7f806a00bb52c462223ccfa3e11bc62f",
+    "artifacts": {
+      "verification_key.json": "f30c5be2b02bf3248c84308f4be22eacfadb4b749d6b7b3a4568623fb71b54a3",
+      "inputs-13.json": "1bfbb06f090652417d95595615e21c104aeb35fde5f346c8f19e21b82b780832",
+      "public-13.json": "7b5eec78d43598c48aded2c509555a955281b9ef6d8d85cafdf87a9f00ec412e",
+      "public-14.json": "7ff1f81b60499e16da379bcffdd608882a6b6209e30a4c7a83ecabbc6aafd779",
+      "development.zkey": "ad13cbfb1a57d31b4ff3fe33b87714dea6dd9689f430f9346017b8dc909d4c51",
+      "inputs-14.json": "eaea1c7ed49e92b8859778743d49ca1d1fbaa55dbacdd87eb9907ca08e7354bb",
+      "proof-14.json": "7410e7af77010722e76db2088750ebf1fb7890bf33b61894613e94bb98bc3df7",
+      "initial.zkey": "11cff2fa8e0d5d928864f52688517efb01bb5f13187d0ed5eb08ee9076caed8c",
+      "proof-13.json": "02813c8a52a03505328b07bc0ed9d4c0fc252711525b037c9efc65fde4ea0361",
+      "interop-13/circuit.r1cs": "8c71b34f7d7c593b1d1ba981602dec4092e5d4b8472aa8445c4f03b8c7810012",
+      "interop-13/witness.json": "953f98aa31b18155f13b95a5d0fc00b571472073269f24e3dfced4bb3fac9d34",
+      "interop-13/r1cs.json": "99859687e104871081f2bb7e3f53e0d33642a2dc988ae2c4983f35d01ac2b32a",
+      "interop-13/witness.wtns": "244f7e337429ede10a50cada01621ac3d7d11a13ae2de37b12767d06c8a5daa4",
+      "interop-14/circuit.r1cs": "8c71b34f7d7c593b1d1ba981602dec4092e5d4b8472aa8445c4f03b8c7810012",
+      "interop-14/witness.json": "00e482fc9c975ee8f60ebfbaffcd4439b1c0e1d0ae1158d98ae0626fe19dd755",
+      "interop-14/r1cs.json": "99859687e104871081f2bb7e3f53e0d33642a2dc988ae2c4983f35d01ac2b32a",
+      "interop-14/witness.wtns": "7af98ff9cca1162603ea7e9ce491e2f2c8b441eb8f79496a543ab110759df4bb",
+      "fixture/verification_key.json": "f30c5be2b02bf3248c84308f4be22eacfadb4b749d6b7b3a4568623fb71b54a3",
+      "fixture/wrong-new-state-public.json": "7ff1f81b60499e16da379bcffdd608882a6b6209e30a4c7a83ecabbc6aafd779",
+      "fixture/public.json": "7b5eec78d43598c48aded2c509555a955281b9ef6d8d85cafdf87a9f00ec412e",
+      "fixture/proof.json": "02813c8a52a03505328b07bc0ed9d4c0fc252711525b037c9efc65fde4ea0361",
+      "circuit/Nargo.toml": "518af48bdacc729ed0f0f8b85f01863108b4d5b68b29e1bb53200fb252b8085f",
+      "circuit/Prover.toml": "02a29bb44357f2a87552e92c4c56a770405ed9d2aae8d3e48b6afd2569f7b8b3",
+      "circuit/target/unused_public.gz": "215d667e0c4229db9da0904ad0187964f6c09b6929df48a249a902eb30949a47",
+      "circuit/target/unused_public.json": "c9eb0cd07743407e050f86e473feea36db0cb21334f74718384b45c3270e56aa",
+      "circuit/src/main.nr": "3dfa1cd3cad3026f219c4cdd4051d033c264282970cdcb696d862a718e80b283",
+      "adapter/public_inputs.bin": "f090a27860cc41c6177e684d9aca384be7baadaeac352d06df4edbb1db358e83",
+      "adapter/vk.bin": "e76798df8931aad81e58f9d12da0a21f954cc43409034bb26fb6faff599de18a",
+      "adapter/vk.mol.bin": "4f80a9875b81e04e0381ef4521274127a0cdf4f955da60253af11aafdca67501",
+      "adapter/proof.bin": "50ab7baf7e42ff2a880e7ddef203cad25f8b3d257c2c32e8ec7978ee35361839",
+      "adapter/vk_data_hash.bin": "0d47f5e5848f9a2f0ded6c3c2ce1b6ac25d53fbb545d81bc64fccdd76361a18d",
+      "adapter/witness.mol.bin": "c601f2b134223e6038ca0af6ac88d04f98a888465d4d289c50df5e5252d51efb"
+    }
+  },
+  "logs": {
+    "target/binding-review-2026-10-06/validation-01/commands.json": "fd0bee056df6928a0ed379a8c4be8b2c78b6bc6af0a467d388c31c27a6ce5134",
+    "target/binding-review-2026-10-06/public-probe-01/commands.json": "695953120567453b2b16c2111e667f11cc3a9ca1a54252a775e7801b50860ab3",
+    "target/binding-review-2026-10-06/quality-01/commands.json": "dc6000d1cc81f0a3a4381168885a355827c3b619eedc9314c08d12fcf1ac2965",
+    "target/binding-review-2026-10-06/validation-02/commands.json": "065dbc16eecd289faadd82a0d28411a73be6be33a4034c3e1c9193540ca0cae8",
+    "target/binding-review-2026-10-06/quality-02/commands.json": "83fcfb68a23df7610526aa2d1e3c778dfd8e67cf713a54e8941b532e77ab9ebe"
+  },
+  "reference_hashes": {
+    "sources.json": "70f13c80e97943865ae6414f3419175e1ad27ca47547601289a24d2c86bc5658",
+    "cellscript-tree.json": "c35ce148ce52323d774420f4cf7b3d21e7980dce3730b8bdd7212f1804551bfc",
+    "forum.json": "dc4a93d973bc5e009c41804321277a8c347a06e2573dd4fcf9550c52a8ce083a",
+    "cellscript/runtime.rs": "95ace8f465e3c160cef2d98ca6d2cbec63258a54e300b7c8e68c8e065731e62b",
+    "cellscript/parent-codegen.rs": "82acdef7e2ff8eb55307813c527290eef2465b599e32a95b5055e15e6b2674b6",
+    "cellscript/crates/cellscript-zk-counter-client/src/lib.rs": "dafe6375a8042c348e8494882103505c1158b0e89477f86a66a690f5926bd17c",
+    "cellscript/crates/cellscript-artifact-checker/src/zk.rs": "c6b9a4aa367a72fd9d77a10f8e3baf9cc178f3585f44f2471cc2ef616cf45635",
+    "cellscript/contracts/zk-transition-verifier/src/main.rs": "46829948aab9814f0b79d65575ffa9e63fa80739d6650f40585e62e51bc0261f",
+    "cellscript/contracts/zk-private-counter/tests/node.rs": "115bd74dec400038e88a4466848c1338508617a1a2f5af82c93622cc933b1058",
+    "cellscript/contracts/zk-private-counter/tests/application.rs": "c7c2bf891534479ef16f95928c1c5cfe53e79bc26b5f7f048e93379a01278f4a",
+    "cellscript/contracts/zk-private-counter/script/src/main.rs": "aa93ec2111125e39d279bb3b9e68c97c4560c05256954b28f7cc1832d7ebaa7e",
+    "cellscript/contracts/zk-private-counter/src/lib.rs": "1ef20bf0858139a7b9300abcec948e960d50e5349f2017cfbd8e2eeaf5ab8ee3",
+    "cellscript/tests/zk_transition.rs": "f15e3eb1a01994efd032c8585ecab7086bebfc04690dfe229710643a59edada9",
+    "cellscript/docs/CELLSCRIPT_ZK_PROFILE.md": "7dd8f0f5613ceaf510b124bb2c56043d3bc7fb42e068d322805170a284464e24",
+    "cellscript/examples/zk/client.ts": "a57d7bb0983db864081b28e222d3cae53b8241ebe526f61fad25e1421fbe36d6",
+    "cellscript/examples/zk/client.test.ts": "ae91a2a771598acb067bb263f7bde4891241b28c1abed1347379cc0953089cb2",
+    "arkworks/r1cs_to_qap.rs": "973bb853b38ea1efe428a77a46778b33b67da0fc909c752f540138defb982ad0",
+    "arkworks/verifier.rs": "9c89522b472b06b7971b6cf15e8456b196ac8d94eee2ae7a667c61f52f0ad469"
+  },
+  "attachment_sha256": "13eab4d5dbc61cdea075ba672b70713a698866e41cff667ff8c275e11834cf25",
+  "source_files": {
+    "scripts/check-binding-boundaries.py": "e0eb6f6fb63a4af3f1257b398e27898bdbcf8ffa3abf175dd743b542bef16987",
+    "scripts/check-public-input-binding.py": "5524d63758591dfd4b05a749adb87695f9fb649967b85546a23e382c17d663b1",
+    "crates/ckb-integration-tests/tests/binding_boundaries.rs": "0c1407e529aecc20367516ee063cf10d5eec093ac33233bb3e5c882eb24c7051"
+  },
+  "initial_validation": {
+    "status": "passed",
+    "protected_before": {
+      "/Users/xiaomao/noir-ckb-verifier/contracts/crates/capsule-binding/src/main.rs": "244252322841d49625b2ec431d6c2c9fe7d624a89421d8b5ad98b5227483c499",
+      "/Users/xiaomao/groth16-ckb/script/target/riscv64imac-unknown-none-elf/release/ckb-script": "9a6ed1137687a8d55037488bbdafa7d1f60aacc771d87ef82dde1a2023e011f8",
+      "/Users/xiaomao/noir-ckb-verifier/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding": "6ccc3e145c55c7b2b4f5eb62d79b1174b602f0adc5dab9e0196b4754ed218962"
+    },
+    "fixture": "/Users/xiaomao/noir-ckb-verifier/target/noir-ckb/proof-bound-capsule/proofs/1791143299589/fixture",
+    "fixture_hashes": {
+      "verification_key.json": "7b893a440f539488d0e938af03b9543ae98b3b94107d59ad7929e85c255142d8",
+      "wrong-capsule-id-public.json": "948764a87743f517e72ab115113beac0cae1db97214de10dc066ba30991accbb",
+      "wrong-new-state-public.json": "0fa76bcc458e982d4737999db88cd1d995d23853daa2e0919a6758e5ade822f1",
+      "wrong-replay-domain-public.json": "bcf49057589b5b116b679d8384df36b76a86d2de1fdb62b4d67261e4764066ce",
+      "public.json": "ad6f5ea7390ce0b72d6741fd1f24299008f992f6da56dd9ffa5e184c90cd2b08",
+      "proof.json": "57d3b27ad7f6794d00c6b0c251474048c444b594742a0e0d680dc7c71794bc9f"
+    },
+    "test_source_sha256": "859cb23c5b6565dd4449544aa70b47cf87e50ceea197970470efed8688f0763b",
+    "runner_sha256": "e0eb6f6fb63a4af3f1257b398e27898bdbcf8ffa3abf175dd743b542bef16987",
+    "binaries": {
+      "baseline": {
+        "path": "/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-01/baseline/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding",
+        "sha256": "6ccc3e145c55c7b2b4f5eb62d79b1174b602f0adc5dab9e0196b4754ed218962",
+        "bytes": 28032,
+        "source_sha256": "244252322841d49625b2ec431d6c2c9fe7d624a89421d8b5ad98b5227483c499",
+        "rustflags": "-C target-feature=-a --remap-path-prefix=/Users/xiaomao/.cargo/registry/src=/cargo-registry --remap-path-prefix=/Users/xiaomao/.rustup/toolchains=/rustup-toolchains --remap-path-prefix=/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-01/baseline=/build"
+      },
+      "new-state-comparison": {
+        "path": "/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-01/new-state-comparison/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding",
+        "sha256": "074bd5759af35f216ee4014be970432c4d9913a1289b5ed725ca8fcffc214f27",
+        "bytes": 28096,
+        "source_sha256": "96ec9d355e9580006415d73e581d33c5a5d5487f923db615f305c3fe5660286c",
+        "rustflags": "-C target-feature=-a --remap-path-prefix=/Users/xiaomao/.cargo/registry/src=/cargo-registry --remap-path-prefix=/Users/xiaomao/.rustup/toolchains=/rustup-toolchains --remap-path-prefix=/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-01/new-state-comparison=/build"
+      },
+      "lock-input-cardinality": {
+        "path": "/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-01/lock-input-cardinality/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding",
+        "sha256": "0ee031cc801b0fe80d0243c64f8ac3068c254afb7ea0a753807bc3fd04dfbfa7",
+        "bytes": 28024,
+        "source_sha256": "b0f264ac4e0ee5a58ab5fba639409a0873153f94bd48c61715f538a0cf9ae835",
+        "rustflags": "-C target-feature=-a --remap-path-prefix=/Users/xiaomao/.cargo/registry/src=/cargo-registry --remap-path-prefix=/Users/xiaomao/.rustup/toolchains=/rustup-toolchains --remap-path-prefix=/Users/xiaomao/noir-ckb-verifier/target/binding-review-2026-10-06/validation-01/lock-input-cardinality=/build"
+      }
+    },
+    "mutations": [
+      {
+        "name": "new-state-comparison",
+        "test": "valid_proof_and_wrong_new_state_reject",
+        "detected": "missing check allowed transaction; expect_err failed"
+      },
+      {
+        "name": "lock-input-cardinality",
+        "test": "duplicate_verifier_lock_input_rejects_witness_ambiguity",
+        "detected": "missing check allowed transaction; expect_err failed"
+      }
+    ],
+    "revision": "090461a901ac569e3331ded05fc4c3896f0457c5",
+    "initial_status": "?? crates/ckb-integration-tests/tests/binding_boundaries.rs\n?? docs/binding-protection-inventory.md\n?? docs/production-readiness-roadmap.md\n?? docs/week-12-and-post-program-direction-brief.md\n?? docs/week-13-sp1-evaluation.md\n?? evidence/week-13.md\n?? scripts/check-binding-boundaries.py\n",
+    "protected_after": {
+      "/Users/xiaomao/noir-ckb-verifier/contracts/crates/capsule-binding/src/main.rs": "244252322841d49625b2ec431d6c2c9fe7d624a89421d8b5ad98b5227483c499",
+      "/Users/xiaomao/groth16-ckb/script/target/riscv64imac-unknown-none-elf/release/ckb-script": "9a6ed1137687a8d55037488bbdafa7d1f60aacc771d87ef82dde1a2023e011f8",
+      "/Users/xiaomao/noir-ckb-verifier/contracts/target/riscv64imac-unknown-none-elf/release/capsule-binding": "6ccc3e145c55c7b2b4f5eb62d79b1174b602f0adc5dab9e0196b4754ed218962"
+    }
+  },
+  "inspected_snarkjs_sources": {
+    "/Users/xiaomao/.npm/_npx/e0177329ee009e97/node_modules/snarkjs/package.json": "5574a6c1e1c4770da0bad3bcd44cc6af8d4a84871802553acb328385294fb084",
+    "/Users/xiaomao/.npm/_npx/e0177329ee009e97/node_modules/snarkjs/src/zkey_new.js": "9afffa3a2df3d6f50f0732cdffc4f384f5c10250f04ea2d81778ecbf98d4bbd2",
+    "/Users/xiaomao/.npm/_npx/e0177329ee009e97/node_modules/snarkjs/src/groth16_prove.js": "36b58c6b524596c009cad1afda4342c4e779965c875ff3b5ad5a0c687cce01f6"
+  }
+}
