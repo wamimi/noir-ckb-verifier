@@ -1,0 +1,5 @@
+[package]
+name = "owned_counter_v1"
+type = "bin"
+authors = []
+[dependencies]
