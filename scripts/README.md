@@ -20,3 +20,14 @@ formatting, lint, and host tests, builds both RISC-V scripts, and executes the
 
 The script uses public fixtures only. It does not regenerate witnesses, Powers
 of Tau transcripts, proving keys, or proofs.
+
+## Owned counter v1
+
+See [the quickstart](../docs/owned-counter-quickstart.md). `fetch-counter-tools.py`
+installs hash-pinned development tools into a new directory. `local-owned-counter.py`
+executes the complete disposable local lifecycle; it signs and broadcasts only on
+its loopback dev chain. `setup-owned-counter.py` generates fresh development setup;
+`owned_counter.py` constructs unsigned transactions, proves, checks and confirms.
+`check-owned-counter.py`, `check-counter-ranges.py` and `mutate-owned-counter.py`
+validate this separate application's exact circuit and Type. No public deployment
+is automatic. Keep private account directories out of evidence.

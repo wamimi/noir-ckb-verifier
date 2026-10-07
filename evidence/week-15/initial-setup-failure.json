@@ -1,0 +1,11 @@
+{
+  "status": "failed",
+  "setup": "PUBLIC DEVELOPMENT ONLY; single-party, public entropy; NOT production",
+  "profile": "noir-ckb/owned-counter/v1",
+  "backend_revision": "828025f3a0090e2934940956c0f5dc8093eb5532",
+  "nargo": "nargo version = 1.0.0-beta.18\nnoirc version = 1.0.0-beta.18+99bb8b5cf33d7669adbdef096b12d80f30b4c0c9\n(git version hash: 99bb8b5cf33d7669adbdef096b12d80f30b4c0c9, is dirty: false)\n",
+  "backend_binary_sha256": "0cc19220ab808415d734120eec9f763df7a6d4f859a758ae81eb23f5ef87cbca",
+  "constraints": 2339,
+  "wires": 2325,
+  "error": "power 10 insufficient for 2339 constraints; snarkjs setup returned zero with ERROR text; no usable zkey"
+}

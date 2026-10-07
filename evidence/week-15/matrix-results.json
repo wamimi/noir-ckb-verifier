@@ -1,0 +1,242 @@
+[
+  {
+    "case": "create-valid.json",
+    "passed": true,
+    "result": "Ok(1748311)"
+  },
+  {
+    "case": "create-nonzero.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Outputs[0].Type, cause: ValidationFailure: see error code 53 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#53 } })"
+  },
+  {
+    "case": "create-wrong-id.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Outputs[0].Type, cause: ValidationFailure: see error code 44 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#44 } })"
+  },
+  {
+    "case": "update-valid.json",
+    "passed": true,
+    "result": "Ok(111247154)"
+  },
+  {
+    "case": "missing-signature.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Lock, cause: ValidationFailure: see error code -2 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-type-hash/9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8.html#-2 } })"
+  },
+  {
+    "case": "wrong-signature.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Lock, cause: ValidationFailure: see error code -31 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-type-hash/9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8.html#-31 } })"
+  },
+  {
+    "case": "invalid-proof-permitted-owner.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 51 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#51 } })"
+  },
+  {
+    "case": "wrong-public-order.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 49 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#49 } })"
+  },
+  {
+    "case": "wrong-successor-state.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 49 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#49 } })"
+  },
+  {
+    "case": "capacity-reduced.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 47 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#47 } })"
+  },
+  {
+    "case": "capacity-increased.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 47 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#47 } })"
+  },
+  {
+    "case": "owner-changed.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 46 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#46 } })"
+  },
+  {
+    "case": "missing-proof.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })"
+  },
+  {
+    "case": "truncated-proof.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })"
+  },
+  {
+    "case": "trailing-proof.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })"
+  },
+  {
+    "case": "proof-in-output-type.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })"
+  },
+  {
+    "case": "proof-wrong-index.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })"
+  },
+  {
+    "case": "other-outpoint-old-vector.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 49 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#49 } })"
+  },
+  {
+    "case": "other-outpoint-recomputed-old-proof.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 51 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#51 } })"
+  },
+  {
+    "case": "other-outpoint-fresh-proof.json",
+    "passed": true,
+    "result": "Ok(111231443)"
+  },
+  {
+    "case": "other-operation-old-proof.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 51 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#51 } })"
+  },
+  {
+    "case": "other-operation-fresh-proof.json",
+    "passed": true,
+    "result": "Ok(111230926)"
+  },
+  {
+    "case": "duplicate-output.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })"
+  },
+  {
+    "case": "ambiguous-different-id.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })"
+  },
+  {
+    "case": "substituted-id.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })"
+  },
+  {
+    "case": "destruction.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })"
+  },
+  {
+    "case": "malformed-state.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 43 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#43 } })"
+  },
+  {
+    "case": "unrelated-change-capacity.json",
+    "passed": true,
+    "result": "Ok(111247465)"
+  },
+  {
+    "case": "unrelated-change-data.json",
+    "passed": true,
+    "result": "Ok(111247392)"
+  },
+  {
+    "case": "dependency-order.json",
+    "passed": true,
+    "result": "Ok(111232071)"
+  },
+  {
+    "case": "application-at-index-one.json",
+    "passed": true,
+    "result": "Ok(111229243)"
+  },
+  {
+    "case": "missing-vk.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 50 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#50 } })"
+  },
+  {
+    "case": "wrong-vk.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 50 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#50 } })"
+  },
+  {
+    "case": "duplicate-vk.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 50 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#50 } })"
+  },
+  {
+    "case": "always-success-owner.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 45 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#45 } })"
+  },
+  {
+    "case": "always-success-valid-proof.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 45 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#45 } })"
+  },
+  {
+    "case": "resolved-owner-code-substitution.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 45 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#45 } })"
+  },
+  {
+    "case": "duplicate-input-group.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })"
+  },
+  {
+    "case": "ambiguous-input-identities.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[2].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })"
+  },
+  {
+    "case": "initial-duplicate-output.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Outputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })"
+  },
+  {
+    "case": "initial-owner-substitution.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Outputs[0].Type, cause: ValidationFailure: see error code 46 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#46 } })"
+  },
+  {
+    "case": "initial-unknown-version.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Outputs[0].Type, cause: ValidationFailure: see error code 41 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#41 } })"
+  },
+  {
+    "case": "oversized-witness.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })"
+  },
+  {
+    "case": "wrong-wire-version.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })"
+  },
+  {
+    "case": "input-since-excluded.json",
+    "passed": true,
+    "result": "Ok(111231174)"
+  },
+  {
+    "case": "output-limit.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 52 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#52 } })"
+  },
+  {
+    "case": "input-limit.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 52 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#52 } })"
+  },
+  {
+    "case": "resolved-dependency-limit.json",
+    "passed": true,
+    "result": "Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 52 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#52 } })"
+  }
+]

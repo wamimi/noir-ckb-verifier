@@ -1,0 +1,23 @@
+{
+  "base_revision": "b155300c8145916a485696bf461e36f055bb5135",
+  "files": {
+    "scripts/owned_counter.py": "0be29f7f1741b9399182f8686241b9f4b8541134b5561b461de9a11ac3d1647d",
+    "scripts/local-owned-counter.py": "390e2f59394f272b71897dbf238d0c32001365f916c686d22be67bededc2aa9c",
+    "scripts/setup-owned-counter.py": "7b15a88862b757330ba6d9112661cb42d018b116c9c851afd9442d46418c28bd",
+    "scripts/check-owned-counter.py": "d805030c83e3057da91ce9f25429a5547f5c8ca681e57afbbaf1bb6181dabb63",
+    "scripts/check-counter-ranges.py": "1ab1bf826cbd3ae0b371bb35d7f020428336c50bb3c00551f47ba8d08e0c3b3a",
+    "scripts/mutate-owned-counter.py": "8ca7c017e5dd313b787946166426308b0cf94526ebfadecb94b09d76411b00a5",
+    "scripts/fetch-counter-tools.py": "4032892e2fe37039af0c630e98336f35accc9624cc09d7a693d516dfe35b4bb3",
+    "crates/noir-ckb-cli/src/main.rs": "736ff3be713343cbee9ecb521f55da7473e6749de7ddb68b7afb59a06543b8a1",
+    "crates/ckb-integration-tests/tests/owned_counter.rs": "fcb1f0b0cda3e0810e37de3cd366184517e0723c5f87de758aa472d3823b4e23",
+    "crates/ckb-integration-tests/Cargo.toml": "81625cd98402de7faa54ef1b5e4ef4abc3f3f562a2825c8bf2136d097d54d8d7",
+    "Cargo.lock": "e3d76162ea6a47176c4db473ad2f41396bd4c82a191e87228faabc0a18ba2dd2",
+    "contracts/Cargo.lock": "29ced8a3517f7c28a2db8b2f36ba9679fd3bcaf355c342385c3b96defff32e02",
+    "contracts/Cargo.toml": "8531470d72c23e644041c2dcf3520924c488690be60ec23ac6be580d18544745",
+    "contracts/crates/owned-counter/Cargo.toml": "84b6e4a40564fdb997babe8bdd756bdabf247ed11c846bcc7ee185db23c5e961",
+    "contracts/crates/owned-counter/build.rs": "e200136d4d747561b468558e95f668d07b12c52f46d5966fabbc2c334d4ac1ba",
+    "contracts/crates/owned-counter/src/main.rs": "a993ca4672cfb24d29343bd28930ae5f1011903d0b47a870c4306490f60807f7",
+    "circuits/owned-counter-v1/src/main.nr": "bff8065c9c91536cec884cf798d49a5481f665726575fe3e4adaf0ce8b43b41a",
+    "circuits/owned-counter-v1/Nargo.toml": "27b265c2cc252ca252e5c80d706aa5ecfa482ca0caa82b92e54746d763dd2a63"
+  }
+}

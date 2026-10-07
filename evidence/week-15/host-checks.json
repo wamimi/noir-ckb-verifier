@@ -1,0 +1,61 @@
+[
+  {
+    "command": [
+      "cargo",
+      "+1.95.0",
+      "fmt",
+      "--all",
+      "--check"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "cargo",
+      "+1.95.0",
+      "test",
+      "--locked",
+      "--offline",
+      "--workspace"
+    ],
+    "exit": 0,
+    "stdout": "\nrunning 4 tests\ntest convert::tests::scalar_parser_rejects_noncanonical_decimal_text ... ok\ntest convert::tests::point_parser_rejects_non_affine_marker ... ok\ntest convert::tests::scalar_parser_rejects_modulus_instead_of_reducing_it ... ok\ntest convert::tests::point_parser_rejects_off_curve_coordinates ... ok\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 7 tests\ntest conversion_rejects_public_input_count_mismatch ... ok\ntest conversion_rejects_wrong_protocol ... ok\ntest endpoint_decoder_rejects_truncated_molecule_witness ... ok\ntest endpoint_decoder_rejects_wrong_wire_version ... ok\ntest molecule_round_trip_matches_endpoint_and_verifies ... ok\ntest endpoint_rejects_wrong_public_input_after_wire_round_trip ... ok\ntest retained_proof_verifies_with_49_and_rejects_7 ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 21 tests\ntest baseline_accepts ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest capsule_creation_is_unsupported ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest capsule_destruction_is_unsupported ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest duplicate_capsule_output_rejects ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest duplicate_verifier_lock_input_rejects ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest duplicate_verifier_lock_output_rejects ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest each_cell_statement_field_mismatch_rejects ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest group_witness_at_nonzero_absolute_input_accepts ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest missing_input_type_rejects ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest old_proof_with_each_changed_public_value_rejects_in_verifier ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest old_proof_with_recomputed_valid_operation_rejects ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest proof_at_wrong_absolute_witness_rejects ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest rebound_different_vk_rejects_old_proof ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest same_proof_accepts_at_two_distinct_input_outpoints ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest same_proof_accepts_changed_capacity ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest same_proof_accepts_unrelated_output ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest swapped_public_values_with_matching_cells_reject_in_verifier ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest type_action_comparison_rejects_without_verifier ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest type_alone_does_not_authenticate_verifier_lock ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest well_formed_invalid_proof_rejects ... ignored, requires pinned verifier and Capsule RISC-V binaries\ntest well_formed_substituted_vk_fails_identity ... ignored, requires pinned verifier and Capsule RISC-V binaries\n\ntest result: ok. 0 passed; 0 failed; 21 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 12 tests\ntest changed_verifier_lock_reject ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest duplicate_capsule_input_rejects_group_ambiguity ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest duplicate_verifier_lock_input_rejects_witness_ambiguity ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest invalid_proof_with_matching_changed_transition_rejects_in_verifier ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest malformed_capsule_args_reject ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest malformed_capsule_cell_data_reject ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest missing_vk_cell_rejects_in_verifier ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest truncated_witness_rejects_in_verifier ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest valid_proof_and_correct_capsule_transition_accept ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest valid_proof_and_wrong_capsule_id_reject ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest valid_proof_and_wrong_new_state_reject ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\ntest valid_proof_and_wrong_replay_domain_reject ... ignored, requires the pinned verifier and Capsule binding RISC-V binaries\n\ntest result: ok. 0 passed; 0 failed; 12 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 1 test\ntest owned_counter_matrix ... ignored, requires fresh counter case directory and isolated development key\n\ntest result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 2 tests\ntest altered_new_state_public_input_is_rejected_in_ckb_vm ... ignored, requires GROTH16_CKB_SCRIPT_BIN pointing to the pinned RISC-V verifier\ntest noir_capsule_proof_verifies_in_ckb_vm ... ignored, requires GROTH16_CKB_SCRIPT_BIN pointing to the pinned RISC-V verifier\n\ntest result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 6 tests\ntest workflow::tests::cycle_parser_extracts_matrix_measurement ... ok\ntest workflow::tests::semantic_gate_accepts_visibility_ordered_witness ... ok\ntest workflow::tests::semantic_gate_rejects_historical_private_value_exposure ... ok\ntest workflow::tests::semantic_gate_preserves_distinct_interleaved_public_values ... ok\ntest workflow::tests::abi_gate_rejects_arrays_structs_and_returns ... ok\ntest workflow::tests::abi_gate_accepts_both_scalar_visibility_orders ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.62s\n     Running unittests src/lib.rs (target/debug/deps/artifact_adapter-0ce84a7994e7304d)\n     Running unittests src/main.rs (target/debug/deps/noir_ckb_adapter-631d1f67049655a3)\n     Running tests/interop.rs (target/debug/deps/interop-ca0eecfd58ee6d8a)\n     Running unittests src/lib.rs (target/debug/deps/ckb_integration_tests-197fb8495c3922c1)\n     Running tests/binding_boundaries.rs (target/debug/deps/binding_boundaries-be87e4448e0dbdde)\n     Running tests/capsule_transition.rs (target/debug/deps/capsule_transition-fd52f3f7d70e45d9)\n     Running tests/owned_counter.rs (target/debug/deps/owned_counter-04a70fc7bad589d9)\n     Running tests/verifier_vm.rs (target/debug/deps/verifier_vm-16f27dc86467ab10)\n     Running unittests src/main.rs (target/debug/deps/noir_ckb-6f223fb55ae8043d)\n   Doc-tests artifact_adapter\n   Doc-tests ckb_integration_tests\n"
+  },
+  {
+    "command": [
+      "cargo",
+      "+1.95.0",
+      "clippy",
+      "--locked",
+      "--offline",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.21s\n"
+  },
+  {
+    "command": [
+      "python3",
+      "-m",
+      "py_compile",
+      "scripts/owned_counter.py",
+      "scripts/local-owned-counter.py",
+      "scripts/check-owned-counter.py",
+      "scripts/mutate-owned-counter.py",
+      "scripts/check-counter-ranges.py",
+      "scripts/setup-owned-counter.py",
+      "scripts/fetch-counter-tools.py"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

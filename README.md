@@ -1,5 +1,21 @@
 # noir-ckb-verifier
 
+Week 15 adds a separate **owner-controlled public counter** with proof verification
+in its application Type and a conventional ownership Lock. See the
+[local quickstart](docs/owned-counter-quickstart.md),
+[application specification](docs/week-15-acceptance-spec.md), and
+[testnet operator gates](docs/owned-counter-testnet.md). It is a public
+proof-enforcement example, not a privacy application or general compiler.
+**There is no withdrawal/destruction path: application capacity remains locked.**
+The older Capsule workflow below remains a historical regression fixture.
+
+**Testnet milestone (7 October 2026):** the owned counter's deployment,
+initialization at zero, and proof-authorized update to one were confirmed with
+Cells checked. [Start the developer review](docs/owned-counter-review.md) or
+inspect the [public testnet evidence](evidence/week-15-testnet.md).
+This is a source-based preview; external reproduction is still requested.
+
+
 An experimental toolchain for turning Noir circuits into CKB-deployable Groth16 verification artifacts and binding proofs to typed Cell transitions.
 
 ## Status
@@ -12,8 +28,9 @@ The active generated-proof workflow now pins the maintained
 visibility-layout correction. Follow the [current generated-proof setup](docs/current-generated-proof-workflow.md)
 for `noir-ckb build`, `prove`, and `test`. Historical Week 8–12 pins and results
 below are retained as evidence, not instructions to replace the active pin.
-The normal application harness remains Capsule-specific; scalar ordering tests
-do not imply arbitrary Noir application support.
+The historical build/prove/test harness remains Capsule-specific; the new
+`counter` commands use a separate fixed application profile. Neither path implies
+arbitrary Noir application support.
 
 Week 7 established the two ends of the proposed pipeline. Week 8 evaluated a
 pinned ACIR-to-Groth16 backend and isolated a public-wire ordering failure.
@@ -44,7 +61,7 @@ The generic verifier can establish `verify(vk, public_inputs, proof)`. The consu
 ## Binding guarantees and current limits
 
 The [protection inventory](docs/binding-protection-inventory.md) traces the
-current statement, scripts and tests. The [binding validation](evidence/binding-review.md)
+historical Capsule statement, scripts and tests. The [binding validation](evidence/binding-review.md)
 adds explicit proof-reuse tests and two isolated RISC-V check mutations. It
 confirms selected-field comparison and cryptographic public-input binding while
 also demonstrating excluded OutPoint, capacity and unrelated-output changes.

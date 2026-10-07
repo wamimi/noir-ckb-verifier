@@ -1,0 +1,58 @@
+{
+  "create": {
+    "tx_status": {
+      "block_hash": "0xd7bfc7c3629526683c2317b116ef7d2f3640e185502a72b7a27305403b2d1a88",
+      "block_number": "0x9",
+      "reason": null,
+      "status": "committed",
+      "tx_index": "0x1"
+    },
+    "application_outpoint": {
+      "tx_hash": "0xca66fa28446bee0808eb8e9cb41a3d9f24d9d86fc8a5be579d1271393b826c55",
+      "index": "0x0"
+    },
+    "observed_output": {
+      "capacity": "0x4a817c800",
+      "lock": {
+        "args": "0x7a45b8ada22b986dc5345a11d150ad4dca99f2fd",
+        "code_hash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+        "hash_type": "type"
+      },
+      "type": {
+        "args": "0x01ab2be29f3cfdb5e2df5299fb12910dc58c3968401baf3253b33f6f7dcdbf0432",
+        "code_hash": "0x6e36a1d931cabb18faeb28ed80f22777b367ab4c259bbec1c1101dfaed275f94",
+        "hash_type": "data1"
+      }
+    },
+    "observed_data": "0x010000000000000000",
+    "live_status": "unknown"
+  },
+  "update": {
+    "tx_status": {
+      "block_hash": "0x07e6e39578d11818674364b623ee8fbdeda0d9570a7131be2f98062c9e7fa59f",
+      "block_number": "0xf",
+      "reason": null,
+      "status": "committed",
+      "tx_index": "0x1"
+    },
+    "application_outpoint": {
+      "tx_hash": "0xaa0f80ad03e3b7650254b737226fb32a31e1c027e74c09509efcd009e3d6fd6a",
+      "index": "0x0"
+    },
+    "observed_output": {
+      "capacity": "0x4a817c800",
+      "lock": {
+        "args": "0x7a45b8ada22b986dc5345a11d150ad4dca99f2fd",
+        "code_hash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+        "hash_type": "type"
+      },
+      "type": {
+        "args": "0x01ab2be29f3cfdb5e2df5299fb12910dc58c3968401baf3253b33f6f7dcdbf0432",
+        "code_hash": "0x6e36a1d931cabb18faeb28ed80f22777b367ab4c259bbec1c1101dfaed275f94",
+        "hash_type": "data1"
+      }
+    },
+    "observed_data": "0x010100000000000000",
+    "live_status": "live"
+  }
+}

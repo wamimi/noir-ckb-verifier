@@ -1,0 +1,43 @@
+{
+  "profile": "noir-ckb/owned-counter/v1",
+  "policy": {
+    "profile": "noir-ckb/owned-counter/v1",
+    "network_domain": "0x72cfc87b8d9a9b4bb2907023ce4d6ace82350f97035187f176b659f802cec01c",
+    "owner_code_hash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+    "owner_data_hash": "0x709f3fda12f561cfacf92273c57a98fede188a3f1a59b1f888d113f9cce08649",
+    "owner_dep": {
+      "out_point": {
+        "tx_hash": "0x7cca5c3925f07a1440ed38a4688497c8f3035673bae5b0df5cb7585fc50e2c02",
+        "index": "0x0"
+      },
+      "dep_type": "dep_group"
+    },
+    "vk_data_hash": "0x685bc8cd974970ba3a030025f683c7fd6fce0715c2e9f286660634a8b35058fe"
+  },
+  "setup": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup",
+  "artifacts": {
+    "type": {
+      "path": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/owned-counter",
+      "sha256": "07494c88be73b006d929509702a6c52db2f8a2f96f8135953efdbaa2876c1677",
+      "data_hash": "0xd834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737",
+      "bytes": 113320
+    },
+    "vk": {
+      "path": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/vk.mol.bin",
+      "sha256": "6ca575a28d52d017e81bf1d60c27d11036d6fb0baefe1fca4041519c1df643e1",
+      "data_hash": "0x685bc8cd974970ba3a030025f683c7fd6fce0715c2e9f286660634a8b35058fe",
+      "bytes": 430
+    }
+  },
+  "development_only": true,
+  "source_sha256": {
+    "contracts/Cargo.toml": "8531470d72c23e644041c2dcf3520924c488690be60ec23ac6be580d18544745",
+    "contracts/Cargo.lock": "29ced8a3517f7c28a2db8b2f36ba9679fd3bcaf355c342385c3b96defff32e02",
+    "contracts/crates/owned-counter/Cargo.toml": "84b6e4a40564fdb997babe8bdd756bdabf247ed11c846bcc7ee185db23c5e961",
+    "contracts/crates/owned-counter/build.rs": "e200136d4d747561b468558e95f668d07b12c52f46d5966fabbc2c334d4ac1ba",
+    "contracts/crates/owned-counter/src/main.rs": "a993ca4672cfb24d29343bd28930ae5f1011903d0b47a870c4306490f60807f7",
+    "circuits/owned-counter-v1/Nargo.toml": "27b265c2cc252ca252e5c80d706aa5ecfa482ca0caa82b92e54746d763dd2a63",
+    "circuits/owned-counter-v1/src/main.nr": "bff8065c9c91536cec884cf798d49a5481f665726575fe3e4adaf0ce8b43b41a"
+  },
+  "build_log_sha256": "9f81193192ee1ff44793973bcbf745b9b556027d5f14daefafe65ecf80e66bef"
+}

@@ -1,0 +1,133 @@
+{
+  "profile": "noir-ckb/owned-counter/v1",
+  "network": "0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606",
+  "original_release_sha256": "6d659fc15c73c9cee8e3ed2a1de68415cd2b07e0fb9d14d9d857025ce381c887",
+  "source_base_revision": "b155300c8145916a485696bf461e36f055bb5135",
+  "source_status": "uncommitted implementation; base revision alone is insufficient",
+  "deployed_source_sha256": {
+    "contracts/Cargo.toml": "8531470d72c23e644041c2dcf3520924c488690be60ec23ac6be580d18544745",
+    "contracts/Cargo.lock": "29ced8a3517f7c28a2db8b2f36ba9679fd3bcaf355c342385c3b96defff32e02",
+    "contracts/crates/owned-counter/Cargo.toml": "84b6e4a40564fdb997babe8bdd756bdabf247ed11c846bcc7ee185db23c5e961",
+    "contracts/crates/owned-counter/build.rs": "e200136d4d747561b468558e95f668d07b12c52f46d5966fabbc2c334d4ac1ba",
+    "contracts/crates/owned-counter/src/main.rs": "a993ca4672cfb24d29343bd28930ae5f1011903d0b47a870c4306490f60807f7",
+    "circuits/owned-counter-v1/Nargo.toml": "27b265c2cc252ca252e5c80d706aa5ecfa482ca0caa82b92e54746d763dd2a63",
+    "circuits/owned-counter-v1/src/main.nr": "bff8065c9c91536cec884cf798d49a5481f665726575fe3e4adaf0ce8b43b41a"
+  },
+  "policy": {
+    "profile": "noir-ckb/owned-counter/v1",
+    "network_domain": "0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606",
+    "owner_code_hash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+    "owner_data_hash": "0x709f3fda12f561cfacf92273c57a98fede188a3f1a59b1f888d113f9cce08649",
+    "owner_dep": {
+      "out_point": {
+        "tx_hash": "0xf8de3bb47d055cdf460d93a2a6e1b05f7432f9777c8c474abf4eec1d4aee5d37",
+        "index": "0x0"
+      },
+      "dep_type": "dep_group"
+    },
+    "vk_data_hash": "0x685bc8cd974970ba3a030025f683c7fd6fce0715c2e9f286660634a8b35058fe"
+  },
+  "development_only": true,
+  "artifacts": {
+    "type": {
+      "sha256": "1bb0449d63dc4c8e0f321bbe3dfbb4cafb790cad2d407ab489444d45fe8b3ed3",
+      "data_hash": "0x79d7e7614ff1689cb6c6fbbd376ab2fa959dc92394abea35cbafb1bd2b7d0a88",
+      "bytes": 113320
+    },
+    "vk": {
+      "sha256": "6ca575a28d52d017e81bf1d60c27d11036d6fb0baefe1fca4041519c1df643e1",
+      "data_hash": "0x685bc8cd974970ba3a030025f683c7fd6fce0715c2e9f286660634a8b35058fe",
+      "bytes": 430
+    }
+  },
+  "transactions": {
+    "deployment": {
+      "hash": "0x0ee39d547101eb348bc72a93f9a08b301353267487f3061f54a0070c44f27ad1",
+      "raw_json_sha256": "cd0fbff364211232fef841126246487dc024a318f1189f1dff6a13646aae1598",
+      "original_receipt_sha256": "4b64744eb891ac08dbf502dd60cd0a75f7e5225f5a73e9351b42e5f8f6c06cb2"
+    },
+    "creation": {
+      "hash": "0x57ee42444304f1c1508c1b6136c4e1c33adb1ff8086eb885bd5abdd5080b269b",
+      "raw_json_sha256": "bd0d6f948ad0827a8ae7768f4d44991935e4da638a0e5cc71cd406b7b2244db0",
+      "original_receipt_sha256": "b3affdfbc58acda1c66d4d72b8421d2fb8480802906866dd7e43e60b926df73f"
+    },
+    "update": {
+      "hash": "0x24a336fbc09ea5330b83adcbaaf17e6eaafcb21776e13df6ec01d00daa613bb6",
+      "raw_json_sha256": "3151c10291b75cfe7381e2a8ab5fc3bf89f7f77575fe15cce7997db85a30bf2e",
+      "original_receipt_sha256": "c3c40fb51a1e308330c76e6dd8ce80c280c423834ea4483927c7da88c01429cf"
+    }
+  },
+  "statement": [
+    "0",
+    "1",
+    "154725372892316643625601094939967772637",
+    "263158646073569369253601295048711988710"
+  ],
+  "proof_witness_sha256": "b48a03c6eba9a6bb6f017422010f464d134f7300bc157c262b25a0f833a950bf",
+  "application": {
+    "initial_outpoint": {
+      "tx_hash": "0x57ee42444304f1c1508c1b6136c4e1c33adb1ff8086eb885bd5abdd5080b269b",
+      "index": "0x0"
+    },
+    "successor_outpoint": {
+      "tx_hash": "0x24a336fbc09ea5330b83adcbaaf17e6eaafcb21776e13df6ec01d00daa613bb6",
+      "index": "0x0"
+    },
+    "type": {
+      "code_hash": "0x79d7e7614ff1689cb6c6fbbd376ab2fa959dc92394abea35cbafb1bd2b7d0a88",
+      "hash_type": "data1",
+      "args": "0x016037891531ed72328710ac5a8e6c8341c05039af411f473eaecd83144b4f4740"
+    },
+    "owner": {
+      "code_hash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+      "hash_type": "type",
+      "args": "0x8fe259ad3dc1d1a8a1a0a798e5b9f898dfc78c77"
+    },
+    "capacity_shannons": 20000000000,
+    "initial_data": "0x010000000000000000",
+    "successor_data": "0x010100000000000000"
+  },
+  "setup": {
+    "setup": "PUBLIC DEVELOPMENT ONLY; single-party, public entropy; NOT production",
+    "backend_revision": "828025f3a0090e2934940956c0f5dc8093eb5532",
+    "nargo": "nargo version = 1.0.0-beta.18\nnoirc version = 1.0.0-beta.18+99bb8b5cf33d7669adbdef096b12d80f30b4c0c9\n(git version hash: 99bb8b5cf33d7669adbdef096b12d80f30b4c0c9, is dirty: false)\n",
+    "constraints": 2339,
+    "wires": 2325,
+    "ptau_power": 13,
+    "artifacts_sha256": {
+      "interop/circuit.r1cs": "843ee202c36a13afece0eb111a83621c7fa9b46078cc6c0148d651e8c4096e43",
+      "development.zkey": "0d6e26824295e3d132470a3e2a6309b391340341b1e0da2d43bc2eaf040e2d79",
+      "phase2.ptau": "9b9cba214fda02253db7cb56a1f9fe66a71aa171c2b1b32bb161db56cb7fd639",
+      "verification_key.json": "455f28fbfa1724897406229ce9f7750eba39daeade121554550aa4a2e295d947"
+    }
+  },
+  "build": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "build",
+      "--locked",
+      "--offline",
+      "--release",
+      "--target",
+      "riscv64imac-unknown-none-elf",
+      "-p",
+      "owned-counter"
+    ],
+    "environment": {
+      "COUNTER_NETWORK_DOMAIN": "0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606",
+      "COUNTER_OWNER_CODE_HASH": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+      "COUNTER_OWNER_DATA_HASH": "0x709f3fda12f561cfacf92273c57a98fede188a3f1a59b1f888d113f9cce08649",
+      "COUNTER_VK_DATA_HASH": "0x685bc8cd974970ba3a030025f683c7fd6fce0715c2e9f286660634a8b35058fe",
+      "CARGO_TARGET_DIR": "<SOURCE>/target/week-15/testnet-artifacts.kPOeOY/build/target",
+      "RUSTFLAGS": "-C target-feature=-a --remap-path-prefix=<CARGO_HOME>/registry/src=/cargo-registry --remap-path-prefix=<RUSTUP_HOME>/toolchains=/rustup-toolchains --remap-path-prefix=<SOURCE>=/build"
+    },
+    "original_log_sha256": "1f9aba6afe3c2ff94906a8af6e6c925833181b506678933c3cb8c35e62a870d6",
+    "path_note": "Path prefixes below are normalized for portability; original build log hash retained."
+  },
+  "public_files_sha256": {
+    "update-public.json": "ca45b4507f182095e7ab7698ffab2c05b52bd502538b6052451d025678005849",
+    "verification-key.snarkjs.json": "455f28fbfa1724897406229ce9f7750eba39daeade121554550aa4a2e295d947",
+    "update-proof.snarkjs.json": "346242a3b9b5014d53f43fcea018d3a078f5bbba6d54c1faa0e42392953c237d"
+  }
+}

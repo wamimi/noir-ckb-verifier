@@ -1,0 +1,44 @@
+{
+  "creation": {
+    "outpoint": {
+      "tx_hash": "0xc604e20c64d731ef9945d0e6d023d7287d031eb2f2c770eb347f53bb6945d67d",
+      "index": "0x0"
+    },
+    "checked_output": {
+      "capacity": "0x4a817c800",
+      "lock": {
+        "code_hash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+        "hash_type": "type",
+        "args": "0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1"
+      },
+      "type": {
+        "code_hash": "0xd834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737",
+        "hash_type": "data1",
+        "args": "0x01ba8405aff46b88f00162e1afb9a4060d7a2341a328b1c6203456265b300b678f"
+      }
+    },
+    "checked_data": "0x010000000000000000",
+    "status": "committed-and-cells-checked"
+  },
+  "update": {
+    "outpoint": {
+      "tx_hash": "0x89e52d3df87ce898fc542000bc81c14142be990abff517019e747f7883e90494",
+      "index": "0x0"
+    },
+    "checked_output": {
+      "capacity": "0x4a817c800",
+      "lock": {
+        "code_hash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+        "hash_type": "type",
+        "args": "0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1"
+      },
+      "type": {
+        "code_hash": "0xd834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737",
+        "hash_type": "data1",
+        "args": "0x01ba8405aff46b88f00162e1afb9a4060d7a2341a328b1c6203456265b300b678f"
+      }
+    },
+    "checked_data": "0x010100000000000000",
+    "status": "committed-and-cells-checked"
+  }
+}

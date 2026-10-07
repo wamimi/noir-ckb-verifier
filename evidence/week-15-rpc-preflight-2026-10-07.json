@@ -1,0 +1,40 @@
+{
+  "command": [
+    "python3",
+    "-B",
+    "scripts/owned_counter.py",
+    "preflight",
+    "--rpc",
+    "https://testnet.ckb.dev",
+    "--genesis",
+    "0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606",
+    "--out",
+    "/Users/xiaomao/noir-ckb-verifier/target/week-15/rpc-preflight-20261007-_4zmw714/policy.json"
+  ],
+  "exit": 0,
+  "stdout": "{\n  \"profile\": \"noir-ckb/owned-counter/v1\",\n  \"network_domain\": \"0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606\",\n  \"owner_code_hash\": \"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8\",\n  \"owner_data_hash\": \"0x709f3fda12f561cfacf92273c57a98fede188a3f1a59b1f888d113f9cce08649\",\n  \"owner_dep\": {\n    \"out_point\": {\n      \"tx_hash\": \"0xf8de3bb47d055cdf460d93a2a6e1b05f7432f9777c8c474abf4eec1d4aee5d37\",\n      \"index\": \"0x0\"\n    },\n    \"dep_type\": \"dep_group\"\n  }\n}\n",
+  "stderr": "",
+  "existing_policy_files_checked": 2,
+  "existing_policies_unchanged": true,
+  "client_sha256": "95b69ffedd56ada275c060c7308a4398b417f250b42dfc05000e67fab2e34e39",
+  "offline_tests": {
+    "command": [
+      "python3",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts/tests",
+      "-p",
+      "test_counter_rpc.py",
+      "-v"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "test_cli_transport_error_is_nonzero_without_traceback_or_policy (test_counter_rpc.RpcTests) ... ok\ntest_existing_policy_is_not_overwritten (test_counter_rpc.RpcTests) ... ok\ntest_genesis_mismatch_still_rejects (test_counter_rpc.RpcTests) ... ok\ntest_headers_payload_timeout_and_default_tls (test_counter_rpc.RpcTests) ... ok\ntest_json_rpc_error_still_rejects (test_counter_rpc.RpcTests) ... ok\ntest_transport_errors_fail_once_with_actionable_safe_message (test_counter_rpc.RpcTests) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.003s\n\nOK\n"
+  },
+  "policy_sha256": "6b9224790410b769ca9e742689faa20bafe5d93fc092c139c1c58e195f27792a",
+  "test_source_sha256": "5b5f2dd494cab884bf05623eb16c6ca179a4e36a7716a1b0c76691e0c24b859e",
+  "scope": "RPC transport fix and read-only testnet preflight only; no signing, broadcasting, funding or deployment. Earlier Week 15 manifests remain historical snapshots."
+}

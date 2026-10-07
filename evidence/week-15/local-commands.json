@@ -1,0 +1,435 @@
+[
+  {
+    "command": [
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/tools-01/ckb-cli_v2.0.0_aarch64-apple-darwin/ckb-cli",
+      "--local-only",
+      "--output-format",
+      "json",
+      "util",
+      "key-info",
+      "--privkey-path",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/private/owner.key"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "{\n  \"address\": {\n    \"mainnet\": \"ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqgzgqz806uveyhm6hzuzhxfhdfws0v2pcg38hl9n\",\n    \"testnet\": \"ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqgzgqz806uveyhm6hzuzhxfhdfws0v2pcgl4us0t\"\n  },\n  \"address(deprecated)\": {\n    \"mainnet\": \"ckb1qyqqysqywl4cejf0h4w9c9wvnw6jaq7c5rss0nftsj\",\n    \"testnet\": \"ckt1qyqqysqywl4cejf0h4w9c9wvnw6jaq7c5rssjkh5uw\"\n  },\n  \"lock_arg\": \"0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1\",\n  \"lock_hash\": \"0x721ef04d85f51ad61e66cad86f6eb02f5edb746318823425d9325403ae80cea2\",\n  \"old-testnet-address\": \"ckt1q9gry5zgqfqqgalt3nyjl02uts2uexa496pa3g8px80fuw\",\n  \"pubkey\": \"02adac1afb198cb147548101104e4a845462b569cfb90485cd9edbb6fb975e3084\"\n}\n",
+    "stderr": "Put this config in < ckb.toml >:\n\n[block_assembler]\ncode_hash = \"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8\"\nhash_type = \"type\"\nargs = \"0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1\"\nmessage = \"0x\"\n\n"
+  },
+  {
+    "command": [
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/tools-01/ckb_v0.210.0_aarch64-apple-darwin-portable/ckb",
+      "-C",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/node",
+      "init",
+      "--chain",
+      "dev",
+      "--rpc-port",
+      "18124",
+      "--p2p-port",
+      "18125",
+      "--genesis-message",
+      "noir-ckb-owned-counter-v1-local-only",
+      "--ba-arg",
+      "0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "Initialized CKB directory in /Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/node\nCreate specs/dev.toml\nCreate ckb.toml\nCreate ckb-miner.toml\nCreate default.db-options\nGenesis Hash: 0x0bbe9a9ac043c838f821251d36b5f2eadd982d6d5aa20ede8d70b6971aed225b\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/owned_counter.py",
+      "preflight",
+      "--rpc",
+      "http://127.0.0.1:18124",
+      "--genesis",
+      "0x72cfc87b8d9a9b4bb2907023ce4d6ace82350f97035187f176b659f802cec01c",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/policy.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "{\n  \"profile\": \"noir-ckb/owned-counter/v1\",\n  \"network_domain\": \"0x72cfc87b8d9a9b4bb2907023ce4d6ace82350f97035187f176b659f802cec01c\",\n  \"owner_code_hash\": \"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8\",\n  \"owner_data_hash\": \"0x709f3fda12f561cfacf92273c57a98fede188a3f1a59b1f888d113f9cce08649\",\n  \"owner_dep\": {\n    \"out_point\": {\n      \"tx_hash\": \"0x7cca5c3925f07a1440ed38a4688497c8f3035673bae5b0df5cb7585fc50e2c02\",\n      \"index\": \"0x0\"\n    },\n    \"dep_type\": \"dep_group\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/setup-owned-counter.py",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup",
+      "--backend",
+      "/Users/xiaomao/Noir-Groth16"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "['git', 'rev-parse', 'HEAD'] 0\n['git', 'status', '--porcelain'] 0\n['nargo', '--version'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 99\n['cargo', '+1.95.0', 'build'] 0\n['nargo', 'compile', '--print-acir'] 0\n['/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/backend-target/debug/noir-cli', 'interop', '/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/circuit/target/owned_counter_v1.json'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 0\n['npx', '--offline', 'snarkjs@0.7.5'] 1\n['npx', '--offline', 'snarkjs@0.7.5'] 1\n['npx', '--offline', 'snarkjs@0.7.5'] 1\n['npx', '--offline', 'snarkjs@0.7.5'] 1\n['cargo', '+1.95.0', 'run'] 0\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/owned_counter.py",
+      "build",
+      "--policy",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/policy.json",
+      "--setup",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/check-counter-ranges.py",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/ranges"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "[\n  {\n    \"case\": \"maximum-valid\",\n    \"fresh_proof\": true,\n    \"passed\": true\n  },\n  {\n    \"case\": \"old-out-of-range\",\n    \"passed\": true,\n    \"fresh_proof\": false,\n    \"boundary\": \"witness constraint solving\"\n  },\n  {\n    \"case\": \"new-overflow\",\n    \"passed\": true,\n    \"fresh_proof\": false,\n    \"boundary\": \"witness constraint solving\"\n  },\n  {\n    \"case\": \"not-increment\",\n    \"passed\": true,\n    \"fresh_proof\": false,\n    \"boundary\": \"witness constraint solving\"\n  },\n  {\n    \"case\": \"context-lo-overflow\",\n    \"passed\": true,\n    \"fresh_proof\": false,\n    \"boundary\": \"witness constraint solving\"\n  },\n  {\n    \"case\": \"context-hi-overflow\",\n    \"passed\": true,\n    \"fresh_proof\": false,\n    \"boundary\": \"witness constraint solving\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/owned_counter.py",
+      "prepare",
+      "deploy",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--rpc",
+      "http://127.0.0.1:18124",
+      "--owner",
+      "0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1",
+      "--funding",
+      "0x9ac320c1908b02875f43846d01d2796ae09389681f704bb1e7bc17bac2ba11f2:0x9",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/deploy.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "{\"transaction_file\": \"/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/deploy.json\", \"fee_shannons\": 1000000, \"signs\": false, \"broadcasts\": false}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/tools-01/ckb-cli_v2.0.0_aarch64-apple-darwin/ckb-cli",
+      "--url",
+      "http://127.0.0.1:18124",
+      "--output-format",
+      "json",
+      "tx",
+      "sign-inputs",
+      "--tx-file",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/deploy.json",
+      "--privkey-path",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/private/owner.key",
+      "--add-signatures",
+      "--skip-check"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "[\n  {\n    \"lock-arg\": \"0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1\",\n    \"signature\": \"0xc21225ca2ffa43f79f569788f2f5387fe3e15cddccbc1d4d8b5ed6557500e7696a069258a9f968f91e98ba039bcc599140ff214ce6acfb8aca1064de8aaf068e01\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/tools-01/ckb-cli_v2.0.0_aarch64-apple-darwin/ckb-cli",
+      "--url",
+      "http://127.0.0.1:18124",
+      "--output-format",
+      "json",
+      "tx",
+      "send",
+      "--tx-file",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/deploy.json",
+      "--skip-check"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "\"0x6259615afe552c1e58c137c3ddf5e3a3e744974d263dec708f28e4b45b705216\"\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/owned_counter.py",
+      "confirm",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--rpc",
+      "http://127.0.0.1:18124",
+      "--tx",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/deploy.json",
+      "--hash",
+      "0x6259615afe552c1e58c137c3ddf5e3a3e744974d263dec708f28e4b45b705216",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/deployment-receipt.json",
+      "--deployment"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "{\n  \"status\": \"committed-and-cells-checked\",\n  \"tx_hash\": \"0x6259615afe552c1e58c137c3ddf5e3a3e744974d263dec708f28e4b45b705216\",\n  \"network\": \"0x72cfc87b8d9a9b4bb2907023ce4d6ace82350f97035187f176b659f802cec01c\",\n  \"release_sha256\": \"0e1cfd6287ea8975072636eba5914af680468e9e3bc7bb2044bcc9cfb5320c32\",\n  \"outputs\": [\n    {\n      \"tx_hash\": \"0x6259615afe552c1e58c137c3ddf5e3a3e744974d263dec708f28e4b45b705216\",\n      \"index\": \"0x0\"\n    },\n    {\n      \"tx_hash\": \"0x6259615afe552c1e58c137c3ddf5e3a3e744974d263dec708f28e4b45b705216\",\n      \"index\": \"0x1\"\n    },\n    {\n      \"tx_hash\": \"0x6259615afe552c1e58c137c3ddf5e3a3e744974d263dec708f28e4b45b705216\",\n      \"index\": \"0x2\"\n    }\n  ],\n  \"type\": {\n    \"tx_hash\": \"0x6259615afe552c1e58c137c3ddf5e3a3e744974d263dec708f28e4b45b705216\",\n    \"index\": \"0x0\"\n  },\n  \"vk\": {\n    \"tx_hash\": \"0x6259615afe552c1e58c137c3ddf5e3a3e744974d263dec708f28e4b45b705216\",\n    \"index\": \"0x1\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/owned_counter.py",
+      "prepare",
+      "create",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--rpc",
+      "http://127.0.0.1:18124",
+      "--owner",
+      "0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1",
+      "--funding",
+      "0x6259615afe552c1e58c137c3ddf5e3a3e744974d263dec708f28e4b45b705216:2",
+      "--deployment",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/deployment-receipt.json",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/create.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "WARNING: no withdrawal/destruction path; application capacity remains locked.\n{\"transaction_file\": \"/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/create.json\", \"fee_shannons\": 1000000, \"signs\": false, \"broadcasts\": false}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/tools-01/ckb-cli_v2.0.0_aarch64-apple-darwin/ckb-cli",
+      "--url",
+      "http://127.0.0.1:18124",
+      "--output-format",
+      "json",
+      "tx",
+      "sign-inputs",
+      "--tx-file",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/create.json",
+      "--privkey-path",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/private/owner.key",
+      "--add-signatures",
+      "--skip-check"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "[\n  {\n    \"lock-arg\": \"0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1\",\n    \"signature\": \"0x4262ff66b92a9b313305516df3dda724f676880ccca9b67e858caafd89846d2523a780470d46fe5ce32d484224eea7c268ca2c3b034ca0114a60f6ae4614d44901\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/tools-01/ckb-cli_v2.0.0_aarch64-apple-darwin/ckb-cli",
+      "--url",
+      "http://127.0.0.1:18124",
+      "--output-format",
+      "json",
+      "tx",
+      "send",
+      "--tx-file",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/create.json",
+      "--skip-check"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "\"0xc604e20c64d731ef9945d0e6d023d7287d031eb2f2c770eb347f53bb6945d67d\"\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/owned_counter.py",
+      "confirm",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--rpc",
+      "http://127.0.0.1:18124",
+      "--tx",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/create.json",
+      "--hash",
+      "0xc604e20c64d731ef9945d0e6d023d7287d031eb2f2c770eb347f53bb6945d67d",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/creation-receipt.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "{\n  \"status\": \"committed-and-cells-checked\",\n  \"tx_hash\": \"0xc604e20c64d731ef9945d0e6d023d7287d031eb2f2c770eb347f53bb6945d67d\",\n  \"network\": \"0x72cfc87b8d9a9b4bb2907023ce4d6ace82350f97035187f176b659f802cec01c\",\n  \"release_sha256\": \"0e1cfd6287ea8975072636eba5914af680468e9e3bc7bb2044bcc9cfb5320c32\",\n  \"outputs\": [\n    {\n      \"tx_hash\": \"0xc604e20c64d731ef9945d0e6d023d7287d031eb2f2c770eb347f53bb6945d67d\",\n      \"index\": \"0x0\"\n    },\n    {\n      \"tx_hash\": \"0xc604e20c64d731ef9945d0e6d023d7287d031eb2f2c770eb347f53bb6945d67d\",\n      \"index\": \"0x1\"\n    }\n  ]\n}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/owned_counter.py",
+      "prepare",
+      "update",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--rpc",
+      "http://127.0.0.1:18124",
+      "--owner",
+      "0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1",
+      "--funding",
+      "0xc604e20c64d731ef9945d0e6d023d7287d031eb2f2c770eb347f53bb6945d67d:1",
+      "--application",
+      "0xc604e20c64d731ef9945d0e6d023d7287d031eb2f2c770eb347f53bb6945d67d:0",
+      "--deployment",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/deployment-receipt.json",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "{\"transaction_file\": \"/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update.json\", \"fee_shannons\": 1000000, \"signs\": false, \"broadcasts\": false}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/owned_counter.py",
+      "prove",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--rpc",
+      "http://127.0.0.1:18124",
+      "--tx",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update.json",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update-proof"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update-proof/transaction.json\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/check-owned-counter.py",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--rpc",
+      "http://127.0.0.1:18124",
+      "--create",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/create.json",
+      "--update",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update-proof/transaction.json",
+      "--proof",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update-proof",
+      "--key",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/private/owner.key",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/matrix"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "prepared create-valid\nprepared create-nonzero\nprepared create-wrong-id\nprepared update-valid\nprepared missing-signature\nprepared wrong-signature\nprepared invalid-proof-permitted-owner\nprepared wrong-public-order\nprepared wrong-successor-state\nprepared capacity-reduced\nprepared capacity-increased\nprepared owner-changed\nprepared missing-proof\nprepared truncated-proof\nprepared trailing-proof\nprepared proof-in-output-type\nprepared proof-wrong-index\nprepared other-outpoint-old-vector\nprepared other-outpoint-recomputed-old-proof\nprepared other-outpoint-fresh-proof\nprepared other-operation-old-proof\nprepared other-operation-fresh-proof\nprepared duplicate-output\nprepared ambiguous-different-id\nprepared substituted-id\nprepared destruction\nprepared malformed-state\nprepared unrelated-change-capacity\nprepared unrelated-change-data\nprepared dependency-order\nprepared application-at-index-one\nprepared missing-vk\nprepared wrong-vk\nprepared duplicate-vk\nprepared always-success-owner\nprepared always-success-valid-proof\nprepared resolved-owner-code-substitution\nprepared duplicate-input-group\nprepared ambiguous-input-identities\nprepared initial-duplicate-output\nprepared initial-owner-substitution\nprepared initial-unknown-version\nprepared oversized-witness\nprepared wrong-wire-version\nprepared input-since-excluded\nprepared output-limit\nprepared input-limit\nprepared resolved-dependency-limit\n\nrunning 1 test\ncreate-valid.json: Ok(1748311)\ncreate-nonzero.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Outputs[0].Type, cause: ValidationFailure: see error code 53 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#53 } })\ncreate-wrong-id.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Outputs[0].Type, cause: ValidationFailure: see error code 44 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#44 } })\nupdate-valid.json: Ok(111247154)\nmissing-signature.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Lock, cause: ValidationFailure: see error code -2 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-type-hash/9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8.html#-2 } })\nwrong-signature.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Lock, cause: ValidationFailure: see error code -31 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-type-hash/9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8.html#-31 } })\ninvalid-proof-permitted-owner.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 51 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#51 } })\nwrong-public-order.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 49 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#49 } })\nwrong-successor-state.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 49 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#49 } })\ncapacity-reduced.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 47 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#47 } })\ncapacity-increased.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 47 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#47 } })\nowner-changed.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 46 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#46 } })\nmissing-proof.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })\ntruncated-proof.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })\ntrailing-proof.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })\nproof-in-output-type.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })\nproof-wrong-index.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })\nother-outpoint-old-vector.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 49 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#49 } })\nother-outpoint-recomputed-old-proof.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 51 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#51 } })\nother-outpoint-fresh-proof.json: Ok(111231443)\nother-operation-old-proof.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 51 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#51 } })\nother-operation-fresh-proof.json: Ok(111230926)\nduplicate-output.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })\nambiguous-different-id.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })\nsubstituted-id.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })\ndestruction.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })\nmalformed-state.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 43 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#43 } })\nunrelated-change-capacity.json: Ok(111247465)\nunrelated-change-data.json: Ok(111247392)\ndependency-order.json: Ok(111232071)\napplication-at-index-one.json: Ok(111229243)\nmissing-vk.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 50 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#50 } })\nwrong-vk.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 50 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#50 } })\nduplicate-vk.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 50 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#50 } })\nalways-success-owner.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 45 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#45 } })\nalways-success-valid-proof.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 45 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#45 } })\nresolved-owner-code-substitution.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 45 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#45 } })\nduplicate-input-group.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })\nambiguous-input-identities.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[2].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })\ninitial-duplicate-output.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Outputs[0].Type, cause: ValidationFailure: see error code 42 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#42 } })\ninitial-owner-substitution.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Outputs[0].Type, cause: ValidationFailure: see error code 46 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#46 } })\ninitial-unknown-version.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Outputs[0].Type, cause: ValidationFailure: see error code 41 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#41 } })\noversized-witness.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })\nwrong-wire-version.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 48 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#48 } })\ninput-since-excluded.json: Ok(111231174)\noutput-limit.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 52 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#52 } })\ninput-limit.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 52 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#52 } })\nresolved-dependency-limit.json: Err(Error { kind: Script, inner: TransactionScriptError { source: Inputs[0].Type, cause: ValidationFailure: see error code 52 on page https://nervosnetwork.github.io/ckb-script-error-codes/by-data-hash/d834acc9f0eded5d5c4391ce50586b7fddddb600c6d85f358669f7dde5bbe737.html#52 } })\ntest owned_counter_matrix ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.05s\n\n    Compiling libc v0.2.189\n   Compiling serde_core v1.0.229\n   Compiling serde v1.0.229\n   Compiling getrandom v0.1.16\n   Compiling thiserror v1.0.69\n   Compiling ppv-lite86 v0.2.21\n   Compiling thiserror-impl v1.0.69\n   Compiling ref-cast v1.0.26\n   Compiling serde_derive_internals v0.30.0\n   Compiling ref-cast-impl v1.0.26\n   Compiling heapsize v0.4.2\n   Compiling dyn-clone v1.0.20\n   Compiling serde_json v1.0.151\n   Compiling siphasher v0.3.11\n   Compiling numext-constructor v0.1.6\n   Compiling schemars_derive v1.2.2\n   Compiling memchr v2.8.3\n   Compiling rand_core v0.5.1\n   Compiling unicode-xid v0.2.6\n   Compiling rand_pcg v0.2.1\n   Compiling rand_chacha v0.2.2\n   Compiling anyhow v1.0.104\n   Compiling derive_more-impl v1.0.0\n   Compiling rand v0.7.3\n   Compiling either v1.17.0\n   Compiling siphasher v1.0.3\n   Compiling fastrand v2.5.0\n   Compiling phf_shared v0.12.1\n   Compiling derive_more v1.0.0\n   Compiling strum_macros v0.27.2\n   Compiling phf_generator v0.12.1\n   Compiling phf_macros v0.12.1\n   Compiling seq-macro v0.3.6\n   Compiling phf v0.12.1\n   Compiling phf_shared v0.8.0\n   Compiling crc32fast v1.5.0\n   Compiling golomb-coded-set v0.2.1\n   Compiling ckb-merkle-mountain-range v0.5.2\n   Compiling merkle-cbt v0.3.2\n   Compiling strum v0.27.2\n   Compiling bit-vec v0.6.3\n   Compiling adler2 v2.0.1\n   Compiling simd-adler32 v0.3.10\n   Compiling miniz_oxide v0.8.9\n   Compiling getrandom v0.2.17\n   Compiling rand_core v0.6.4\n   Compiling bytes v1.12.1\n   Compiling ckb-occupied-capacity-core v1.1.1\n   Compiling rand_chacha v0.3.1\n   Compiling ckb-occupied-capacity-macros v1.1.1\n   Compiling molecule v0.9.2\n   Compiling ckb-occupied-capacity v1.1.1\n   Compiling rand v0.8.7\n   Compiling cpufeatures v0.2.17\n   Compiling same-file v1.0.6\n   Compiling schemars v1.2.2\n   Compiling phf_generator v0.8.0\n   Compiling walkdir v2.5.0\n   Compiling byteorder v1.5.0\n   Compiling phf_codegen v0.8.0\n   Compiling rayon v1.12.0\n   Compiling sha2 v0.10.9\n   Compiling futures-core v0.3.33\n   Compiling phf v0.8.0\n   Compiling itertools v0.13.0\n   Compiling log v0.4.33\n   Compiling futures-sink v0.3.33\n   Compiling futures-channel v0.3.33\n   Compiling futures-macro v0.3.33\n   Compiling secp256k1-sys v0.10.1\n   Compiling getrandom v0.4.3\n   Compiling rustix v1.1.4\n   Compiling futures-io v0.3.33\n   Compiling bitflags v2.13.1\n   Compiling slab v0.4.12\n   Compiling futures-task v0.3.33\n   Compiling ckb-constant v1.1.3\n   Compiling futures-util v0.3.33\n   Compiling errno v0.3.14\n   Compiling flate2 v1.1.9\n   Compiling ark-std v0.5.0\n   Compiling tokio-macros v2.7.2\n   Compiling ark-serialize v0.5.0\n   Compiling includedir_codegen v0.6.0\n   Compiling ark-ff v0.5.0\n   Compiling includedir v0.6.0\n   Compiling miette-derive v5.10.0\n   Compiling ckb-system-scripts v0.5.4\n   Compiling unicode-width v0.1.14\n   Compiling tokio v1.53.1\n   Compiling numext-fixed-uint-core v0.1.6\n   Compiling ckb-error v1.1.1\n   Compiling miette v5.10.0\n   Compiling sha-1 v0.10.1\n   Compiling scroll_derive v0.10.5\n   Compiling xxhash-rust v0.8.18\n   Compiling ckb-fixed-hash-core v1.1.2\n   Compiling base64 v0.21.7\n   Compiling scroll v0.10.2\n   Compiling ckb-fixed-hash-macros v1.1.1\n   Compiling ark-poly v0.5.0\n   Compiling sha1 v0.10.7\n   Compiling memmap2 v0.5.10\n   Compiling ckb-fixed-hash v1.1.1\n   Compiling tempfile v3.27.0\n   Compiling reflink-copy v0.1.30\n   Compiling ahash v0.7.8\n   Compiling eaglesong v0.1.0\n   Compiling plain v0.2.3\n   Compiling ark-ec v0.5.0\n   Compiling ark-relations v0.5.1\n   Compiling ckb-logger v1.1.1\n   Compiling keccak v0.1.6\n   Compiling toml v0.5.11\n   Compiling ckb-vm v0.24.14\n   Compiling futures-executor v0.3.33\n   Compiling convert_case v0.4.0\n   Compiling secp256k1 v0.30.0\n   Compiling futures v0.3.33\n   Compiling derive_more v0.99.20\n   Compiling merlin v3.0.0\n   Compiling ark-snark v0.5.1\n   Compiling ckb-vm-definitions v0.24.14\n   Compiling ckb-script v1.2.0\n   Compiling ark-crypto-primitives v0.5.0\n   Compiling ark-groth16 v0.5.0\n   Compiling ssri v9.2.0\n   Compiling ark-bn254 v0.5.0\n   Compiling goblin v0.4.0\n   Compiling goblin v0.2.3\n   Compiling ckb-crypto v1.1.1\n   Compiling ckb-verification-traits v1.1.1\n   Compiling tokio-stream v0.1.19\n   Compiling groth16-schema v0.0.0 (https://github.com/CECILIA-MULANDI/groth16-ckb?rev=d64c769ffe2d2edb5eb308dc59058efda77c2f83#d64c769f)\n   Compiling ckb-systemtime v1.1.1\n   Compiling cacache v13.1.0\n   Compiling verifier-core v0.0.0 (https://github.com/CECILIA-MULANDI/groth16-ckb?rev=d64c769ffe2d2edb5eb308dc59058efda77c2f83#d64c769f)\n   Compiling hashbrown v0.12.3\n   Compiling numext-fixed-uint-hack v0.1.6\n   Compiling wire-decode v0.0.0 (https://github.com/CECILIA-MULANDI/groth16-ckb?rev=d64c769ffe2d2edb5eb308dc59058efda77c2f83#d64c769f)\n   Compiling ckb-always-success-script v0.0.1\n   Compiling lru v0.7.8\n   Compiling lazy_static v1.5.0\n   Compiling artifact-adapter v0.1.0 (/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/crates/artifact-adapter)\n   Compiling ckb-integration-tests v0.1.0 (/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/crates/ckb-integration-tests)\n   Compiling numext-fixed-uint v0.1.6\n   Compiling ckb-gen-types v1.1.1\n   Compiling ckb-rational v1.1.2\n   Compiling ckb-types v1.1.3\n   Compiling ckb-jsonrpc-types v1.2.0\n   Compiling ckb-traits v1.1.2\n   Compiling ckb-dao-utils v1.1.1\n   Compiling ckb-pow v1.1.1\n   Compiling ckb-resource v1.2.0\n   Compiling ckb-chain-spec v1.1.2\n   Compiling ckb-mock-tx-types v1.1.1\n   Compiling ckb-dao v1.1.2\n   Compiling ckb-verification v1.2.0\n   Compiling ckb-testtool v1.1.1\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.71s\n     Running tests/owned_counter.rs (target/debug/deps/owned_counter-04a70fc7bad589d9)\n\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/mutate-owned-counter.py",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--baseline",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/matrix",
+      "--key",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/private/owner.key",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/mutations"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "verification detected by incorrect acceptance\ninitial_zero detected by incorrect acceptance\ncapacity detected by incorrect acceptance\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/tools-01/ckb-cli_v2.0.0_aarch64-apple-darwin/ckb-cli",
+      "--url",
+      "http://127.0.0.1:18124",
+      "--output-format",
+      "json",
+      "tx",
+      "sign-inputs",
+      "--tx-file",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update-proof/transaction.json",
+      "--privkey-path",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/private/owner.key",
+      "--add-signatures",
+      "--skip-check"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "[\n  {\n    \"lock-arg\": \"0x02400477eb8cc92fbd5c5c15cc9bb52e83d8a0e1\",\n    \"signature\": \"0x0b761952eb2259b19333b09423290c175c40306fcad0c96f1e7174a9a93afcea30448a11ac77904e2e0ee6fce3db838c053f3d6163a80628a73f5d51162ddc2900\"\n  }\n]\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/owned_counter.py",
+      "check",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--rpc",
+      "http://127.0.0.1:18124",
+      "--tx",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update-proof/transaction.json",
+      "--proof",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update-proof"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "{\"status\": \"checked-before-signing\", \"input\": {\"tx_hash\": \"0xc604e20c64d731ef9945d0e6d023d7287d031eb2f2c770eb347f53bb6945d67d\", \"index\": \"0x0\"}, \"statement\": [\"0\", \"1\", \"35314909352004060841495461327358116950\", \"60160164817530313343466502135685063732\"], \"fee_shannons\": 1000000, \"signs\": false, \"broadcasts\": false}\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/tools-01/ckb-cli_v2.0.0_aarch64-apple-darwin/ckb-cli",
+      "--url",
+      "http://127.0.0.1:18124",
+      "--output-format",
+      "json",
+      "tx",
+      "send",
+      "--tx-file",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update-proof/transaction.json",
+      "--skip-check"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "\"0x89e52d3df87ce898fc542000bc81c14142be990abff517019e747f7883e90494\"\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/scripts/owned_counter.py",
+      "confirm",
+      "--release",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/build/release.json",
+      "--rpc",
+      "http://127.0.0.1:18124",
+      "--tx",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update-proof/transaction.json",
+      "--hash",
+      "0x89e52d3df87ce898fc542000bc81c14142be990abff517019e747f7883e90494",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/update-receipt.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "exit": 0,
+    "stdout": "{\n  \"status\": \"committed-and-cells-checked\",\n  \"tx_hash\": \"0x89e52d3df87ce898fc542000bc81c14142be990abff517019e747f7883e90494\",\n  \"network\": \"0x72cfc87b8d9a9b4bb2907023ce4d6ace82350f97035187f176b659f802cec01c\",\n  \"release_sha256\": \"0e1cfd6287ea8975072636eba5914af680468e9e3bc7bb2044bcc9cfb5320c32\",\n  \"outputs\": [\n    {\n      \"tx_hash\": \"0x89e52d3df87ce898fc542000bc81c14142be990abff517019e747f7883e90494\",\n      \"index\": \"0x0\"\n    },\n    {\n      \"tx_hash\": \"0x89e52d3df87ce898fc542000bc81c14142be990abff517019e747f7883e90494\",\n      \"index\": \"0x1\"\n    }\n  ]\n}\n",
+    "stderr": ""
+  }
+]

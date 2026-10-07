@@ -1,0 +1,16 @@
+{
+  "status": "committed-and-cells-checked",
+  "tx_hash": "0x57ee42444304f1c1508c1b6136c4e1c33adb1ff8086eb885bd5abdd5080b269b",
+  "network": "0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606",
+  "release_sha256": "6d659fc15c73c9cee8e3ed2a1de68415cd2b07e0fb9d14d9d857025ce381c887",
+  "outputs": [
+    {
+      "tx_hash": "0x57ee42444304f1c1508c1b6136c4e1c33adb1ff8086eb885bd5abdd5080b269b",
+      "index": "0x0"
+    },
+    {
+      "tx_hash": "0x57ee42444304f1c1508c1b6136c4e1c33adb1ff8086eb885bd5abdd5080b269b",
+      "index": "0x1"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "command": [
+    "python3",
+    "scripts/owned_counter.py",
+    "check",
+    "--release",
+    "target/week-15/build-01/release.json",
+    "--rpc",
+    "http://127.0.0.1:18114",
+    "--tx",
+    "/Users/xiaomao/noir-ckb-verifier/target/week-15/client-final-01/stale.json",
+    "--proof",
+    "/Users/xiaomao/noir-ckb-verifier/target/week-15/client-final-01/proof"
+  ],
+  "exit": 1,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/Users/xiaomao/noir-ckb-verifier/scripts/owned_counter.py\", line 198, in <module>\n    if __name__=='__main__':main()\n  File \"/Users/xiaomao/noir-ckb-verifier/scripts/owned_counter.py\", line 197, in main\n    args=p.parse_args();args.func(args)\n  File \"/Users/xiaomao/noir-ckb-verifier/scripts/owned_counter.py\", line 158, in check\n    values=statement(r['policy'],tx,old);require(values==binding['statement'] and values==read(a.proof/'public.json'),'operation differs; regenerate proof')\n  File \"/Users/xiaomao/noir-ckb-verifier/scripts/owned_counter.py\", line 12, in require\n    if not ok:raise ValueError(message)\nValueError: operation differs; regenerate proof\n"
+}

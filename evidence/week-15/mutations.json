@@ -1,0 +1,81 @@
+[
+  {
+    "mutation": "verification",
+    "removed_lines": [
+      "    // MUTATION-BEGIN: verification",
+      "    verifier_core::verify(&vk, &proof, &expected).map_err(|_| PROOF)?;",
+      "    // MUTATION-END: verification"
+    ],
+    "baseline_binary_sha256": "07494c88be73b006d929509702a6c52db2f8a2f96f8135953efdbaa2876c1677",
+    "mutant_binary_sha256": "b50437377e6f06a32d38e28c58487de545013cb3e8286e591717828875334036",
+    "mutant_code_hash": "0x3d4abb0ba97bc87601af4f71898e65365ef88b44f420916f606f45b8fa005479",
+    "target": "invalid-proof-permitted-owner",
+    "detected": true,
+    "results": [
+      {
+        "case": "update-valid.json",
+        "passed": true,
+        "result": "Ok(1801416)"
+      },
+      {
+        "case": "invalid-proof-permitted-owner.json",
+        "passed": false,
+        "result": "Ok(1767380)"
+      }
+    ]
+  },
+  {
+    "mutation": "initial_zero",
+    "removed_lines": [
+      "        // MUTATION-BEGIN: initial_zero",
+      "        if new[1..] != [0; 8] {",
+      "            return Err(INIT);",
+      "        }",
+      "        // MUTATION-END: initial_zero"
+    ],
+    "baseline_binary_sha256": "07494c88be73b006d929509702a6c52db2f8a2f96f8135953efdbaa2876c1677",
+    "mutant_binary_sha256": "d6c5fc3396dfc4a5b62e537793c64fbd5e3e21ed6da7b0ee745e8300eb17e056",
+    "mutant_code_hash": "0x7f93d6a6da20af4bd0014d3fe9a3dca655831afe6b07c6a398dab6bbc967a9f8",
+    "target": "create-nonzero",
+    "detected": true,
+    "results": [
+      {
+        "case": "create-valid.json",
+        "passed": true,
+        "result": "Ok(1723064)"
+      },
+      {
+        "case": "create-nonzero.json",
+        "passed": false,
+        "result": "Ok(1724521)"
+      }
+    ]
+  },
+  {
+    "mutation": "capacity",
+    "removed_lines": [
+      "    // MUTATION-BEGIN: capacity",
+      "    if load_cell_capacity(0, Source::GroupInput).map_err(|_| LOAD)? != capacity {",
+      "        return Err(CAPACITY);",
+      "    }",
+      "    // MUTATION-END: capacity"
+    ],
+    "baseline_binary_sha256": "07494c88be73b006d929509702a6c52db2f8a2f96f8135953efdbaa2876c1677",
+    "mutant_binary_sha256": "20e76026a5820853333bd7d78b56d25a5b464c497c940c5f707f8f7c4e782c7b",
+    "mutant_code_hash": "0x2181e315bc56fdefc38c746a81241846041dbcc24097358e0e80635279d215d6",
+    "target": "capacity-reduced",
+    "detected": true,
+    "results": [
+      {
+        "case": "update-valid.json",
+        "passed": true,
+        "result": "Ok(111042796)"
+      },
+      {
+        "case": "capacity-reduced.json",
+        "passed": false,
+        "result": "Ok(111163697)"
+      }
+    ]
+  }
+]

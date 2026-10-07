@@ -1,0 +1,23 @@
+{
+  "status": "existing-direct-verifier-Type-feasibility-passed; new-application-not-implemented",
+  "toolkit_revision": "b155300c8145916a485696bf461e36f055bb5135",
+  "verifier_revision": "d64c769ffe2d2edb5eb308dc59058efda77c2f83",
+  "binary_sha256": "9a6ed1137687a8d55037488bbdafa7d1f60aacc771d87ef82dde1a2023e011f8",
+  "binary_bytes": 98464,
+  "rustflags": "-C target-feature=-a --remap-path-prefix=/Users/xiaomao/.cargo/registry/src=/cargo-registry --remap-path-prefix=/Users/xiaomao/.rustup/toolchains=/rustup-toolchains --remap-path-prefix=/Users/xiaomao/noir-ckb-verifier/target/week-15/phase1-01/verifier-copy=/build",
+  "fixture": {
+    "verification_key.json": "d96ceaee485227824b492c891593c27013b41dd8b1e45156e9535642f9a8ec5e",
+    "wrong-capsule-id-public.json": "948764a87743f517e72ab115113beac0cae1db97214de10dc066ba30991accbb",
+    "wrong-new-state-public.json": "0fa76bcc458e982d4737999db88cd1d995d23853daa2e0919a6758e5ade822f1",
+    "wrong-replay-domain-public.json": "bcf49057589b5b116b679d8384df36b76a86d2de1fdb62b4d67261e4764066ce",
+    "public.json": "33b71b2b3f9fa8f09ef9f6201bd252d5cc69c2c1d663fb27735c10f75d665b57",
+    "manifest.json": "2a34c031f34b7fa2e30867bdb8e2e95cf9960083d200e52c4bc514977aef449e",
+    "intended-public.json": "b3f9428976048e2a3d1b5d6b42adb61e2fdaa07c523c3304a3537cbf74b7d3d2",
+    "proof.json": "6c763e8657bb46eafb4b38cd66f3c57618a24e402031b12c0ae0c6e8f5b53c2c"
+  },
+  "logs_sha256": "a5a049c859d19a90b10d727f7bd6d452176b9275e2b78e6421538affe2d0a540",
+  "specification_status": "awaiting-user-approval",
+  "commands_file": "target/week-15/phase1-01/commands.json",
+  "positive_cycles": 101576496,
+  "baseline_workspace_hashes_file": "target/week-15/phase1-01/workspace-before.json"
+}

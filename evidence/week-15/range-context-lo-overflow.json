@@ -1,0 +1,14 @@
+{
+  "case": "context-lo-overflow",
+  "command": [
+    "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/backend-target/debug/noir-cli",
+    "interop",
+    "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/circuit/target/owned_counter_v1.json",
+    "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/ranges/context-lo-overflow/inputs.json",
+    "--out",
+    "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/ranges/context-lo-overflow/interop"
+  ],
+  "exit": 1,
+  "stdout": "",
+  "stderr": "Error: failed generating witness\n\nCaused by:\n    ACVM failed to solve: Cannot satisfy constraint at 38; payload=no assertion payload; debug=UnsatisfiedConstrain { opcode_location: Resolved(Acir(38)), payload: None }\n"
+}

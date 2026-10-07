@@ -1,0 +1,174 @@
+{
+  "cwd": "<SOURCE>",
+  "initial": [
+    {
+      "command": [
+        "cargo",
+        "+1.95.0",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "exit": 101,
+      "stderr": "error: failed to download `anstyle-wincon v3.0.11`\n\nCaused by:\n  attempting to make an HTTP request, but --offline was specified\n",
+      "output_note": "metadata JSON parsed; omitted paths",
+      "packages": null
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--manifest-path",
+        "contracts/Cargo.toml",
+        "--format-version",
+        "1"
+      ],
+      "exit": 101,
+      "stderr": "error: failed to download `zerocopy-derive v0.8.55`\n\nCaused by:\n  attempting to make an HTTP request, but --offline was specified\n",
+      "output_note": "metadata JSON parsed; omitted paths",
+      "packages": null
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.95.0",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--manifest-path",
+        "../Noir-Groth16/Cargo.toml",
+        "--format-version",
+        "1"
+      ],
+      "exit": 101,
+      "stderr": "error: failed to download `anstyle-wincon v3.0.11`\n\nCaused by:\n  attempting to make an HTTP request, but --offline was specified\n",
+      "output_note": "metadata JSON parsed; omitted paths",
+      "packages": null
+    },
+    {
+      "command": [
+        "npm",
+        "exec",
+        "--yes",
+        "--package=snarkjs@0.7.5",
+        "--",
+        "node",
+        "-e",
+        "console.log(\"snarkjs package cached\")"
+      ],
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout": "snarkjs package cached\n",
+      "stderr": "npm notice\nnpm notice New minor version of npm available! 11.4.2 -> 11.21.0\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v11.21.0\nnpm notice To update run: npm install -g npm@11.21.0\nnpm notice\n",
+      "cache": "initially empty isolated npm cache"
+    },
+    {
+      "command": [
+        "npx",
+        "--offline",
+        "snarkjs@0.7.5",
+        "--version"
+      ],
+      "exit": 99,
+      "expected_exit": 99,
+      "stdout": "snarkjs@0.7.5 banner and help (full local output retained); expected exit99",
+      "stderr": "",
+      "cache": "initially empty isolated npm cache"
+    }
+  ],
+  "locked_fetch_and_recheck": [
+    {
+      "command": [
+        "cargo",
+        "+1.95.0",
+        "fetch",
+        "--locked",
+        "--manifest-path",
+        "Cargo.toml"
+      ],
+      "exit": 0,
+      "stderr": " Downloading crates ...\n  Downloaded windows-interface v0.59.3\n  Downloaded winapi-util v0.1.11\n  Downloaded windows-result v0.4.1\n  Downloaded windows-implement v0.60.2\n  Downloaded wasm-bindgen-macro v0.2.126\n  Downloaded windows-threading v0.2.1\n  Downloaded rand_hc v0.2.0\n  Downloaded windows-strings v0.5.1\n  Downloaded once_cell_polyfill v1.70.2\n  Downloaded windows-collections v0.3.2\n  Downloaded windows-link v0.2.1\n  Downloaded wasm-bindgen-shared v0.2.126\n  Downloaded windows-numerics v0.3.1\n  Downloaded anstyle-wincon v3.0.11\n  Downloaded wasi v0.11.1+wasi-snapshot-preview1\n  Downloaded valuable v0.1.1\n  Downloaded windows-future v0.3.2\n  Downloaded wasi v0.9.0+wasi-snapshot-preview1\n  Downloaded rustversion v1.0.23\n  Downloaded web-time v1.1.0\n  Downloaded windows-core v0.62.2\n  Downloaded r-efi v6.0.0\n  Downloaded wasm-bindgen v0.2.126\n  Downloaded bumpalo v3.20.3\n  Downloaded wasm-bindgen-macro-support v0.2.126\n  Downloaded js-sys v0.3.103\n  Downloaded zerocopy-derive v0.8.55\n  Downloaded winapi v0.3.9\n  Downloaded windows-sys v0.61.2\n  Downloaded winapi-i686-pc-windows-gnu v0.4.0\n  Downloaded winapi-x86_64-pc-windows-gnu v0.4.0\n  Downloaded linux-raw-sys v0.12.1\n  Downloaded windows v0.62.2\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.95.0",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--manifest-path",
+        "Cargo.toml"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "metadata output omitted"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "fetch",
+        "--locked",
+        "--manifest-path",
+        "contracts/Cargo.toml"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--manifest-path",
+        "contracts/Cargo.toml"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "metadata output omitted"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.95.0",
+        "fetch",
+        "--locked",
+        "--manifest-path",
+        "../Noir-Groth16/Cargo.toml"
+      ],
+      "exit": 0,
+      "stderr": " Downloading crates ...\n  Downloaded wit-bindgen-rust-macro v0.51.0\n  Downloaded wit-bindgen-core v0.51.0\n  Downloaded leb128fmt v0.1.0\n  Downloaded id-arena v2.3.0\n  Downloaded wasm-metadata v0.244.0\n  Downloaded r-efi v5.3.0\n  Downloaded wit-bindgen v0.51.0\n  Downloaded wit-bindgen-rust v0.51.0\n  Downloaded prettyplease v0.2.37\n  Downloaded wasm-encoder v0.244.0\n  Downloaded zerocopy-derive v0.8.39\n  Downloaded wasip2 v1.0.2+wasi-0.2.9\n  Downloaded wasip3 v0.4.0+wasi-0.3.0-rc-2026-01-06\n  Downloaded wit-parser v0.244.0\n  Downloaded wit-component v0.244.0\n  Downloaded wasmparser v0.244.0\n  Downloaded linux-raw-sys v0.11.0\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.95.0",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1",
+        "--manifest-path",
+        "../Noir-Groth16/Cargo.toml"
+      ],
+      "exit": 0,
+      "stderr": "",
+      "stdout": "metadata output omitted"
+    }
+  ],
+  "scope": "same machine existing Cargo caches; initially empty isolated npm cache; not full fresh-machine installation"
+}

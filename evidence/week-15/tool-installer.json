@@ -1,0 +1,18 @@
+[
+  {
+    "tool": "ckb",
+    "version": "v0.210.0",
+    "url": "https://github.com/nervosnetwork/ckb/releases/download/v0.210.0/ckb_v0.210.0_aarch64-apple-darwin-portable.zip",
+    "archive_sha256": "80477890543aa4425666dfe4f74022d4c8237cb9767052fef68e7a7e6b811ef2",
+    "binary_sha256": "800d625b4baaa55cf6408b2f30ad744c4df90d52b94023ce226be875327c9493",
+    "binary": "/Users/xiaomao/noir-ckb-verifier/target/week-15/tool-installer-check-01/ckb_v0.210.0_aarch64-apple-darwin-portable/ckb"
+  },
+  {
+    "tool": "ckb-cli",
+    "version": "v2.0.0",
+    "url": "https://github.com/nervosnetwork/ckb-cli/releases/download/v2.0.0/ckb-cli_v2.0.0_aarch64-apple-darwin.zip",
+    "archive_sha256": "e19e0fc8228e3cc9eba5e4e3506f2559a8321cf472a9f5392bc6dc4093308d06",
+    "binary_sha256": "994166d983955fb59b6bab172485b3f65ff60487493b62a6569ad93eaa7adffb",
+    "binary": "/Users/xiaomao/noir-ckb-verifier/target/week-15/tool-installer-check-01/ckb-cli_v2.0.0_aarch64-apple-darwin/ckb-cli"
+  }
+]

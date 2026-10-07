@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "+1.95.0",
+    "test",
+    "--locked",
+    "--offline",
+    "-p",
+    "ckb-integration-tests",
+    "--test",
+    "owned_counter",
+    "--",
+    "--ignored",
+    "--nocapture"
+  ],
+  "env": {
+    "COUNTER_CASES": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/mutations/verification/cases"
+  },
+  "exit": 101,
+  "stdout": "\nrunning 1 test\nupdate-valid.json: Ok(1801416)\ninvalid-proof-permitted-owner.json: Ok(1767380)\ntest owned_counter_matrix ... FAILED\n\nfailures:\n\nfailures:\n    owned_counter_matrix\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s\n\n",
+  "stderr": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s\n     Running tests/owned_counter.rs (target/debug/deps/owned_counter-04a70fc7bad589d9)\n\nthread 'owned_counter_matrix' (11941337) panicked at crates/ckb-integration-tests/tests/owned_counter.rs:141:9:\ncase invalid-proof-permitted-owner.json: expected Some(51), got Ok(1767380)\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\nerror: test failed, to rerun pass `-p ckb-integration-tests --test owned_counter`\n"
+}

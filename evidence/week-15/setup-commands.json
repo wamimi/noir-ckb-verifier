@@ -1,0 +1,413 @@
+[
+  {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/Users/xiaomao/Noir-Groth16",
+    "env": {},
+    "exit": 0,
+    "stdout": "828025f3a0090e2934940956c0f5dc8093eb5532\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "cwd": "/Users/xiaomao/Noir-Groth16",
+    "env": {},
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "nargo",
+      "--version"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "nargo version = 1.0.0-beta.18\nnoirc version = 1.0.0-beta.18+99bb8b5cf33d7669adbdef096b12d80f30b4c0c9\n(git version hash: 99bb8b5cf33d7669adbdef096b12d80f30b4c0c9, is dirty: false)\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "--version"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 99,
+    "stdout": "snarkjs@0.7.5\n        Copyright (C) 2018  0kims association\n        This program comes with ABSOLUTELY NO WARRANTY;\n        This is free software, and you are welcome to redistribute it\n        under certain conditions; see the COPYING file in the official\n        repo directory at  https://github.com/iden3/snarkjs \n\nUsage:\n        snarkjs <full command> ...  <options>\n   or   snarkjs <shortcut> ...  <options>\n\nType snarkjs <command> --help to get more information for that command\n\nFull Command                  Description\n============                  =================\npowersoftau new               Starts a powers of tau ceremony\n     Usage:  snarkjs ptn <curve> <power> [powersoftau_0000.ptau]\npowersoftau contribute        creates a ptau file with a new contribution\n     Usage:  snarkjs ptc <powersoftau.ptau> <new_powersoftau.ptau>\npowersoftau export challenge  Creates a challenge\n     Usage:  snarkjs ptec <powersoftau_0000.ptau> [challenge]\npowersoftau challenge contributeContribute to a challenge\n     Usage:  snarkjs ptcc <curve> <challenge> [response]\npowersoftau import response   import a response to a ptau file\n     Usage:  snarkjs ptir <powersoftau_old.ptau> <response> <<powersoftau_new.ptau>\npowersoftau beacon            adds a beacon\n     Usage:  snarkjs ptb <old_powersoftau.ptau> <new_powersoftau.ptau> <beaconHash(Hex)> <numIterationsExp>\npowersoftau prepare phase2    Prepares phase 2. \n     Usage:  snarkjs pt2 <powersoftau.ptau> <new_powersoftau.ptau>\npowersoftau convert           Convert ptau\n     Usage:  snarkjs ptcv <old_powersoftau.ptau> <new_powersoftau.ptau>\npowersoftau truncate          Generate different powers of tau with smaller sizes \n     Usage:  snarkjs ptt <powersoftau.ptau>\npowersoftau verify            verifies a powers of tau file\n     Usage:  snarkjs ptv <powersoftau.ptau>\npowersoftau export json       Exports a power of tau file to a JSON\n     Usage:  snarkjs ptej <powersoftau_0000.ptau> <powersoftau_0000.json>\nr1cs info                     Print statistiscs of a circuit\n     Usage:  snarkjs ri [circuit.r1cs]\nr1cs print                    Print the constraints of a circuit\n     Usage:  snarkjs rp [circuit.r1cs] [circuit.sym]\nr1cs export json              Export r1cs to JSON file\n     Usage:  snarkjs rej [circuit.r1cs] [circuit.json]\nwtns calculate                Caclculate specific witness of a circuit given an input\n     Usage:  snarkjs wc [circuit.wasm] [input.json] [witness.wtns]\nwtns debug                    Calculate the witness with debug info.\n     Usage:  snarkjs wd [circuit.wasm] [input.json] [witness.wtns] [circuit.sym]\nwtns export json              Calculate the witness with debug info.\n     Usage:  snarkjs wej [witness.wtns] [witnes.json]\nwtns check                    Check if a specific witness of a circuit fulfills the r1cs constraints\n     Usage:  snarkjs wchk [circuit.r1cs] [[witness.wtns]\nzkey contribute               creates a zkey file with a new contribution\n     Usage:  snarkjs zkc <circuit_old.zkey> <circuit_new.zkey>\nzkey export bellman           Export a zKey to a MPCParameters file compatible with kobi/phase2 (Bellman)\n     Usage:  snarkjs zkeb <circuit_xxxx.zkey> [circuit.mpcparams]\nzkey bellman contribute       contributes to a challenge file in bellman format\n     Usage:  snarkjs zkbc <curve> <circuit.mpcparams> <circuit_response.mpcparams>\nzkey import bellman           Export a zKey to a MPCParameters file compatible with kobi/phase2 (Bellman) \n     Usage:  snarkjs zkib <circuit_old.zkey> <circuit.mpcparams> <circuit_new.zkey>\nzkey beacon                   adds a beacon\n     Usage:  snarkjs zkb <circuit_old.zkey> <circuit_new.zkey> <beaconHash(Hex)> <numIterationsExp>\nzkey verify r1cs              Verify zkey file contributions and verify that matches with the original circuit.r1cs and ptau\n     Usage:  snarkjs zkv [circuit.r1cs] [powersoftau.ptau] [circuit_final.zkey]\nzkey verify init              Verify zkey file contributions and verify that matches with the original circuit.r1cs and ptau\n     Usage:  snarkjs zkvi [circuit_0000.zkey] [powersoftau.ptau] [circuit_final.zkey]\nzkey export verificationkey   Exports a verification key\n     Usage:  snarkjs zkev [circuit_final.zkey] [verification_key.json]\nzkey export json              Exports a circuit key to a JSON file\n     Usage:  snarkjs zkej [circuit_final.zkey] [circuit_final.zkey.json]\nzkey export solidityverifier  Creates a verifier in solidity\n     Usage:  snarkjs zkesv [circuit_final.zkey] [verifier.sol]\nzkey export soliditycalldata  Generates call parameters ready to be called.\n     Usage:  snarkjs zkesc [public.json] [proof.json]\ngroth16 setup                 Creates an initial groth16 pkey file with zero contributions\n     Usage:  snarkjs g16s [circuit.r1cs] [powersoftau.ptau] [circuit_0000.zkey]\ngroth16 prove                 Generates a zk Proof from witness\n     Usage:  snarkjs g16p [circuit_final.zkey] [witness.wtns] [proof.json] [public.json]\ngroth16 fullprove             Generates a zk Proof from input\n     Usage:  snarkjs g16f [input.json] [circuit_final.wasm] [circuit_final.zkey] [proof.json] [public.json]\ngroth16 verify                Verify a zk Proof\n     Usage:  snarkjs g16v [verification_key.json] [public.json] [proof.json]\nplonk setup                   Creates an initial PLONK pkey \n     Usage:  snarkjs pks [circuit.r1cs] [powersoftau.ptau] [circuit.zkey]\nplonk prove                   Generates a PLONK Proof from witness\n     Usage:  snarkjs pkp [circuit.zkey] [witness.wtns] [proof.json] [public.json]\nplonk fullprove               Generates a PLONK Proof from input\n     Usage:  snarkjs pkf [input.json] [circuit.wasm] [circuit.zkey] [proof.json] [public.json]\nplonk verify                  Verify a PLONK Proof\n     Usage:  snarkjs pkv [verification_key.json] [public.json] [proof.json]\nfflonk setup                  BETA version. Creates a FFLONK zkey from a circuit\n     Usage:  snarkjs ffs [circuit.r1cs] [powersoftau.ptau] [circuit.zkey]\nfflonk prove                  BETA version. Generates a FFLONK Proof from witness\n     Usage:  snarkjs ffp [circuit.zkey] [witness.wtns] [proof.json] [public.json]\nfflonk fullprove              BETA version. Generates a witness and the FFLONK Proof in the same command\n     Usage:  snarkjs fff [witness.json] [circuit.wasm] [circuit.zkey] [proof.json] [public.json]\nfflonk verify                 BETA version. Verify a FFLONK Proof\n     Usage:  snarkjs ffv [verification_key.json] [public.json] [proof.json]\nfile info                     Check info of a binary file\n     Usage:  snarkjs fi [binary.file]\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "cargo",
+      "+1.95.0",
+      "build",
+      "--locked",
+      "--offline",
+      "-p",
+      "noir-cli"
+    ],
+    "cwd": "/Users/xiaomao/Noir-Groth16",
+    "env": {
+      "CARGO_TARGET_DIR": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/backend-target"
+    },
+    "exit": 0,
+    "stdout": "",
+    "stderr": "   Compiling proc-macro2 v1.0.106\n   Compiling quote v1.0.44\n   Compiling unicode-ident v1.0.24\n   Compiling typenum v1.19.0\n   Compiling autocfg v1.5.0\n   Compiling cfg-if v1.0.4\n   Compiling version_check v0.9.5\n   Compiling zerocopy v0.8.39\n   Compiling rand_core v0.6.4\n   Compiling serde_core v1.0.228\n   Compiling either v1.15.0\n   Compiling paste v1.0.15\n   Compiling once_cell v1.21.3\n   Compiling serde v1.0.228\n   Compiling subtle v2.6.1\n   Compiling libc v0.2.182\n   Compiling generic-array v0.14.7\n   Compiling ahash v0.8.12\n   Compiling num-traits v0.2.19\n   Compiling syn v1.0.109\n   Compiling num-integer v0.1.46\n   Compiling num-bigint v0.4.6\n   Compiling rand_core v0.10.0\n   Compiling getrandom v0.4.1\n   Compiling cmov v0.5.2\n   Compiling const-oid v0.10.2\n   Compiling ctutils v0.4.0\n   Compiling arrayvec v0.7.6\n   Compiling itertools v0.13.0\n   Compiling allocator-api2 v0.2.21\n   Compiling hashbrown v0.15.5\n   Compiling base64ct v1.8.3\n   Compiling hex v0.4.3\n   Compiling pem-rfc7468 v1.0.0\n   Compiling equivalent v1.0.2\n   Compiling hashbrown v0.16.1\n   Compiling winnow v0.7.14\n   Compiling rustcrypto-ff v0.14.0-rc.0\n   Compiling termcolor v1.4.1\n   Compiling indexmap v2.13.0\n   Compiling rustversion v1.0.22\n   Compiling cpubits v0.1.0\n   Compiling crc32fast v1.5.0\n   Compiling toml_datetime v0.7.5+spec-1.1.0\n   Compiling unicode-width v0.1.14\n   Compiling ppv-lite86 v0.2.21\n   Compiling toml_parser v1.0.9+spec-1.1.0\n   Compiling base16ct v1.0.0\n   Compiling rand_chacha v0.3.1\n   Compiling syn v2.0.116\n   Compiling thiserror v1.0.69\n   Compiling crypto-common v0.1.7\n   Compiling rand v0.8.5\n   Compiling digest v0.10.7\n   Compiling toml_edit v0.23.10+spec-1.0.0\n   Compiling adler2 v2.0.1\n   Compiling simd-adler32 v0.3.8\n   Compiling miniz_oxide v0.8.9\n   Compiling rustcrypto-group v0.14.0-rc.0\n   Compiling proc-macro-crate v3.4.0\n   Compiling cpufeatures v0.2.17\n   Compiling block-padding v0.3.3\n   Compiling itertools v0.10.5\n   Compiling heck v0.4.1\n   Compiling shlex v1.3.0\n   Compiling ark-std v0.5.0\n   Compiling ark-std v0.4.0\n   Compiling rmp v0.8.15\n   Compiling find-msvc-tools v0.1.9\n   Compiling inout v0.1.4\n   Compiling cc v1.2.56\n   Compiling hashbrown v0.13.2\n   Compiling strum v0.24.1\n   Compiling base64 v0.22.1\n   Compiling cipher v0.4.4\n   Compiling constant_time_eq v0.4.2\n   Compiling arrayref v0.3.9\n   Compiling aes v0.8.4\n   Compiling cbc v0.1.2\n   Compiling keccak v0.2.0-rc.1\n   Compiling zmij v1.0.21\n   Compiling log v0.4.29\n   Compiling virtue v0.0.18\n   Compiling unty v0.0.4\n   Compiling serde_json v1.0.149\n   Compiling tracing-core v0.1.36\n   Compiling memchr v2.8.0\n   Compiling blake3 v1.8.3\n   Compiling bincode_derive v2.0.1\n   Compiling itoa v1.0.17\n   Compiling byteorder v1.5.0\n   Compiling base64 v0.21.7\n   Compiling utf8parse v0.2.2\n   Compiling pin-project-lite v0.2.16\n   Compiling anstyle-parse v0.2.7\n   Compiling anstyle-query v1.1.5\n   Compiling rustc-hash v2.1.1\n   Compiling anstyle v1.0.13\n   Compiling colorchoice v1.0.4\n   Compiling is_terminal_polyfill v1.70.2\n   Compiling clap_lex v1.0.0\n   Compiling zeroize_derive v1.4.3\n   Compiling serde_derive v1.0.228\n   Compiling enum-ordinalize-derive v4.3.2\n   Compiling ark-serialize-derive v0.5.0\n   Compiling ark-ff-macros v0.5.0\n   Compiling ark-ff-asm v0.5.0\n   Compiling zeroize v1.8.2\n   Compiling ark-serialize v0.5.0\n   Compiling enum-ordinalize v4.3.2\n   Compiling thiserror-impl v1.0.69\n   Compiling flate2 v1.1.9\n   Compiling num_enum_derive v0.7.5\n   Compiling tracing-attributes v0.1.31\n   Compiling anstream v0.6.21\n   Compiling num_enum v0.7.5\n   Compiling anyhow v1.0.101\n   Compiling heck v0.5.0\n   Compiling tracing v0.1.44\n   Compiling strsim v0.11.1\n   Compiling ark-serialize-derive v0.4.2\n   Compiling derivative v2.2.0\n   Compiling ark-serialize v0.4.2\n   Compiling ark-ff-macros v0.4.2\n   Compiling ark-ff-asm v0.4.2\n   Compiling strum_macros v0.24.3\n   Compiling clap_builder v4.5.59\n   Compiling clap_derive v4.5.55\n   Compiling hybrid-array v0.4.7\n   Compiling crypto-common v0.2.0\n   Compiling block-buffer v0.11.0\n   Compiling der v0.8.0\n   Compiling crypto-bigint v0.7.0-rc.27\n   Compiling digest v0.11.0\n   Compiling educe v0.6.0\n   Compiling hmac v0.13.0-rc.5\n   Compiling signature v3.0.0-rc.10\n   Compiling spki v0.8.0-rc.4\n   Compiling sec1 v0.8.0-rc.13\n   Compiling pkcs8 v0.11.0-rc.11\n   Compiling rfc6979 v0.5.0-rc.5\n   Compiling sha2 v0.11.0-rc.5\n   Compiling blake2 v0.11.0-rc.5\n   Compiling r1cs-file v0.3.0\n   Compiling elliptic-curve v0.14.0-rc.28\n   Compiling primefield v0.14.0-rc.7\n   Compiling wtns-file v0.1.5\n   Compiling lazy_static v1.5.0\n   Compiling clap v4.5.59\n   Compiling ecdsa v0.17.0-rc.16\n   Compiling primeorder v0.14.0-rc.7\n   Compiling ark-ff v0.5.0\n   Compiling k256 v0.14.0-rc.7\n   Compiling p256 v0.14.0-rc.7\n   Compiling codespan-reporting v0.11.1\n   Compiling serde-big-array v0.5.1\n   Compiling rmp-serde v1.3.1\n   Compiling bincode v2.0.1\n   Compiling bincode v1.3.3\n   Compiling codespan v0.11.1\n   Compiling noirc_span v1.0.0-beta.19 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.19#74d6be65)\n   Compiling noirc_span v1.0.0-beta.18 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.18#99bb8b5c)\n   Compiling ark-ff v0.4.2\n   Compiling ark-poly v0.5.0\n   Compiling ark-ec v0.5.0\n   Compiling ark-poly v0.4.2\n   Compiling ark-ec v0.4.2\n   Compiling ark-bn254 v0.5.0\n   Compiling acir_field v1.0.0-beta.19 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.19#74d6be65)\n   Compiling acir_field v1.0.0-beta.18 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.18#99bb8b5c)\n   Compiling ark-grumpkin v0.5.0\n   Compiling ark-bn254 v0.4.0\n   Compiling brillig v1.0.0-beta.18 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.18#99bb8b5c)\n   Compiling brillig v1.0.0-beta.19 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.19#74d6be65)\n   Compiling acir_field v0.46.0\n   Compiling brillig v0.46.0\n   Compiling acir v1.0.0-beta.18 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.18#99bb8b5c)\n   Compiling acir v1.0.0-beta.19 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.19#74d6be65)\n   Compiling acir v0.46.0\n   Compiling acvm_blackbox_solver v1.0.0-beta.19 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.19#74d6be65)\n   Compiling noir-acir v0.1.0 (/Users/xiaomao/Noir-Groth16/crates/noir-acir)\n   Compiling brillig_vm v1.0.0-beta.19 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.19#74d6be65)\n   Compiling bn254_blackbox_solver v1.0.0-beta.19 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.19#74d6be65)\n   Compiling acvm v1.0.0-beta.19 (https://github.com/noir-lang/noir.git?tag=v1.0.0-beta.19#74d6be65)\n   Compiling noir-witness v0.1.0 (/Users/xiaomao/Noir-Groth16/crates/noir-witness)\n   Compiling noir-r1cs v0.1.0 (/Users/xiaomao/Noir-Groth16/crates/noir-r1cs)\n   Compiling noir-cli v0.1.0 (/Users/xiaomao/Noir-Groth16/crates/noir-cli)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 22.05s\n"
+  },
+  {
+    "command": [
+      "nargo",
+      "compile",
+      "--print-acir"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/circuit",
+    "env": {},
+    "exit": 0,
+    "stdout": "Compiled ACIR for main:\nfunc 0\nprivate parameters: []\npublic parameters: [w0, w1, w2, w3]\nreturn values: []\nBRILLIG CALL func: 0, inputs: [w0, 18446744073709551616], outputs: [w4, w5]\nBLACKBOX::RANGE input: w4, bits: 190\nBLACKBOX::RANGE input: w5, bits: 64\nASSERT w5 = w0 - 18446744073709551616*w4\nASSERT w6 = -w4 + 1186564023676924939888766319973246049704924238154051448977\nBLACKBOX::RANGE input: w6, bits: 190\nBRILLIG CALL func: 1, inputs: [-w4 + 1186564023676924939888766319973246049704924238154051448977], outputs: [w7]\nASSERT w8 = w4*w7 - 1186564023676924939888766319973246049704924238154051448977*w7 + 1\nASSERT 0 = -w4*w8 + 1186564023676924939888766319973246049704924238154051448977*w8\nASSERT w9 = w5*w8 + 4331911350818177023*w8\nBLACKBOX::RANGE input: w9, bits: 63\nASSERT w5 = w0\nBRILLIG CALL func: 0, inputs: [w1, 18446744073709551616], outputs: [w10, w11]\nBLACKBOX::RANGE input: w10, bits: 190\nBLACKBOX::RANGE input: w11, bits: 64\nASSERT w11 = w1 - 18446744073709551616*w10\nASSERT w12 = -w10 + 1186564023676924939888766319973246049704924238154051448977\nBLACKBOX::RANGE input: w12, bits: 190\nBRILLIG CALL func: 1, inputs: [-w10 + 1186564023676924939888766319973246049704924238154051448977], outputs: [w13]\nASSERT w14 = w10*w13 - 1186564023676924939888766319973246049704924238154051448977*w13 + 1\nASSERT 0 = -w10*w14 + 1186564023676924939888766319973246049704924238154051448977*w14\nASSERT w15 = w11*w14 + 4331911350818177023*w14\nBLACKBOX::RANGE input: w15, bits: 63\nASSERT w11 = w1\nASSERT w1 = w0 + 1\nBRILLIG CALL func: 0, inputs: [w2, 340282366920938463463374607431768211456], outputs: [w16, w17]\nBLACKBOX::RANGE input: w16, bits: 126\nBLACKBOX::RANGE input: w17, bits: 128\nASSERT w18 = -w17 + 340282366920938463463374607431768211455\nBLACKBOX::RANGE input: w18, bits: 128\nASSERT w17 = w2 - 340282366920938463463374607431768211456*w16\nASSERT w19 = w16 + 20746827117051438823981594372716013474\nBLACKBOX::RANGE input: w19, bits: 126\nBRILLIG CALL func: 1, inputs: [-w16 + 64323764613183177041862057485226039389], outputs: [w20]\nASSERT w21 = w16*w20 - 64323764613183177041862057485226039389*w20 + 1\nASSERT 0 = -w16*w21 + 64323764613183177041862057485226039389*w21\nASSERT w22 = w17*w21 + 31631953497925087476338759149270597631*w21\nBLACKBOX::RANGE input: w22, bits: 126\nASSERT w17 = w2\nBRILLIG CALL func: 0, inputs: [w3, 340282366920938463463374607431768211456], outputs: [w23, w24]\nBLACKBOX::RANGE input: w23, bits: 126\nBLACKBOX::RANGE input: w24, bits: 128\nASSERT w25 = -w24 + 340282366920938463463374607431768211455\nBLACKBOX::RANGE input: w25, bits: 128\nASSERT w24 = w3 - 340282366920938463463374607431768211456*w23\nASSERT w26 = w23 + 20746827117051438823981594372716013474\nBLACKBOX::RANGE input: w26, bits: 126\nBRILLIG CALL func: 1, inputs: [-w23 + 64323764613183177041862057485226039389], outputs: [w27]\nASSERT w28 = w23*w27 - 64323764613183177041862057485226039389*w27 + 1\nASSERT 0 = -w23*w28 + 64323764613183177041862057485226039389*w28\nASSERT w29 = w24*w28 + 31631953497925087476338759149270597631*w28\nBLACKBOX::RANGE input: w29, bits: 126\nASSERT w24 = w3\n\nunconstrained func 0: directive_integer_quotient\n0: @10 = const u32 2\n1: @11 = const u32 0\n2: @0 = calldata copy [@11; @10]\n3: @2 = field int_div @0, @1\n4: @1 = field mul @2, @1\n5: @1 = field sub @0, @1\n6: @0 = @2\n7: stop &[@11; @10]\nunconstrained func 1: directive_invert\n0: @21 = const u32 1\n1: @20 = const u32 0\n2: @0 = calldata copy [@20; @21]\n3: @2 = const field 0\n4: @3 = field eq @0, @2\n5: jump if @3 to 8\n6: @1 = const field 1\n7: @0 = field field_div @1, @0\n8: stop &[@20; @21]\n\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/backend-target/debug/noir-cli",
+      "interop",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/circuit/target/owned_counter_v1.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/inputs.json",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/interop"
+    ],
+    "cwd": "/Users/xiaomao/Noir-Groth16",
+    "env": {},
+    "exit": 0,
+    "stdout": "n_wires=2325 n_constraints=2339 witness_len=2325\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "wtns",
+      "check",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/interop/circuit.r1cs",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/interop/witness.wtns"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: WITNESS CHECKING STARTED\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: > Reading r1cs file\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: > Reading witness file\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: ----------------------------\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m:   WITNESS CHECK\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m:   Curve:          bn128\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m:   Vars (wires):   2325\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m:   Outputs:        0\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m:   Public Inputs:  4\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m:   Private Inputs: 0\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m:   Labels:         2325\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m:   Constraints:    2339\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m:   Custom Gates:   false\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: ----------------------------\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: > Checking witness correctness\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: WITNESS IS CORRECT\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: WITNESS CHECKING FINISHED SUCCESSFULLY\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "r1cs",
+      "export",
+      "json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/interop/circuit.r1cs",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/r1cs.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: undefined: Loading constraints: 0/2339\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: undefined: Loading map: 0/2325\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "wtns",
+      "export",
+      "json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/interop/witness.wtns",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/witness.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "powersoftau",
+      "new",
+      "bn128",
+      "13",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/initial.ptau"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: First Contribution Hash:\n\t\tb149df23 29d37dee 14a2a9c9 ddcd0eb8\n\t\te1fb6a5a f5dcbdd4 f46a10e0 176dac30\n\t\t62579199 95193c2c b067c467 7138f506\n\t\t341dc2d3 279dc020 4fcc2e9d 14390581\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "powersoftau",
+      "contribute",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/initial.ptau",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/contributed.ptau",
+      "--name=PUBLIC DEVELOPMENT ONLY",
+      "-e=PUBLIC-DEVELOPMENT-ONLY-owned-counter-v1"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Contribution Response Hash imported: \n\t\tc1258a58 aee31a32 cbfce817 b9e10b98\n\t\ta981490e c50931d3 dbbb6af4 16f0289a\n\t\tc2dcf08e 641b0831 df0005fd 9e2ebba5\n\t\tbe4b4dfc ce9d6bab a708e390 04e03f41\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Next Challenge Hash: \n\t\tce9f0c08 eb8bd5e4 f8257a95 fa5eda23\n\t\t09f57386 9737b653 55d60411 53e217e0\n\t\t19fcfa4c 3cd128b7 3e87c520 656b71b7\n\t\taedac27a fcfa6668 ac35c7d3 7ca1eb0e\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "powersoftau",
+      "prepare",
+      "phase2",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/contributed.ptau",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/phase2.ptau"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "powersoftau",
+      "verify",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/phase2.ptau"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Powers Of tau file OK!\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Next challenge hash: \n\t\tce9f0c08 eb8bd5e4 f8257a95 fa5eda23\n\t\t09f57386 9737b653 55d60411 53e217e0\n\t\t19fcfa4c 3cd128b7 3e87c520 656b71b7\n\t\taedac27a fcfa6668 ac35c7d3 7ca1eb0e\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: -----------------------------------------------------\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Contribution #1: PUBLIC DEVELOPMENT ONLY\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Next Challenge: \n\t\tce9f0c08 eb8bd5e4 f8257a95 fa5eda23\n\t\t09f57386 9737b653 55d60411 53e217e0\n\t\t19fcfa4c 3cd128b7 3e87c520 656b71b7\n\t\taedac27a fcfa6668 ac35c7d3 7ca1eb0e\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Response Hash:\n\t\tc1258a58 aee31a32 cbfce817 b9e10b98\n\t\ta981490e c50931d3 dbbb6af4 16f0289a\n\t\tc2dcf08e 641b0831 df0005fd 9e2ebba5\n\t\tbe4b4dfc ce9d6bab a708e390 04e03f41\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Response Hash:\n\t\tb149df23 29d37dee 14a2a9c9 ddcd0eb8\n\t\te1fb6a5a f5dcbdd4 f46a10e0 176dac30\n\t\t62579199 95193c2c b067c467 7138f506\n\t\t341dc2d3 279dc020 4fcc2e9d 14390581\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: -----------------------------------------------------\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Powers of Tau Ok!\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "groth16",
+      "setup",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/interop/circuit.r1cs",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/phase2.ptau",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/initial.zkey"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Reading r1cs\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Reading tauG1\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Reading tauG2\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Reading alphatauG1\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Reading betatauG1\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Circuit hash: \n\t\te60ef9c4 c3f0ba71 053e90a5 18477fc3\n\t\tc55abb80 27dd8abe 6f768f67 2d575ba8\n\t\t6a0214f0 3e6389e1 4cb7c77e 118ade00\n\t\t00650ff0 3b2ef850 4bf70d9e 157ad40c\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "zkey",
+      "contribute",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/initial.zkey",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/development.zkey",
+      "--name=PUBLIC DEVELOPMENT ONLY",
+      "-e=PUBLIC-DEVELOPMENT-ONLY-owned-counter-v1-phase2"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Circuit Hash: \n\t\te60ef9c4 c3f0ba71 053e90a5 18477fc3\n\t\tc55abb80 27dd8abe 6f768f67 2d575ba8\n\t\t6a0214f0 3e6389e1 4cb7c77e 118ade00\n\t\t00650ff0 3b2ef850 4bf70d9e 157ad40c\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Contribution Hash: \n\t\tc6a40445 2eed1af4 fba316fe f26b5b70\n\t\tf99de242 3098d8bb dae24b5b aaf6eef7\n\t\t07569d6a 8458032a 05abf2bc 5ca9d0c0\n\t\tb8c6f794 c903c210 4e470284 a2e4e3b4\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "zkey",
+      "verify",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/interop/circuit.r1cs",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/phase2.ptau",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/development.zkey"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Reading r1cs\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Reading tauG1\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Reading tauG2\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Reading alphatauG1\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Reading betatauG1\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Circuit hash: \n\t\te60ef9c4 c3f0ba71 053e90a5 18477fc3\n\t\tc55abb80 27dd8abe 6f768f67 2d575ba8\n\t\t6a0214f0 3e6389e1 4cb7c77e 118ade00\n\t\t00650ff0 3b2ef850 4bf70d9e 157ad40c\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: Circuit Hash: \n\t\te60ef9c4 c3f0ba71 053e90a5 18477fc3\n\t\tc55abb80 27dd8abe 6f768f67 2d575ba8\n\t\t6a0214f0 3e6389e1 4cb7c77e 118ade00\n\t\t00650ff0 3b2ef850 4bf70d9e 157ad40c\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: -------------------------\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: contribution #1 PUBLIC DEVELOPMENT ONLY:\n\t\tc6a40445 2eed1af4 fba316fe f26b5b70\n\t\tf99de242 3098d8bb dae24b5b aaf6eef7\n\t\t07569d6a 8458032a 05abf2bc 5ca9d0c0\n\t\tb8c6f794 c903c210 4e470284 a2e4e3b4\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: -------------------------\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: ZKey Ok!\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "zkey",
+      "export",
+      "verificationkey",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/development.zkey",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/verification_key.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: EXPORT VERIFICATION KEY STARTED\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: > Detected protocol: groth16\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: EXPORT VERIFICATION KEY FINISHED\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "groth16",
+      "prove",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/development.zkey",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/interop/witness.wtns",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/proof.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/public.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "groth16",
+      "verify",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/verification_key.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/public.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/proof.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: OK!\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "groth16",
+      "verify",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/verification_key.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/changed-0.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/proof.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 1,
+    "stdout": "\u001b[31;22m[ERROR] \u001b[39;1msnarkJS\u001b[0m: Invalid proof\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "groth16",
+      "verify",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/verification_key.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/changed-1.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/proof.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 1,
+    "stdout": "\u001b[31;22m[ERROR] \u001b[39;1msnarkJS\u001b[0m: Invalid proof\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "groth16",
+      "verify",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/verification_key.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/changed-2.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/proof.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 1,
+    "stdout": "\u001b[31;22m[ERROR] \u001b[39;1msnarkJS\u001b[0m: Invalid proof\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "npx",
+      "--offline",
+      "snarkjs@0.7.5",
+      "groth16",
+      "verify",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/verification_key.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/changed-3.json",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/proof.json"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 1,
+    "stdout": "\u001b[31;22m[ERROR] \u001b[39;1msnarkJS\u001b[0m: Invalid proof\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "cargo",
+      "+1.95.0",
+      "run",
+      "--locked",
+      "--offline",
+      "-p",
+      "artifact-adapter",
+      "--bin",
+      "noir-ckb-adapter",
+      "--",
+      "--vk",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/verification_key.json",
+      "--proof",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/proof.json",
+      "--public",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/public.json",
+      "--negative-public",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/changed-0.json",
+      "--out",
+      "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/adapter"
+    ],
+    "cwd": "/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01",
+    "env": {},
+    "exit": 0,
+    "stdout": "arkworks_positive_verify=accepted\narkworks_negative_verify=rejected\ngroth16_ckb_wire_roundtrip=accepted\npublic_input_count=4\nvk_bytes=392\nproof_bytes=128\npublic_inputs_bytes=132\nvk_molecule_bytes=430\nwitness_molecule_bytes=290\nvk_data_hash=685bc8cd974970ba3a030025f683c7fd6fce0715c2e9f286660634a8b35058fe\noutput_directory=/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/adapter\n",
+    "stderr": "   Compiling proc-macro2 v1.0.107\n   Compiling quote v1.0.47\n   Compiling unicode-ident v1.0.24\n   Compiling autocfg v1.5.1\n   Compiling version_check v0.9.5\n   Compiling crossbeam-utils v0.8.22\n   Compiling zerocopy v0.8.55\n   Compiling typenum v1.20.1\n   Compiling crossbeam-epoch v0.9.20\n   Compiling crossbeam-deque v0.8.7\n   Compiling rand_core v0.6.4\n   Compiling rayon-core v1.13.0\n   Compiling subtle v2.6.1\n   Compiling either v1.17.0\n   Compiling generic-array v0.14.7\n   Compiling once_cell v1.21.4\n   Compiling paste v1.0.15\n   Compiling num-traits v0.2.19\n   Compiling cfg-if v1.0.4\n   Compiling arrayvec v0.7.8\n   Compiling itertools v0.13.0\n   Compiling libc v0.2.189\n   Compiling ahash v0.8.12\n   Compiling tracing-core v0.1.36\n   Compiling allocator-api2 v0.2.21\n   Compiling pin-project-lite v0.2.17\n   Compiling syn v1.0.109\n   Compiling hashbrown v0.15.5\n   Compiling tracing v0.1.44\n   Compiling tracing-subscriber v0.2.25\n   Compiling syn v2.0.119\n   Compiling ppv-lite86 v0.2.21\n   Compiling syn v3.0.3\n   Compiling rand_chacha v0.3.1\n   Compiling rand v0.8.7\n   Compiling block-buffer v0.10.4\n   Compiling crypto-common v0.1.7\n   Compiling find-msvc-tools v0.1.9\n   Compiling shlex v2.0.1\n   Compiling digest v0.10.7\n   Compiling cc v1.4.0\n   Compiling serde_core v1.0.229\n   Compiling utf8parse v0.2.2\n   Compiling rayon v1.12.0\n   Compiling byteorder v1.5.0\n   Compiling anstyle-parse v1.0.0\n   Compiling blake2 v0.10.6\n   Compiling zmij v1.0.23\n   Compiling blake2b-rs v0.2.0\n   Compiling num-integer v0.1.46\n   Compiling colorchoice v1.0.5\n   Compiling anstyle-query v1.1.5\n   Compiling is_terminal_polyfill v1.70.2\n   Compiling num-bigint v0.4.8\n   Compiling faster-hex v0.6.1\n   Compiling bytes v1.12.1\n   Compiling anstyle v1.0.14\n   Compiling ark-std v0.5.0\n   Compiling anstream v1.0.0\n   Compiling cty v0.2.2\n   Compiling clap_lex v1.1.0\n   Compiling molecule v0.9.2\n   Compiling strsim v0.11.1\n   Compiling serde_json v1.0.151\n   Compiling zeroize_derive v1.5.0\n   Compiling enum-ordinalize-derive v4.4.1\n   Compiling ark-serialize-derive v0.5.0\n   Compiling ark-ff-asm v0.5.0\n   Compiling cpufeatures v0.2.17\n   Compiling zeroize v1.9.0\n   Compiling ark-crypto-primitives-macros v0.5.0\n   Compiling keccak v0.1.6\n   Compiling ark-serialize v0.5.0\n   Compiling enum-ordinalize v4.4.1\n   Compiling sha2 v0.10.9\n   Compiling thiserror v2.0.19\n   Compiling heck v0.5.0\n   Compiling serde v1.0.229\n   Compiling clap_derive v4.6.4\n   Compiling ark-ff-macros v0.5.0\n   Compiling clap_builder v4.6.2\n   Compiling groth16-schema v0.0.0 (https://github.com/CECILIA-MULANDI/groth16-ckb?rev=d64c769ffe2d2edb5eb308dc59058efda77c2f83#d64c769f)\n   Compiling serde_derive v1.0.229\n   Compiling derivative v2.2.0\n   Compiling thiserror-impl v2.0.19\n   Compiling memchr v2.8.3\n   Compiling blake2b-ref v0.3.1\n   Compiling merlin v3.0.0\n   Compiling itoa v1.0.18\n   Compiling clap v4.6.4\n   Compiling wire-decode v0.0.0 (https://github.com/CECILIA-MULANDI/groth16-ckb?rev=d64c769ffe2d2edb5eb308dc59058efda77c2f83#d64c769f)\n   Compiling ckb-hash v1.1.1\n   Compiling hex v0.4.3\n   Compiling educe v0.6.0\n   Compiling ark-ff v0.5.0\n   Compiling ark-poly v0.5.0\n   Compiling ark-relations v0.5.1\n   Compiling ark-snark v0.5.1\n   Compiling ark-ec v0.5.0\n   Compiling ark-crypto-primitives v0.5.0\n   Compiling ark-bn254 v0.5.0\n   Compiling ark-groth16 v0.5.0\n   Compiling verifier-core v0.0.0 (https://github.com/CECILIA-MULANDI/groth16-ckb?rev=d64c769ffe2d2edb5eb308dc59058efda77c2f83#d64c769f)\n   Compiling artifact-adapter v0.1.0 (/Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/crates/artifact-adapter)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 15.54s\n     Running `target/debug/noir-ckb-adapter --vk /Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/verification_key.json --proof /Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/proof.json --public /Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/public.json --negative-public /Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/changed-0.json --out /Users/xiaomao/noir-ckb-verifier/target/week-15/reproduction-source-01/target/local-run/setup/adapter`\n"
+  }
+]

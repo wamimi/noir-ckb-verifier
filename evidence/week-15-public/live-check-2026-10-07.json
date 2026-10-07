@@ -1,0 +1,27 @@
+{
+  "mode": "live read-only RPC: three committed transactions and contents verified",
+  "network": "0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606",
+  "transactions": {
+    "deployment": "0x0ee39d547101eb348bc72a93f9a08b301353267487f3061f54a0070c44f27ad1",
+    "creation": "0x57ee42444304f1c1508c1b6136c4e1c33adb1ff8086eb885bd5abdd5080b269b",
+    "update": "0x24a336fbc09ea5330b83adcbaaf17e6eaafcb21776e13df6ec01d00daa613bb6"
+  },
+  "state": "0 -> 1",
+  "application_capacity_ckb": 200,
+  "initial_outpoint": {
+    "tx_hash": "0x57ee42444304f1c1508c1b6136c4e1c33adb1ff8086eb885bd5abdd5080b269b",
+    "index": "0x0"
+  },
+  "successor_outpoint": {
+    "tx_hash": "0x24a336fbc09ea5330b83adcbaaf17e6eaafcb21776e13df6ec01d00daa613bb6",
+    "index": "0x0"
+  },
+  "public_statement": [
+    "0",
+    "1",
+    "154725372892316643625601094939967772637",
+    "263158646073569369253601295048711988710"
+  ],
+  "initial_current_status": "unknown",
+  "successor_current_status": "live"
+}

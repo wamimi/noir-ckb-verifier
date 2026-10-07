@@ -1,0 +1,187 @@
+{
+  "cwd": "<SOURCE>",
+  "results": [
+    {
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts/tests",
+        "-v"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": "test_changed_transaction_rejects (test_counter_review.ReviewTests) ... ok\ntest_recorded_mode_does_not_call_rpc (test_counter_review.ReviewTests) ... ok\ntest_unconfirmed_transaction_rejects_without_retry (test_counter_review.ReviewTests) ... ok\ntest_valid_operation_and_unsigned_json_digest (test_counter_review.ReviewTests) ... ok\ntest_witness_change_rejects (test_counter_review.ReviewTests) ... ok\ntest_wrong_context_rejects_even_with_matching_transaction_digest (test_counter_review.ReviewTests) ... ok\ntest_cli_transport_error_is_nonzero_without_traceback_or_policy (test_counter_rpc.RpcTests) ... ok\ntest_existing_policy_is_not_overwritten (test_counter_rpc.RpcTests) ... ok\ntest_genesis_mismatch_still_rejects (test_counter_rpc.RpcTests) ... ok\ntest_headers_payload_timeout_and_default_tls (test_counter_rpc.RpcTests) ... ok\ntest_json_rpc_error_still_rejects (test_counter_rpc.RpcTests) ... ok\ntest_transport_errors_fail_once_with_actionable_safe_message (test_counter_rpc.RpcTests) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in 0.005s\n\nOK\n"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "scripts/review-counter.py"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"mode\": \"recorded evidence; NOT a live query\",\n  \"network\": \"0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606\",\n  \"transactions\": {\n    \"deployment\": \"0x0ee39d547101eb348bc72a93f9a08b301353267487f3061f54a0070c44f27ad1\",\n    \"creation\": \"0x57ee42444304f1c1508c1b6136c4e1c33adb1ff8086eb885bd5abdd5080b269b\",\n    \"update\": \"0x24a336fbc09ea5330b83adcbaaf17e6eaafcb21776e13df6ec01d00daa613bb6\"\n  },\n  \"state\": \"0 -> 1\",\n  \"application_capacity_ckb\": 200,\n  \"initial_outpoint\": {\n    \"tx_hash\": \"0x57ee42444304f1c1508c1b6136c4e1c33adb1ff8086eb885bd5abdd5080b269b\",\n    \"index\": \"0x0\"\n  },\n  \"successor_outpoint\": {\n    \"tx_hash\": \"0x24a336fbc09ea5330b83adcbaaf17e6eaafcb21776e13df6ec01d00daa613bb6\",\n    \"index\": \"0x0\"\n  },\n  \"public_statement\": [\n    \"0\",\n    \"1\",\n    \"154725372892316643625601094939967772637\",\n    \"263158646073569369253601295048711988710\"\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.95.0",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "noir-ckb-cli",
+        "--",
+        "counter",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "usage: owned_counter.py [-h]\n                        {preflight,build,prepare,prove,confirm,inspect,check}\n                        ...\n\nFixed public counter v1 client. No keys, signing, or broadcasting in this\ntool.\n\npositional arguments:\n  {preflight,build,prepare,prove,confirm,inspect,check}\n\noptional arguments:\n  -h, --help            show this help message and exit\n",
+      "stderr": "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.33s\n     Running `target/debug/noir-ckb counter --help`\n"
+    },
+    {
+      "command": [
+        "npx",
+        "--offline",
+        "snarkjs@0.7.5",
+        "groth16",
+        "verify",
+        "evidence/week-15-public/verification-key.snarkjs.json",
+        "evidence/week-15-public/update-public.json",
+        "evidence/week-15-public/update-proof.snarkjs.json"
+      ],
+      "exit": 0,
+      "stdout": "\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: OK!\n",
+      "stderr": ""
+    },
+    {
+      "check": "relative links and Bash/zsh fenced snippet syntax and embedded Python syntax",
+      "links": 60,
+      "snippets": 30,
+      "errors": []
+    },
+    {
+      "check": "deployed source, historical preservation and original receipt hashes",
+      "files": 46,
+      "changed": []
+    }
+  ],
+  "wallet_command_help_only": [
+    {
+      "command": [
+        "<PINNED_CKB_CLI>",
+        "--local-only",
+        "account",
+        "new",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "ckb-cli-account-new \nCreate a new account and print related information.\n\nUSAGE:\n    ckb-cli account new [FLAGS] [OPTIONS]\n\nFLAGS:\n        --no-color      Do not highlight(color) output json\n        --debug         Display request parameters\n        --local-only    This is a local only subcommand, do not check alerts and get network type\n    -h, --help          Prints help information\n    -V, --version       Prints version information\n\nOPTIONS:\n        --output-format <output-format>    Select output format [default: yaml]  [possible values: yaml, json]\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<PINNED_CKB_CLI>",
+        "--local-only",
+        "util",
+        "key-info",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "ckb-cli-util-key-info \nShow public information of a secp256k1 private key (from file) or public key\n\nUSAGE:\n    ckb-cli util key-info [FLAGS] [OPTIONS]\n\nFLAGS:\n        --no-color      Do not highlight(color) output json\n        --debug         Display request parameters\n        --local-only    This is a local only subcommand, do not check alerts and get network type\n    -h, --help          Prints help information\n    -V, --version       Prints version information\n\nOPTIONS:\n        --privkey-path <privkey-path>      Private key file path (only read first line)\n        --output-format <output-format>    Select output format [default: yaml]  [possible values: yaml, json]\n        --pubkey <pubkey>                  Public key (hex string, compressed format)\n        --address <address>                Target address (see:\n                                           https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-\n                                           ckb-address-format/0021-ckb-address-format.md)\n        --lock-arg <lock-arg>              Lock argument (account identifier, blake2b(pubkey)[0..20])\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<PINNED_CKB_CLI>",
+        "wallet",
+        "get-live-cells",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "ckb-cli-wallet-get-live-cells \nGet live cells by address\n\nUSAGE:\n    ckb-cli wallet get-live-cells [FLAGS] [OPTIONS]\n\nFLAGS:\n        --no-color      Do not highlight(color) output json\n        --debug         Display request parameters\n        --local-only    This is a local only subcommand, do not check alerts and get network type\n    -h, --help          Prints help information\n    -V, --version       Prints version information\n\nOPTIONS:\n        --address <address>                Target address (see:\n                                           https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-\n                                           ckb-address-format/0021-ckb-address-format.md)\n        --limit <limit>                    Get live cells <= limit [default: 15]\n        --output-format <output-format>    Select output format [default: yaml]  [possible values: yaml, json]\n        --from <from>                      From block number (inclusive)\n        --to <to>                          To block number (exclusive)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<PINNED_CKB_CLI>",
+        "tx",
+        "init",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "ckb-cli-tx-init \nInit a common (sighash/multisig) transaction\n\nUSAGE:\n    ckb-cli tx init [FLAGS] [OPTIONS] --tx-file <tx-file>\n\nFLAGS:\n        --no-color      Do not highlight(color) output json\n        --debug         Display request parameters\n        --local-only    This is a local only subcommand, do not check alerts and get network type\n    -h, --help          Prints help information\n    -V, --version       Prints version information\n\nOPTIONS:\n        --tx-file <tx-file>                Multisig transaction data file (format: json)\n        --output-format <output-format>    Select output format [default: yaml]  [possible values: yaml, json]\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<PINNED_CKB_CLI>",
+        "tx",
+        "add-input",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "ckb-cli-tx-add-input \nAdd cell input (with secp/multisig lock)\n\nUSAGE:\n    ckb-cli tx add-input [FLAGS] [OPTIONS] --tx-hash <tx-hash> --index <index> --tx-file <tx-file>\n\nFLAGS:\n        --no-color      Do not highlight(color) output json\n        --debug         Display request parameters\n        --local-only    This is a local only subcommand, do not check alerts and get network type\n        --skip-check    Send transaction without any check, be cautious to use this flag\n    -h, --help          Prints help information\n    -V, --version       Prints version information\n\nOPTIONS:\n        --tx-hash <tx-hash>                              Transaction hash\n        --index <index>                                  Transaction output index\n        --output-format <output-format>\n            Select output format [default: yaml]  [possible values: yaml, json]\n\n        --since-absolute-epoch <since-absolute-epoch>    Since absolute epoch number\n        --tx-file <tx-file>                              Multisig transaction data file (format: json)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<PINNED_CKB_CLI>",
+        "tx",
+        "add-output",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "ckb-cli-tx-add-output \nAdd cell output\n\nUSAGE:\n    ckb-cli tx add-output [FLAGS] [OPTIONS] --capacity <capacity> --tx-file <tx-file>\n\nFLAGS:\n        --no-color      Do not highlight(color) output json\n        --debug         Display request parameters\n        --local-only    This is a local only subcommand, do not check alerts and get network type\n    -h, --help          Prints help information\n    -V, --version       Prints version information\n\nOPTIONS:\n        --to-sighash-address <to-sighash-address>                  To normal sighash address\n        --output-format <output-format>\n            Select output format [default: yaml]  [possible values: yaml, json]\n\n        --to-short-multisig-address <to-short-multisig-address>\n            To short multisig address(encode with legacy multisig script)\n\n        --to-long-multisig-address <to-long-multisig-address>\n            To long multisig address (special case, include since)\n\n        --capacity <capacity>                                      The capacity (unit: CKB, format: 123.335)\n        --to-data <to-data>                                        Hex data store in target cell (optional)\n        --to-data-path <to-data-path>                              Data binary file path store in target cell (optional)\n        --tx-file <tx-file>                                        Multisig transaction data file (format: json)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<PINNED_CKB_CLI>",
+        "tx",
+        "info",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "ckb-cli-tx-info \nShow detail of this multisig transaction (capacity, tx-fee, etc.)\n\nUSAGE:\n    ckb-cli tx info [FLAGS] [OPTIONS] --tx-file <tx-file>\n\nFLAGS:\n        --no-color      Do not highlight(color) output json\n        --debug         Display request parameters\n        --local-only    This is a local only subcommand, do not check alerts and get network type\n    -h, --help          Prints help information\n    -V, --version       Prints version information\n\nOPTIONS:\n        --tx-file <tx-file>                Multisig transaction data file (format: json)\n        --output-format <output-format>    Select output format [default: yaml]  [possible values: yaml, json]\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<PINNED_CKB_CLI>",
+        "tx",
+        "sign-inputs",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "ckb-cli-tx-sign-inputs \nSign all sighash/multisig inputs in this transaction\n\nUSAGE:\n    ckb-cli tx sign-inputs [FLAGS] [OPTIONS] --tx-file <tx-file>\n\nFLAGS:\n        --no-color          Do not highlight(color) output json\n        --add-signatures    Sign and add signatures\n        --debug             Display request parameters\n        --local-only        This is a local only subcommand, do not check alerts and get network type\n        --skip-check        Send transaction without any check, be cautious to use this flag\n    -h, --help              Prints help information\n    -V, --version           Prints version information\n\nOPTIONS:\n        --privkey-path <privkey-path>      Private key file path (only read first line)\n        --from-account <from-account>      The account's lock-arg or sighash address (transfer from this account)\n        --output-format <output-format>    Select output format [default: yaml]  [possible values: yaml, json]\n        --tx-file <tx-file>                Multisig transaction data file (format: json)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<PINNED_CKB_CLI>",
+        "tx",
+        "send",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "ckb-cli-tx-send \nSend multisig transaction\n\nUSAGE:\n    ckb-cli tx send [FLAGS] [OPTIONS] --tx-file <tx-file>\n\nFLAGS:\n        --no-color      Do not highlight(color) output json\n        --skip-check    Send transaction without any check, be cautious to use this flag\n        --debug         Display request parameters\n        --zero-lock     The --zero-lock option allows users to deploy a script permanently locked with an unspendable\n                        lock script. This lock script is defined with the following parameters:\n                        \n                        - code_hash: 0x0000000000000000000000000000000000000000000000000000000000000000\n                        - hash_type: data/data1/data2\n                        - args: 0x\n                        \n                        Once activated, the script becomes immutable and irreversible, ensuring no modifications or\n                        revocations can be made post-deployment.\n                        \n                        Key Considerations:\n                        \n                        - Permanent Immutability: Script logic and data will be permanently fixed on-chain.\n                        - No Recovery Mechanism: If vulnerabilities or defects exist in the script, there is no way to\n                        upgrade, patch, or revoke it.\n                        - Use with Caution: Thoroughly audit and test the script before deployment. This option is\n                        recommended only for scenarios requiring absolute finality, where script behavior must remain\n                        tamper-proof indefinitely.\n        --local-only    This is a local only subcommand, do not check alerts and get network type\n    -h, --help          Prints help information\n    -V, --version       Prints version information\n\nOPTIONS:\n        --tx-file <tx-file>                Multisig transaction data file (format: json)\n        --max-tx-fee <max-tx-fee>          Max transaction fee (unit: CKB) [default: 1.0]\n        --output-format <output-format>    Select output format [default: yaml]  [possible values: yaml, json]\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "<PINNED_CKB_CLI>",
+        "rpc",
+        "get_transaction",
+        "--help"
+      ],
+      "exit": 0,
+      "stdout": "ckb-cli-rpc-get_transaction \nGet transaction content by transaction hash\n\nUSAGE:\n    ckb-cli rpc get_transaction [FLAGS] [OPTIONS] --hash <hash>\n\nFLAGS:\n        --raw-data      Output raw jsonrpc data\n        --packed        returns a 0x-prefixed hex string\n        --no-color      Do not highlight(color) output json\n        --debug         Display request parameters\n        --local-only    This is a local only subcommand, do not check alerts and get network type\n    -h, --help          Prints help information\n    -V, --version       Prints version information\n\nOPTIONS:\n        --hash <hash>                      Tx hash\n        --output-format <output-format>    Select output format [default: yaml]  [possible values: yaml, json]\n",
+      "stderr": ""
+    }
+  ]
+}
