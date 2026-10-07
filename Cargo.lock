@@ -638,6 +638,8 @@ version = "0.1.0"
 dependencies = [
  "artifact-adapter",
  "ckb-testtool",
+ "hex",
+ "serde_json",
 ]
 
 [[package]]
