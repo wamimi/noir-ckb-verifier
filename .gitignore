@@ -33,3 +33,6 @@ node_modules/
 # Fuzzing output is not part of the Week 7 baseline
 fuzz/artifacts/
 fuzz/corpus/
+
+# Python client/validation caches
+__pycache__/
