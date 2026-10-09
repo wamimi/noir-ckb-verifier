@@ -12,13 +12,13 @@ No wallet is needed for local reproduction. Stop on any failed prerequisite.
 ## Get the source and pinned backend
 
 Run from a workspace parent directory. The five original counter/SP1 commits are
-published through `836f2a1fb8426a2f45ce788d4075331b8870854f`. Clone the current
-preview and record its actual revision; the original baseline predates the guided
-launcher. For an exact reproduction of a review, check out that review's recorded
-commit in a separate clone.
+published through `836f2a1`. The tested guided launcher is published at
+`4ae8a710f9ba71be21f8a19cef12dbdf87571f41`; the commands below pin that preview.
+Record `git rev-parse HEAD` with your reproduction feedback.
 
 ```bash
-git clone https://github.com/wamimi/noir-ckb-verifier.git
+git clone --no-checkout https://github.com/wamimi/noir-ckb-verifier.git
+git -C noir-ckb-verifier checkout --detach 4ae8a710f9ba71be21f8a19cef12dbdf87571f41
 git -C noir-ckb-verifier rev-parse HEAD
 git clone https://github.com/wamimi/Noir-Groth16.git
 git -C Noir-Groth16 checkout --detach 828025f3a0090e2934940956c0f5dc8093eb5532

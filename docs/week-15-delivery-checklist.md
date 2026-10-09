@@ -34,7 +34,8 @@ completed review deliverables.
 
 - [x] Five implementation/test/docs/SP1 commits confirmed on GitHub main at `836f2a1`.
 - [x] Original source, reviewer instructions and public evidence are published.
-- [ ] Publish the guided onboarding follow-up after its checks pass.
+- [x] Guided onboarding follow-up published at `4ae8a71`; remote source, reviewer
+      page and evidence checked against local files.
 - [ ] Record and upload the approximately five-minute demonstration; add its real URL.
 - [ ] Publish the combined counter result/backend decision forum update.
 - [ ] Share the same post and reviewer link with the review group and Neon; invite

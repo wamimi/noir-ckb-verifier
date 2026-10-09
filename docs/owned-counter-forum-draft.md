@@ -1,8 +1,8 @@
 # noir-ckb: a testnet counter demo and a request for developer feedback
 
 Status: prepared for publication. Add the actual video URL after recording; do not
-claim this draft has been posted. Source baseline `836f2a1` is published; the guided
-onboarding follow-up must be published before advertising its commands remotely.
+claim this draft has been posted. Source baseline `836f2a1` and the tested guided
+onboarding follow-up `4ae8a71` are published.
 
 ## What now works
 
@@ -24,6 +24,8 @@ and update are confirmed in the linked evidence.
 
 Start with the [reviewer page](https://github.com/wamimi/noir-ckb-verifier/blob/main/docs/owned-counter-review.md)
 and [testnet evidence](https://github.com/wamimi/noir-ckb-verifier/blob/main/evidence/week-15-testnet.md).
+Tested guided preview revision: `4ae8a710f9ba71be21f8a19cef12dbdf87571f41`.
+From that source checkout, run `python3 -B scripts/start-counter.py`.
 You can inspect recorded artifacts, perform live read-only checks, or reproduce the
 complete application locally. Neither initial review nor local reproduction needs
 your own wallet or faucet funds. Testnet deployment is optional.

@@ -30,9 +30,13 @@ The five source/test/documentation/SP1 commits are on GitHub through
 The [original reviewer instructions](https://github.com/wamimi/noir-ckb-verifier/blob/836f2a1/docs/owned-counter-review.md)
 and public proof, statement and transaction evidence are available.
 
-The guided onboarding follow-up is prepared locally, not yet recorded here as
-published. The video and forum announcement are pending publication; no placeholder
-is counted as a delivered demo.
+The guided onboarding follow-up is published at
+`4ae8a710f9ba71be21f8a19cef12dbdf87571f41`, including the
+[reviewer starting page](https://github.com/wamimi/noir-ckb-verifier/blob/4ae8a71/docs/owned-counter-review.md),
+launcher and new validation evidence. Remote source, reviewer page and evidence
+were fetched and matched to the local files after the push.
+The video and forum announcement are pending publication; no placeholder is
+counted as a delivered demo.
 
 ## Backend decision
 
@@ -44,7 +48,7 @@ limitation. This is not a claim that SP1 is unsuitable or Groth16 is universally
 
 ## Pending
 
-- Publish the onboarding follow-up, record/upload the demo, publish/share the forum
+- Record/upload the demo, publish/share the forum
   update with the review group and Neon, and submit this report.
 - Independent reproduction, including installation and execution feedback.
 - Concrete developer use cases, required public-to-Cell mappings, adoption blockers
