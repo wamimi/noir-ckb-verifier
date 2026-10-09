@@ -1,5 +1,12 @@
 # `noir-ckb` developer preview
 
+For the current counter preview, use `noir-ckb counter start` (or, before building
+Rust, `python3 -B scripts/start-counter.py`). See the [reviewer starting page](../../docs/owned-counter-review.md).
+`counter start --help` lists guided modes. Individual `counter` operations remain available.
+This executable requires the Python scripts in its source checkout; it is not a standalone distribution.
+
+The build/prove/test documentation below describes the historical Capsule workflow.
+
 `noir-ckb` coordinates the repository's pinned, development-only path from the
 supported Noir Capsule circuit to a proof-bound transaction test in CKB-VM.
 

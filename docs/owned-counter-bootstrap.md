@@ -11,16 +11,15 @@ No wallet is needed for local reproduction. Stop on any failed prerequisite.
 
 ## Get the source and pinned backend
 
-Run from a workspace parent directory. The announcement must identify a source
-revision that actually includes the counter. At drafting time the implementation
-is uncommitted on base `b155300`; checking out that base alone is insufficient.
-Set `COUNTER_SOURCE_REF` to the published revision, not an invented tag:
+Run from a workspace parent directory. The five original counter/SP1 commits are
+published through `836f2a1fb8426a2f45ce788d4075331b8870854f`. Clone the current
+preview and record its actual revision; the original baseline predates the guided
+launcher. For an exact reproduction of a review, check out that review's recorded
+commit in a separate clone.
 
 ```bash
-# Set COUNTER_SOURCE_REF from the actual preview announcement before these lines.
-test -n "$COUNTER_SOURCE_REF"
-git clone --no-checkout https://github.com/wamimi/noir-ckb-verifier.git
-git -C noir-ckb-verifier checkout --detach "$COUNTER_SOURCE_REF"
+git clone https://github.com/wamimi/noir-ckb-verifier.git
+git -C noir-ckb-verifier rev-parse HEAD
 git clone https://github.com/wamimi/Noir-Groth16.git
 git -C Noir-Groth16 checkout --detach 828025f3a0090e2934940956c0f5dc8093eb5532
 cd noir-ckb-verifier
@@ -118,8 +117,17 @@ python3 scripts/fetch-counter-tools.py --out target/counter-tools
 
 Expected: manifest with CKB 0.210.0 and ckb-cli 2.0.0, checked archive and executable
 SHA-256 values. Existing output directories intentionally reject; choose a new
-name and carry it through your next commands. Return to the
-[local quickstart](owned-counter-quickstart.md#one-disposable-local-lifecycle).
+name and carry it through your next commands. Then run the guided checks and lifecycle:
+
+```bash
+python3 -B scripts/start-counter.py doctor
+python3 -B scripts/start-counter.py local
+```
+
+The launcher also recognizes Homebrew LLVM 18 in its standard ARM64 location and
+sets its target compiler environment for child processes. It does not install tools
+or edit your shell configuration. Use `--tools PATH` for a different downloaded-tool
+directory. The [local quickstart](owned-counter-quickstart.md) retains the direct commands.
 
 ## Resources and failures
 

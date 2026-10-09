@@ -16,6 +16,13 @@ inspect the [public testnet evidence](evidence/week-15-testnet.md).
 This is a source-based preview; external reproduction is still requested.
 
 
+**Start here:** [inspect or reproduce the counter](docs/owned-counter-review.md).
+From the source checkout with Python 3.9+, run `python3 -B scripts/start-counter.py`
+for guided inspection, read-only testnet checks or local reproduction. Inspection
+needs no wallet or faucet funds. The sections below retain historical milestones;
+top-level `build/prove/test` still refer to the older Capsule example.
+
+
 An experimental toolchain for turning Noir circuits into CKB-deployable Groth16 verification artifacts and binding proofs to typed Cell transitions.
 
 ## Status

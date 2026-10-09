@@ -1,0 +1,37 @@
+[
+  {
+    "case": "maximum-valid",
+    "fresh_proof": true,
+    "passed": true
+  },
+  {
+    "case": "old-out-of-range",
+    "passed": true,
+    "fresh_proof": false,
+    "boundary": "witness constraint solving"
+  },
+  {
+    "case": "new-overflow",
+    "passed": true,
+    "fresh_proof": false,
+    "boundary": "witness constraint solving"
+  },
+  {
+    "case": "not-increment",
+    "passed": true,
+    "fresh_proof": false,
+    "boundary": "witness constraint solving"
+  },
+  {
+    "case": "context-lo-overflow",
+    "passed": true,
+    "fresh_proof": false,
+    "boundary": "witness constraint solving"
+  },
+  {
+    "case": "context-hi-overflow",
+    "passed": true,
+    "fresh_proof": false,
+    "boundary": "witness constraint solving"
+  }
+]

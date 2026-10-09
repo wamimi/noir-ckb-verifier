@@ -35,6 +35,14 @@ checkout, host/compiler installation, exact toolchain pins and all three locked
 Cargo caches plus the npx cache. Its commands distinguish tested warm-cache checks
 from an untested full fresh-machine installation.
 
+## Guided entry point
+
+After bootstrap, run `python3 -B scripts/start-counter.py` and choose local
+reproduction, or use `python3 -B scripts/start-counter.py local` directly.
+The launcher checks prerequisites, chooses a fresh run directory and includes
+negative tests and mutations. `doctor` checks prerequisites without starting a chain.
+The equivalent built Rust command is `noir-ckb counter start`.
+
 ## One disposable local lifecycle
 
 From this source checkout, use new output directories on each run:

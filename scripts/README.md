@@ -23,6 +23,10 @@ of Tau transcripts, proving keys, or proofs.
 
 ## Owned counter v1
 
+`start-counter.py` offers a guided menu and scriptable `inspect`, `live`, `doctor`
+and `local` modes. Local mode delegates to the existing runner with mutations enabled;
+it checks prerequisites but does not install system tools.
+
 See [the quickstart](../docs/owned-counter-quickstart.md). `fetch-counter-tools.py`
 installs hash-pinned development tools into a new directory. `local-owned-counter.py`
 executes the complete disposable local lifecycle; it signs and broadcasts only on

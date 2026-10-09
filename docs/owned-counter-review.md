@@ -5,59 +5,94 @@ increment, with CKB enforcing ownership, initialization and the specific Cell
 transition. It is one fixed reference application, not yet a toolkit that can
 generate arbitrary applications from your circuit.
 
-## Start here: choose the counter, not the historical Capsule
+**Limits upfront:** fixed public counter; public, development-only Groth16 setup;
+local reproduction tested on macOS ARM64; no arbitrary-circuit generation;
+no withdrawal/destruction from the application Cell. This is not audited or production-ready.
 
-The counter uses `scripts/local-owned-counter.py` and `noir-ckb counter ...`.
-The top-level `noir-ckb build/prove/test` and `scripts/reviewer-smoke.sh` still
-exercise Capsule. Neither accepts your external circuit as a new application.
-For a new machine, begin with [complete prerequisites](owned-counter-bootstrap.md).
-For a quick no-wallet view from this source checkout:
+## Start here
 
-```bash
-python3 -B scripts/review-counter.py
-```
-
-This prints **recorded evidence**, not a live transaction. To refresh read-only:
+You can read the evidence in your browser without installing tools, obtaining a
+wallet or requesting faucet funds. To use the guided source-checkout launcher,
+install Git and Python 3.9+, clone this repository, and run from its root:
 
 ```bash
-python3 -B scripts/review-counter.py --rpc https://testnet.ckb.dev
+python3 -B scripts/start-counter.py
 ```
 
-Expected: three committed transactions, state 0→1, 200 CKB, consumed input and
-current successor status. No keys, signatures or broadcasts. The portable public
-manifest is [here](../evidence/week-15-public/deployment.json); historical local
-paths are unnecessary. A currently spent successor does not invalidate the
-historical committed update; its current status is shown separately.
+The menu separates recorded inspection, live read-only checks, local reproduction
+and prerequisite diagnostics. If the Rust CLI is already built, the equivalent is
+`noir-ckb counter start`. The launcher requires this source checkout; it is not a
+standalone binary or automatic system installer.
+
+The historical top-level `noir-ckb build/prove/test` and `reviewer-smoke.sh`
+exercise Capsule, not this counter. Use the counter paths below.
 
 ## Choose a review path
 
-### 1. Inspect the deployed demonstration — no wallet required
+### 1. Inspect the existing demonstration — no wallet required
 
-Open the [deployment, initialization and update evidence](../evidence/week-15-testnet.md).
-Follow its explorer links and compare the initial and successor Cell data,
-ownership, capacity, and consumed input. State encoding is a version byte `01`
-followed by a little-endian u64: zero is `010000000000000000`, and one is
-`010100000000000000`.
+**Offline / recorded:** open the [testnet evidence](../evidence/week-15-testnet.md),
+[public statement](../evidence/week-15-public/update-public.json),
+[proof](../evidence/week-15-public/update-proof.snarkjs.json) and
+[verification key](../evidence/week-15-public/verification-key.snarkjs.json).
+With the source checkout and Python, run:
 
-This is read-only review, not a browser playground. You cannot update the
-maintainer-owned counter without its ownership signature. Do not request or
-share its keys.
+```bash
+python3 -B scripts/start-counter.py inspect
+```
 
-### 2. Run your own disposable local instance
+This checks public artifact hashes and displays the recorded state 0→1 and 200 CKB.
+It does not query a node or cryptographically verify the proof. For a separate
+cryptographic check, install Node.js/npm, cache the pinned package once online,
+and then verify the retained proof offline:
 
-Follow the [local quickstart](owned-counter-quickstart.md). The reproduced platform
-is macOS ARM64. Start with the toolchain/cache prerequisites; the runner uses
-offline builds and will not install every prerequisite automatically.
+```bash
+npm exec --yes --package=snarkjs@0.7.5 -- node -e 'console.log("snarkjs cached")'
+npx --offline snarkjs@0.7.5 groth16 verify evidence/week-15-public/verification-key.snarkjs.json evidence/week-15-public/update-public.json evidence/week-15-public/update-proof.snarkjs.json
+```
 
-The local workflow generates development artifacts, starts an isolated node,
-creates an account, initializes the counter, proves an update, and checks the
-committed Cells. It always runs the negative matrix; `--mutations` additionally runs isolated
-mutations. Expected evidence includes 48 VM cases and three detected mutations.
-See the [test matrix](owned-counter-test-matrix.md) for what those checks mean.
+Expected proof verification: exit zero and `OK!`. This verifies an existing proof;
+it does not generate a fresh proof or independently establish chain commitment.
 
-Use new output directories. Never reuse generated local account keys publicly.
-The installed Rust executable alone is not a standalone package: current counter
-commands require the Python scripts and source checkout.
+**Live / read-only:** follow the evidence page's explorer links or run:
+
+```bash
+python3 -B scripts/start-counter.py live
+```
+
+This queries testnet and checks the three committed transactions, deployed artifact
+identities, consumed input, statement, ownership and capacity. It reports current
+Cell status separately. A successor spent later does not invalidate the historical
+update. No signing or broadcast occurs. No current network check is claimed when
+the network is unavailable; use the explicitly recorded path instead.
+
+The application Type binds the public statement to the actual Cell operation and
+verifies the proof. The conventional owner Lock requires an owner signature.
+Neither a valid proof alone nor an owner signature alone is sufficient for an update.
+
+### 2. Reproduce the complete application locally
+
+The [bootstrap guide](owned-counter-bootstrap.md) covers the pinned compiler,
+backend, Rust toolchains, dependency caches and node tools. Only this path needs
+the full development toolchain. The supported reproduced environment is macOS ARM64.
+
+```bash
+python3 -B scripts/start-counter.py doctor
+python3 -B scripts/start-counter.py local
+```
+
+The launcher reports missing prerequisites with remedies. Once they pass, it
+chooses a fresh output directory and runs the existing disposable local lifecycle:
+fresh development setup and proof generation, initialization, 48 VM cases,
+three isolated mutations, and a signed update with committed Cells checked.
+It creates its own local-only account and funds; you need no existing wallet or faucet.
+Use `--help` for custom backend/tool paths, output directory and local ports.
+`local --yes` supports non-interactive execution.
+
+See the [quickstart](owned-counter-quickstart.md) for individual operations and
+[negative-test matrix](owned-counter-test-matrix.md) for the checks. Failed runs
+remain failures and retain diagnostics. Never share generated keys or entire
+output directories. Full fresh-machine and independent reproduction remain unverified.
 
 ### 3. Deploy your own testnet instance — advanced/operator-assisted
 
@@ -77,12 +112,15 @@ Cell. Review unsigned transactions before signing and confirm before retries.
 
 Please use the **Owned counter v1 preview review** issue template. Separate:
 
-- Reproduction: platform, revision, steps attempted, elapsed setup time, exact
-  failure or success, and whether you inspected, ran locally, or used testnet.
-- Application need: what you want to build, what the proof would establish,
-  which Cell operation it would authorize, and the specific missing capability
-  preventing integration today.
-- Follow-up: whether you would test a supported integration for that use case.
+- Could you follow the instructions without help? Where did installation or execution fail?
+- Were proof verification, owner authorization and Cell binding responsibilities clear?
+- What would you want to prove in a CKB application? Do you have a Noir circuit or concrete application?
+- Which public values would need to match your Cells?
+- Would you try an early supported-circuit workflow with us? What would prevent adoption?
+
+Include your revision, platform, attempted path, elapsed setup time and sanitized
+errors. A concrete use case plus agreement to test is stronger demand evidence
+than general interest; successful reproduction primarily validates usability.
 
 Do not attach wallet directories, private inputs, secrets, or entire target folders.
 Enthusiasm and working tests do not alone establish developer demand. Concrete
@@ -91,6 +129,8 @@ integration needs and actual reproduction attempts are the purpose of this previ
 ## Source provenance
 
 The [publication source snapshot](../evidence/week-15-public/publication-source-state.json)
-records hashes for the publishable source and evidence. Use a published commit
-containing this guide when reporting reproduction results. The preview is a
+records the original handoff's file hashes, not a rolling hash list for later
+onboarding edits. The original five counter/SP1 commits were confirmed on GitHub
+at `836f2a1fb8426a2f45ce788d4075331b8870854f`. Use `git rev-parse HEAD` to report
+the exact revision of your checkout, including subsequent launcher changes. The preview is a
 source-checkout workflow, not a standalone binary distribution.

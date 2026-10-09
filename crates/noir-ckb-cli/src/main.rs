@@ -43,11 +43,18 @@ enum Command {
 
 fn run(cli: Cli) -> Result<(), CliError> {
     if let Command::Counter { args } = &cli.command {
-        let script =
-            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../scripts/owned_counter.py");
+        let (entry, forwarded) = if args.first().map(String::as_str) == Some("start") {
+            ("start-counter.py", &args[1..])
+        } else {
+            ("owned_counter.py", &args[..])
+        };
+        let script = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../scripts")
+            .join(entry);
         let status = std::process::Command::new("python3")
+            .arg("-B")
             .arg(script)
-            .args(args)
+            .args(forwarded)
             .status()
             .map_err(|source| CliError::CommandStart {
                 command: "counter client".into(),

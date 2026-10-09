@@ -1,0 +1,25 @@
+{
+  "status": "locally-validated",
+  "profile": "noir-ckb/owned-counter/v1",
+  "network": "isolated-local-development",
+  "tool_binaries": {
+    "ckb_sha256": "800d625b4baaa55cf6408b2f30ad744c4df90d52b94023ce226be875327c9493",
+    "ckb_cli_sha256": "994166d983955fb59b6bab172485b3f65ff60487493b62a6569ad93eaa7adffb"
+  },
+  "genesis": "0x2485f6bba9d7b18fb7f0ce2bb82dbd95142d03ebf892a4fc1fb6bcde8dbfd176",
+  "deployment": {
+    "tx_hash": "0xdee7451f8a322e01c7fdbeab387d2eb245dba19af47c7cfc34fa85a2f4f8b965",
+    "status": "committed-and-cells-checked"
+  },
+  "creation": {
+    "tx_hash": "0x3dc14308620ddcde410807c5ac7f992cc794d721556a22d91ca1371861ca2059",
+    "status": "committed-and-cells-checked"
+  },
+  "update": {
+    "tx_hash": "0xdbb80a67dfffe8ccb8b2fc1f3a1c003905614f96cccb43a753a9ee494de60c72",
+    "status": "committed-and-cells-checked"
+  },
+  "release_sha256": "305a910cad808fd28df2d03cc8c5fe273c4cebda5b276c7b032ce8e89db44246",
+  "matrix_cases": 48,
+  "mutations_executed": true
+}

@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-09",
+  "original_published_revision": "836f2a1fb8426a2f45ce788d4075331b8870854f",
+  "environment": "maintainer macOS ARM64; existing pinned tools/backend and warm caches; not independent or fresh-machine reproduction",
+  "command": "python3 -B scripts/start-counter.py local --yes --tools target/week-15/tools-01 --out target/week-15-guided-validation-20261009 --rpc-port 18134 --p2p-port 18135",
+  "exit": 0,
+  "python_tests_passed": 19,
+  "cli_tests_passed": 6,
+  "clippy": "passed with warnings denied",
+  "format": "passed",
+  "retained_public_proof": "snarkjs 0.7.5 verify exit 0, OK!",
+  "read_only_testnet_check": "three committed transactions and contents verified; initial unknown, successor live",
+  "public_files_sha256": {
+    "local-run.json": "0a4e790080364456af14d32d2eaefa5609809e5ae0c5adf2903ea05b015d3d40",
+    "range-results.json": "47c246d3a08caaee2464416d02b835ba8c8328fcbde858d33d2d60ffe25c71ea",
+    "mutations.json": "f7d7870f14fa2bb165c27ccd346fa88e74984724813ad6b4df118619f473e3d7",
+    "matrix-results.json": "3de8346f0285f7b44f9c11ab34ede9feed4913ade81b26f9daa2e251450dc723"
+  }
+}
