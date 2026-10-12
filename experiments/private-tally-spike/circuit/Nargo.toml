@@ -1,0 +1,10 @@
+[package]
+name = "private_tally_spike"
+type = "bin"
+authors = []
+
+[dependencies]
+# noir-lang/poseidon v0.2.6 = commit 00f879180a56720169cff92a56778d40678d8e26.
+# Only Poseidon2::hash calls with <= 3 inputs are allowed: longer inputs hit the
+# stale-cache bug fixed in v0.4.0, which does not compile on Noir beta.18.
+poseidon = { tag = "v0.2.6", git = "https://github.com/noir-lang/poseidon" }

@@ -85,8 +85,8 @@ the normal CLI's clean-revision guard, project configuration, or current-build
 pointers. It performs no trusted setup, proving or VM execution.
 
 Expected final markers: `week14_layout_checks=passed` and
-`fresh_proof_and_vm_status=pending`. Any error is a stop condition. Do not reuse
-an output directory or continue to setup after a mismatch. A missing offline
+`fresh_proof_and_vm_status=pending`. The runner treats any error as a stop
+condition: it never reuses an output directory or continues to setup after a mismatch. A missing offline
 dependency is a prerequisite failure, not a successful test. The runner completed
 successfully in `local-check-01` and, after lint cleanup, `local-check-02`.
 Its pending-proof marker describes the runner's scope; later proof and VM results

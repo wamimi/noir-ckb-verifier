@@ -1,5 +1,6 @@
 # Schemas
 
-This directory will hold the Molecule schemas or pinned schema imports used to encode verification keys, proofs, and public inputs for `groth16-ckb`.
-
-Week 7 documents the existing wire endpoint but does not duplicate or modify its production schema.
+Reserved for Molecule schemas used to encode verification keys, proofs and public
+inputs. None are defined here yet: the project uses the production schema of
+[`groth16-ckb`](https://github.com/CECILIA-MULANDI/groth16-ckb) through its pinned
+`wire-decode` crate, without duplicating or modifying it.

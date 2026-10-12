@@ -1,0 +1,59 @@
+name: Counter Linux container
+
+# Builds the pinned counter image and runs the local, no-wallet lifecycle on
+# Ubuntu 24.04 x86_64 and ARM64 hosted runners. Runs on manual dispatch, or on
+# a push to a branch named counter-linux-validation/* (full local mode; workflow_dispatch only
+# appears once this file is on the default branch). Uploads public summaries
+# only (never run/private or wallet directories).
+on:
+  push:
+    branches: ["counter-linux-validation/**"]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "quick (lifecycle) or local (lifecycle + 48 VM cases, ranges, mutations)"
+        required: true
+        default: quick
+        type: choice
+        options: [quick, local]
+
+permissions:
+  contents: read
+
+jobs:
+  counter:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Python launcher tests
+        run: python3 -B -m unittest discover -s scripts/tests -v
+
+      - name: Build pinned image
+        run: scripts/run-counter-container.sh build
+
+      - name: Run counter (${{ inputs.mode || 'local' }})
+        run: scripts/run-counter-container.sh "${{ inputs.mode || 'local' }}"
+
+      - name: Collect public summaries
+        if: always()
+        run: |
+          mkdir -p public-summary
+          for dir in target/container-runs/*/; do
+            name="$(basename "$dir")"
+            mkdir -p "public-summary/$name"
+            for file in container-provenance.json exit-code console.log run/manifest.json; do
+              if [ -f "$dir/$file" ]; then cp "$dir/$file" "public-summary/$name/$(echo "$file" | tr / -)"; fi
+            done
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: counter-${{ inputs.mode || 'local' }}-${{ matrix.runner }}
+          path: public-summary/

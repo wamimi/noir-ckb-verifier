@@ -127,10 +127,8 @@ transaction. Capacity and unrelated outputs are excluded. The Type checks that
 the successor Lock matches the input Lock, but does not authenticate that Lock
 as the intended verifier. Correct verifier/VK admission is therefore a composition
 assumption, not a property of the Type alone. Creation/destruction are unsupported.
-These limitations are now demonstrated by the
-[binding boundary tests](../evidence/binding-review.md). See the
-[proposed profile](binding-profile-v1.md) for witness ownership, exact identity
-semantics and future context choices. No Spawn/IPC integration is needed for the
+These limitations were demonstrated by dedicated binding boundary tests on
+6 October 2026, and informed the owned counter's design in Week 15. No Spawn/IPC integration is needed for the
 current two-script composition.
 
 ## Why the Barretenberg path is only a control

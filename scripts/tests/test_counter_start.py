@@ -49,6 +49,32 @@ class StartTests(unittest.TestCase):
             forwarded = run.call_args.args[1]
             self.assertTrue(forwarded[forwarded.index("--out") + 1].is_absolute())
 
+    def test_full_local_never_passes_quick(self):
+        with patch.object(start, "doctor", return_value=True), patch.object(start, "validate_local"), patch.object(start, "run_script", return_value=0) as run:
+            self.assertEqual(start.main(["local", "--yes"]), 0)
+            self.assertNotIn("--quick", run.call_args.args[1])
+
+    def test_quick_skips_mutations_and_is_labelled(self):
+        with patch.object(start, "doctor", return_value=True), patch.object(start, "validate_local"), patch.object(start, "run_script", return_value=0) as run:
+            self.assertEqual(start.main(["quick", "--yes"]), 0)
+            forwarded = run.call_args.args[1]
+            self.assertEqual(run.call_args.args[0], "local-owned-counter.py")
+            self.assertIn("--quick", forwarded)
+            self.assertNotIn("--mutations", forwarded)
+
+    def test_quick_still_requires_prerequisites(self):
+        with patch.object(start, "doctor", return_value=False), patch.object(start, "run_script") as run:
+            self.assertEqual(start.main(["quick", "--yes"]), 1)
+            run.assert_not_called()
+
+    def test_join_test_uses_its_own_flag(self):
+        with patch.object(start, "doctor", return_value=True), patch.object(start, "validate_local"), patch.object(start, "run_script", return_value=0) as run:
+            self.assertEqual(start.main(["join-test", "--yes"]), 0)
+            forwarded = run.call_args.args[1]
+            self.assertIn("--join-test", forwarded)
+            self.assertNotIn("--quick", forwarded)
+            self.assertNotIn("--mutations", forwarded)
+
     def test_doctor_never_starts_local_runner(self):
         with patch.object(start, "doctor", return_value=True), patch.object(start, "run_script") as run:
             self.assertEqual(start.main(["doctor"]), 0)

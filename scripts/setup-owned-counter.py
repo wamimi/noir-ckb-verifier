@@ -11,7 +11,7 @@ def main():
     ap.add_argument('--backend',type=Path,default=ROOT.parent/'Noir-Groth16')
     args=ap.parse_args(); out=args.out.resolve(); backend=args.backend.resolve()
     out.mkdir(parents=True,exist_ok=False)
-    log=[]; manifest={'status':'running','setup':'PUBLIC DEVELOPMENT ONLY; single-party, public entropy; NOT production','profile':'noir-ckb/owned-counter/v1'}
+    log=[]; manifest={'status':'running','setup':'DEVELOPMENT ONLY; single-party local setup (public -e label, snarkjs adds OS randomness that is not retained; the contributor could have kept it); NOT production','profile':'noir-ckb/owned-counter/v1'}
     def save():
         (out/'commands.json').write_text(json.dumps(log,indent=2)+'\n')
         (out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')

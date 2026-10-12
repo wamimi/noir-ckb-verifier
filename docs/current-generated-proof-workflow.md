@@ -81,6 +81,6 @@ Raw backend `witness` diagnostics now include `acir.wtns`; use the paired
 uses the latter. Regenerate setup keys and proofs when wire layout changes.
 Never mix old keys with a newly compiled circuit.
 
-The setup uses public development entropy. The Capsule commitments are arithmetic
+The setup is a single-party development setup (snarkjs mixes OS randomness with the public `-e` label; the contribution secret is not retained, but the person who ran setup could have kept it and forged proofs). The Capsule commitments are arithmetic
 placeholders, not a private protocol. Historical Week 8–12 guides and fixtures
 retain their original revisions; they must not be relabeled as fork-generated.

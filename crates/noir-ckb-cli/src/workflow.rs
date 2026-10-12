@@ -256,7 +256,7 @@ pub fn build(loaded: &LoadedConfig) -> Result<(), CliError> {
 
 pub fn prove(loaded: &LoadedConfig) -> Result<(), CliError> {
     println!("profile={DEVELOPMENT_PROFILE}");
-    println!("warning=the proving setup uses public development entropy");
+    println!("warning=the proving setup is a single-party development setup, not a production ceremony");
     validate_required_inputs(loaded)?;
     validate_nargo_version(loaded)?;
     validate_snarkjs_version(loaded)?;

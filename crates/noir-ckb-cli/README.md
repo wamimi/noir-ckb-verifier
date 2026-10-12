@@ -1,7 +1,7 @@
 # `noir-ckb` developer preview
 
 For the current counter preview, use `noir-ckb counter start` (or, before building
-Rust, `python3 -B scripts/start-counter.py`). See the [reviewer starting page](../../docs/owned-counter-review.md).
+Rust, `python3 -B scripts/start-counter.py`). See [Try the counter](../../docs/try-the-counter.md).
 `counter start --help` lists guided modes. Individual `counter` operations remain available.
 This executable requires the Python scripts in its source checkout; it is not a standalone distribution.
 
@@ -64,8 +64,8 @@ target/noir-ckb/proof-bound-capsule/builds/<run-id>/
 
 ### `noir-ckb prove`
 
-The prove command creates fresh BN254 Groth16 setup and proof artifacts with
-public development entropy. It checks the exact seven-value public vector,
+The prove command creates fresh BN254 Groth16 setup and proof artifacts from a
+single-party development setup (not publicly derivable; not production). It checks the exact seven-value public vector,
 requires all configured negative vectors to fail, performs the arkworks and
 pinned endpoint round trip, and writes CKB Molecule payloads below:
 

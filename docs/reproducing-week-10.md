@@ -371,7 +371,7 @@ positions.
 
 ### Generate a development-only Groth16 proof
 
-The following setup uses public development entropy. It is deliberately
+The following is a single-party development setup (snarkjs mixes OS randomness with the public `-e` label; the contribution secret is not retained, but the person who ran setup could have kept it and forged proofs). It is deliberately
 unsuitable for production.
 
 ```bash

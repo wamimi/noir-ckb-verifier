@@ -1,0 +1,9 @@
+# Never send generated runs, disposable keys, wallets or private notes to a build.
+target/
+.local/
+**/private/
+**/*.key
+**/wallet/
+node_modules/
+.git/
+experiments/week13-sp1/target/

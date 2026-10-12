@@ -8,11 +8,11 @@ work describe the earlier local-run snapshot, not the latest project status.
 The implementation uses a separate application profile with inexpensive owner
 admission before pairing.
 Base toolkit revision is `b155300c8145916a485696bf461e36f055bb5135`; implementation
-is uncommitted workspace changes, not a claimed release revision. No staging,
-commit, push, publication, PR or public-network transaction was performed.
+was not yet committed at this snapshot, so the base revision alone does not
+contain it. No public-network transaction had been made at this point.
 
 The [application specification](../docs/week-15-acceptance-spec.md),
-[quickstart](../docs/owned-counter-quickstart.md), and
+[quickstart](https://github.com/wamimi/noir-ckb-verifier/blob/6e49bec/docs/owned-counter-quickstart.md), and
 [requirement matrix](../docs/owned-counter-test-matrix.md) describe the fixed
 `noir-ckb/owned-counter/v1` profile. It is a **public proof-enforcement example**,
 not a privacy application or general generator. Application capacity has **no
@@ -55,7 +55,7 @@ Runner: `scripts/local-owned-counter.py`, copied into
 `target/week-15/reproduction-source-01/`, output `target/local-run` beneath that
 copy. Invoked with the pinned native CKB/ckb-cli paths, backend
 `/Users/xiaomao/Noir-Groth16`, ports 18124/18125 and `--mutations`.
-[Full commands](week-15/local-commands.json), [source copy](week-15/source-copy.json),
+[Full commands](week-15/local-commands.json),
 [build flags](week-15/build.json), [setup logs](week-15/setup-commands.json).
 
 Pins: backend `828025f3a0090e2934940956c0f5dc8093eb5532`; verifier libraries
@@ -123,9 +123,9 @@ retained. All recorded range failures explicitly contain `Cannot satisfy constra
 The circuit/contract sources match the fresh-directory release source hashes.
 The earlier whole-workflow run and these later targeted checks are distinct.
 
-[Preservation hashes](week-15/preservation.json) verify 36 historical and pre-existing files
-unchanged, including Capsule source/fixtures, earlier evidence and pre-existing
-untracked planning documents. No old public slot, key or artifact was repurposed.
+The original validation also checked that 36 historical and pre-existing files
+were unchanged. Workspace inventory and preservation bookkeeping are retained
+locally. No old public slot, key or artifact was repurposed.
 The previous Phase 1 file intentionally retains its historical pre-implementation
 status; the later application specification and this implementation evidence supersede
 that status without rewriting historical measurements.
@@ -137,11 +137,10 @@ admission, fresh development setup, unsigned transaction/proof/check/confirmatio
 client, existing CLI `counter` entry point, local signing/node workflow, VM/range/
 mutation tests, integrity manifests, quickstart and issue template.
 
-**Implemented but not publicly executed:** operator-assisted testnet preparation,
-signing-tool integration and confirmation path. Testnet policy/artifact build,
-wallet/address/funding preflight, approved broadcasts and receipts are pending.
-No transaction is submitted or confirmed on testnet. Begin with the small read-only
-[operator preflight batch](../docs/owned-counter-testnet.md); wait for actual output.
+**Implemented but not yet publicly executed at this snapshot:** testnet preparation,
+signing-tool integration and the confirmation path. No testnet transaction had been
+submitted at this point; the testnet lifecycle was completed later and is recorded in
+[testnet evidence](week-15-testnet.md).
 
 **Proposed only:** configurable external-circuit bindings and future application
 profiles, including Battleship. No game or general compiler is implemented.
