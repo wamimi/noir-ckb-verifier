@@ -63,7 +63,7 @@ def doctor(args, env):
     check("pinned clean backend", probe(["git", "rev-parse", "HEAD"], env, args.backend, contains=BACKEND_REV)
           and probe(["git", "diff", "--quiet", "HEAD"], env, args.backend)
           and clean_backend(args.backend, env),
-          f"Clone the backend and check out {BACKEND_REV}; see docs/owned-counter-bootstrap.md.")
+          f"Clone the backend and check out {BACKEND_REV}; see docs/try-the-counter.md (Part 1, option B).")
     check("Nargo beta.18 and compiler pin", probe(["nargo", "--version"], env, contains="1.0.0-beta.18")
           and probe(["nargo", "--version"], env, contains="99bb8b5cf33d7669adbdef096b12d80f30b4c0c9"),
           "Run: python3 scripts/fetch-counter-tools.py (pinned nargo), or: noirup --version 1.0.0-beta.18")
@@ -73,7 +73,7 @@ def doctor(args, env):
           "Run: npm exec --yes --package=snarkjs@0.7.5 -- node -e 'console.log(1)'")
     compiler = env.get("CC_riscv64imac_unknown_none_elf")
     check("LLVM 18 target compiler", bool(compiler) and cp.clang_major(compiler, env) == 18,
-          (entry["clang_hint"] if entry else "Install clang 18") + "; or export CLANG. See docs/owned-counter-bootstrap.md.")
+          (entry["clang_hint"] if entry else "Install clang 18") + "; or export CLANG. See docs/try-the-counter.md (Part 1, option B).")
     # Query rustup's list instead of running `rustc +x`, which can trigger an automatic toolchain download.
     installed = {version: installed_toolchain(version, env) for version in ("1.95.0", "1.94.1")}
     for version, ok in installed.items():
@@ -93,7 +93,7 @@ def doctor(args, env):
         check(f"{name} pinned executable", ok,
               f"Run: python3 scripts/fetch-counter-tools.py --out {shlex.quote(str(args.tools))} (lists URLs and asks first).")
     print("Prerequisite checks passed." if not failures else
-          f"Fix {len(failures)} prerequisite check(s), then rerun doctor. Full guide: docs/owned-counter-bootstrap.md.", flush=True)
+          f"Fix {len(failures)} prerequisite check(s), then rerun doctor. Guide: docs/try-the-counter.md.", flush=True)
     return not failures
 
 
@@ -159,7 +159,7 @@ def main(argv=None):
               "3. Quick local run: fresh proof and signed local transactions (no wallet, no funds)\n"
               "4. Full local validation: quick run plus 48 VM cases, range checks and 3 mutations\n5. Check local prerequisites\n"
               "6. Rehearse the testnet participant path locally (second key joins a local deployment)\n"
-              "   For real testnet participation see docs/owned-counter-testnet-join.md")
+              "   For real testnet participation see docs/try-the-counter.md (Part 2)")
         choice = input("Choose 1–6: ").strip()
         if choice not in ("1", "2", "3", "4", "5", "6"):
             parser.error("Choose 1 to 6.")

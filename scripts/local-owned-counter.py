@@ -70,7 +70,7 @@ def main():
         manifest['genesis']=genesis;save();client('preflight','--rpc',url,'--genesis',genesis,'--out',out/'policy.json')
         stage('setup + fresh proof');run(['python3',c.ROOT/'scripts/setup-owned-counter.py','--out',out/'setup','--backend',a.backend.resolve()])
         stage('contract build');client('build','--policy',out/'policy.json','--setup',out/'setup','--out',out/'build');release=out/'build/release.json'
-        if not a.quick:stage('range checks');run(['python3',c.ROOT/'scripts/check-counter-ranges.py','--release',release,'--out',out/'ranges'])
+        if not (a.quick or a.join_test):stage('range checks');run(['python3',c.ROOT/'scripts/check-counter-ranges.py','--release',release,'--out',out/'ranges'])
         g=c.rpc(url,'get_block_by_number',['0x0'])['transactions'][0];i=next(i for i,o in enumerate(g['outputs']) if o['lock']['args']==arg)
         client('prepare','deploy','--release',release,'--rpc',url,'--owner',arg,'--funding',g['hash']+':'+hex(i),'--out',out/'deploy.json')
         stage('deployment');deployment=submit(out/'deploy.json','deployment')

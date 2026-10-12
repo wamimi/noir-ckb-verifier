@@ -1,7 +1,7 @@
 # `noir-ckb` developer preview
 
 For the current counter preview, use `noir-ckb counter start` (or, before building
-Rust, `python3 -B scripts/start-counter.py`). See the [reviewer starting page](../../docs/owned-counter-review.md).
+Rust, `python3 -B scripts/start-counter.py`). See [Try the counter](../../docs/try-the-counter.md).
 `counter start --help` lists guided modes. Individual `counter` operations remain available.
 This executable requires the Python scripts in its source checkout; it is not a standalone distribution.
 

@@ -281,7 +281,7 @@ def init(args):
 Verified. Your toolchain reproduces the published circuit, R1CS and verification key,
 and the live testnet Cells hold the published contract and key.
 
-Next (see docs/owned-counter-testnet-join.md):
+Next (see docs/try-the-counter.md, Part 2):
   1. Create a dedicated testnet-only account with your own ckb-cli and fund it from the faucet.
   2. Pick ONE live, empty funding Cell of at least {APP_CAPACITY_CKB + MIN_CHANGE_CKB + 1} CKB.
      {APP_CAPACITY_CKB} CKB becomes permanently locked in your counter (minimum allowed {minimum} CKB);

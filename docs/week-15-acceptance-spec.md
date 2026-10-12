@@ -6,8 +6,7 @@ Status: **implemented, locally validated, and demonstrated on testnet**. See
 lifecycle is recorded in [testnet evidence](../evidence/week-15-testnet.md).
 Implementation started from toolkit `b155300c8145916a485696bf461e36f055bb5135`.
 The existing Capsule and its artifacts remain
-historical regressions. [Feasibility evidence](../evidence/week-15-phase1.md)
-is for the existing verifier, not this application.
+historical regressions.
 
 ## Architecture
 
@@ -223,7 +222,7 @@ The circuit/Type/client use a separate profile; Capsule remains unchanged.
 CLI pin/adapter/manifest facilities are reused, with setup separated from
 per-operation proving and public values derived from live Cells.
 The implementation adds the fixed `counter` command family; exact implemented
-commands and prerequisites are in the [quickstart](owned-counter-quickstart.md).
+commands and prerequisites are in [Try the counter](try-the-counter.md).
 The documented wallet interface uses pinned ckb-cli tooling and separately
 reviewed preparation, signing, submission and confirmation steps.
 
@@ -232,11 +231,10 @@ and a same-machine fresh-directory reproduction are recorded in the evidence.
 The separate testnet evidence records confirmed public transactions. No
 independent reproduction or production-readiness claim follows from these results.
 
-Testnet proceeds only with operator approval, in separate checked batches:
-preflight (revision/artifacts/genesis/address/tools/funding), dependency deployment,
-initialization, prove/update, then receipts and Cell checks. Distinguish locked
-capacity from fees. Operator signs; never request keys or inspect personal wallets.
-Before a retry, resolve any previous broadcast's status. Invalid cases stay local
-or use dry-run. A hash or successful process exit is not confirmation. Record
-implemented, locally validated, ready for operator execution, submitted/unconfirmed
-and confirmed statuses independently. Each deployment requires explicit operator review before signing or broadcasting.
+Testnet use proceeds in separate, checked steps: preflight (revision, artifacts,
+genesis, address, tools, funding), dependency deployment, initialization, proving and
+update, then receipts and Cell checks. Locked capacity is distinguished from fees.
+The account holder signs; the tools never request keys or read wallets. The status of
+any previous broadcast is resolved before a retry. Invalid cases stay local. A
+transaction hash or a successful process exit is not treated as confirmation.
+Implemented, locally validated, submitted and confirmed states are recorded separately.

@@ -230,14 +230,14 @@ names and hashes exist.
   rule.
 - Leak scans on every run directory and CI artifact.
 
-## 11. Phases and approval gates
+## 11. Implementation phases
 
-| Phase | Delivers | Gate |
+| Phase | Delivers | Prerequisite |
 | --- | --- | --- |
-| D1 | Circuit, local single-party setup tooling, adapter reuse, client secret handling | Approve this spec |
-| D2 | Type Script, guard Lock pin, VM matrix, mutations | — |
-| D3 | Local lifecycle in the launcher (`quick`/`local` for v2) on macOS and Linux | — |
-| D4 | Ceremony, testnet deployment and a participant flow | Separate approval: contributors, funding, broadcast |
+| D1 | Circuit, local single-party setup tooling, adapter reuse, client secret handling | This design (accepted) |
+| D2 | Type Script, guard Lock pin, VM matrix, mutations | D1 |
+| D3 | Local lifecycle in the launcher (`quick`/`local` for v2) on macOS and Linux | D2 |
+| D4 | Ceremony, testnet deployment and a participant flow | D3, confirmed ceremony contributors, testnet funding |
 
 ## 12. Decisions (12 October 2026)
 

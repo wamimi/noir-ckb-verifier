@@ -95,7 +95,7 @@ For every generated fixture, retain:
 - expected consumer and format assumptions
 - verification results from each implementation that consumed it
 
-NB: Do not commit proving keys, toxic-waste inputs, private application witnesses, or large generated build directories.
+Proving keys, toxic-waste inputs, private application witnesses and large generated build directories are not committed. The one exception is the published testnet development bundle in `releases/owned-counter-v1-testnet/`, which participants need to join the existing deployment (see `docs/try-the-counter.md`).
 
 ## Week 9 adapter pins
 

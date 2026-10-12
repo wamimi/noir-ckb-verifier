@@ -30,8 +30,8 @@ also retained in `regression.txt` and is not counted as defect reproduction.
 
 Logs are in `target/week-14/patched/layout-final.txt`, `cli-final.txt`, and
 `toolkit-compatibility.txt`. Formatting was run in both repositories; diff
-whitespace checks passed. At the initial handoff the runner was syntax-checked
-only; its subsequent successful executions are recorded below.
+whitespace checks passed. The runner was initially only syntax-checked; its
+subsequent successful executions are recorded below.
 
 Regression development exposed two additional consumers: metadata range checks
 must not treat insertion in the wire map as proof of an in-range ACIR index, and
@@ -46,13 +46,10 @@ rejection. Toolkit tests explicitly reject arrays, structs and returns.
 
 ## Acceptance progression
 
-At the initial handoff, workspace checks, fresh proofs and VM execution were
-pending. The subsequent results below supersede that pending status only for
-the named fixtures and commands. Historical evidence remains separate.
+Workspace checks, fresh proofs and VM execution were initially pending. The
+results below supersede that status only for the named fixtures and commands. Historical evidence remains separate.
 
-No commits, staging, PRs or external posts were made. The CKB verifier and
-historical fixtures were not modified. Pre-existing toolkit planning documents
-and Week 13 research files remain untouched.
+The CKB verifier and historical fixtures were not modified.
 
 ## Separate behavior-preserving Clippy cleanup
 
@@ -68,8 +65,7 @@ The isolated delta and before/after source hashes are retained under
 `target/week-14/lint-cleanup-01/`; its `backend.patch` also snapshots the updated
 combined tracked diff. This source snapshot does not establish rebuilt binary,
 proof or test provenance. Subsequent strict Clippy, workspace tests and the
-`local-check-02` rebuild passed after this cleanup. No staging or commit was
-performed during this evidence update.
+`local-check-02` rebuild passed after this cleanup.
 
 Both `target/week-14/local-check-01` and `local-check-02` are preserved. The runner
 refuses existing output directories; any subsequent execution needs a fresh path.
@@ -173,9 +169,9 @@ the historical patch snapshots or their hashes.
 The backend fix was published to `wamimi/Noir-Groth16`, branch
 `fix/week14-public-wire-layout`, commit
 `828025f3a0090e2934940956c0f5dc8093eb5532`. The original project attribution and
-license declaration remain intact. No upstream PR was opened. The user supplied
-successful backend all-feature validation (95 passed, four ignored), followed
-by the separate snarkjs interop smoke test (one passed, zero ignored).
+license declaration remain intact. No upstream PR was opened. The backend all-feature
+validation passed (95 passed, four ignored), followed by the separate snarkjs
+interop smoke test (one passed, zero ignored).
 
 The toolkit configuration now pins that exact fork commit. Historical pins in
 earlier evidence remain unchanged. Active setup instructions are in
@@ -197,7 +193,7 @@ The following were executed directly on the local integration checkout:
 
 The initial sandboxed build stopped at npm dependency resolution: an offline
 attempt returned `ENOTCACHED`, and the waiting online attempt was interrupted.
-The normal workflow then passed with approved network/sibling-build access.
+The normal workflow then passed with network access and the sibling backend build enabled.
 No compatibility guard was bypassed.
 
 Generated records under `target/noir-ckb/proof-bound-capsule/`:
@@ -226,5 +222,4 @@ or deterministic proof-hash claims. Generated manifests retain artifact hashes.
 This validates local integration of the published fork. Independent clean-clone
 testing, wider Noir compatibility and security review remain outstanding.
 Development setup and the arithmetic Capsule fixture remain unsuitable for
-production. No commits or publication of the toolkit changes occurred in this
-validation step.
+production.

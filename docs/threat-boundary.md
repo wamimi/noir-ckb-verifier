@@ -129,9 +129,8 @@ The CKB-VM verifier has finite cycle and memory limits. The Week 7 evidence reco
 
 ## Reproduced binding limits (2026-10-06)
 
-The [protection inventory](binding-protection-inventory.md) and
-[binding evidence](../evidence/binding-review.md) supersede the former missing
-well-formed wrong-VK test item: substitution now rejects at identity lookup, and
+Binding boundary tests added on that date closed the former missing well-formed
+wrong-VK test item: substitution now rejects at identity lookup, and
 an old proof under a rebound different valid-point key rejects cryptographically.
 Two isolated check mutations are detected by their targeted VM tests.
 
@@ -146,8 +145,8 @@ is injected by testtool; no supported on-chain initialization is demonstrated.
 A separate fresh Noir fixture confirmed that an unused declared public scalar
 is cryptographically bound in the pinned lowering/snarkjs/arkworks/CKB path.
 That result does not supply script-side context derivation, and Capsule's schema
-was not changed. Proposed context and upgrade choices are in the
-[binding specification](binding-profile-v1.md).
+was not changed. These limits informed the owned counter (Week 15), whose context
+digest includes the consumed OutPoint, successor Lock and capacity.
 
 ## Reference
 
