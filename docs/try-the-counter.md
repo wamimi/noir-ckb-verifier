@@ -47,16 +47,85 @@ All commands in this guide are run from inside that `noir-ckb-verifier` folder.
 
 ## Part 1, option A: run it in a container
 
-**Step 1. Install Docker.**
-- Mac: you do not need Docker Desktop. Install the small open-source engine Colima:
-  ```bash
-  brew install colima docker
-  colima start --cpu 4 --memory 8 --disk 60
-  ```
-- Ubuntu: install Docker Engine (`sudo apt install docker.io`, then add yourself to
-  the `docker` group and log in again).
+**Step 1. Install Docker.** Docker has two parts: the *engine*, which runs
+containers in the background, and the `docker` command, which you type. You need
+both. Pick the instructions for your computer, then do the check at the end.
 
-Check it works: `docker version` should print a "Server" section.
+**Mac (Apple Silicon).** Docker Desktop is not needed. These steps install Colima,
+a small free engine, with the Homebrew package manager.
+
+1. Check that Homebrew is installed:
+   ```bash
+   brew --version
+   ```
+   If this prints `command not found`, install Homebrew: open <https://brew.sh>,
+   copy the single install command shown on that page into Terminal and press
+   Enter. When it finishes, it prints "Next steps" with two or three commands that
+   add `brew` to your PATH. Run those, then open a new Terminal window.
+2. Install Colima, the `docker` command and its build plugin:
+   ```bash
+   brew install colima docker docker-buildx
+   ```
+3. Tell `docker` where Homebrew put the build plugin. This is needed once. It
+   adds one setting to `~/.docker/config.json` and keeps anything already there:
+   ```bash
+   mkdir -p ~/.docker
+   python3 - <<'EOF'
+   import json, pathlib
+   p = pathlib.Path.home() / ".docker/config.json"
+   cfg = json.loads(p.read_text()) if p.exists() else {}
+   dirs = cfg.setdefault("cliPluginsExtraDirs", [])
+   if "/opt/homebrew/lib/docker/cli-plugins" not in dirs:
+       dirs.append("/opt/homebrew/lib/docker/cli-plugins")
+   p.write_text(json.dumps(cfg, indent=2) + "\n")
+   print("updated", p)
+   EOF
+   ```
+4. Start the engine with 4 CPU cores, 8 GB of memory and 60 GB of disk:
+   ```bash
+   colima start --cpu 4 --memory 8 --disk 60
+   ```
+   The first start downloads a small Linux system and takes a few minutes.
+   Colima keeps running in the background. After restarting your Mac, run
+   `colima start` again; it remembers these sizes. `colima stop` shuts it down.
+
+**Ubuntu 24.04.**
+
+1. Install the engine and the build plugin. `sudo` asks for your computer
+   password:
+   ```bash
+   sudo apt update
+   sudo apt install -y docker.io docker-buildx
+   ```
+2. Start the engine now and every time the computer boots:
+   ```bash
+   sudo systemctl enable --now docker
+   ```
+3. Allow your user account to use Docker without `sudo`:
+   ```bash
+   sudo usermod -aG docker "$USER"
+   ```
+4. Log out of your desktop session and log back in (or restart the computer).
+   The permission from step 3 only applies to new logins. To use it in the
+   current terminal straight away instead, run `newgrp docker`.
+
+   Note: members of the `docker` group can control the whole computer through
+   Docker, so only do this on a machine you own.
+
+**Check that Docker works (Mac and Ubuntu):**
+
+```bash
+docker version
+```
+
+The output has two parts, `Client:` and `Server:`. If both are there, Docker is
+ready. If not:
+
+| You see | Fix |
+| --- | --- |
+| `Cannot connect to the Docker daemon` | The engine is not running. Mac: `colima start`. Ubuntu: `sudo systemctl start docker`. |
+| `permission denied` mentioning `docker.sock` (Ubuntu) | Log out and back in after step 3, or run `newgrp docker`. |
+| `docker: command not found` (Mac) | Run `brew link --overwrite docker`, then open a new Terminal window. |
 
 **Step 2. Build the container.** This downloads Rust, Noir, the CKB node and
 everything else, inside the container only. The first build takes a while
@@ -73,9 +142,12 @@ scripts/run-counter-container.sh build
 scripts/run-counter-container.sh quick
 ```
 
-You should see numbered stages (`== Stage 1/7: local chain` … `7/7`) and finally
-`Container exit 0`. It takes a few minutes. The whole run has no internet access:
-the CKB chain exists only inside the container and is thrown away afterwards.
+This one command does the whole demo by itself. There is nothing to type, sign
+or approve while it runs, and no wallet or password is involved. You will see it
+print seven numbered stages (`== Stage 1/7: local chain` up to `7/7`), explained
+in [what the stages mean](#what-the-stages-mean), and finally `Container exit 0`.
+It takes a few minutes. The run has no internet access: the CKB chain exists only
+inside the container and is thrown away afterwards.
 
 **Step 4 (optional). Run the full test suite** as well: 48 attack cases against
 the contract, range checks, and three deliberately broken contracts that must be
@@ -155,10 +227,12 @@ never installs or changes anything.
 python3 -B scripts/start-counter.py quick
 ```
 
-You will see seven numbered stages: start a private local chain, make a fresh
-setup and proof, build the contract, deploy it, create a counter at 0, prove the
-update, then sign, check and confirm the update to 1. The first run takes several
-minutes because it compiles the backend; later runs are faster.
+This one command does the whole demo by itself. There is nothing to type, sign
+or approve while it runs, and no wallet or password is involved. It prints seven
+numbered stages, explained in [what the stages mean](#what-the-stages-mean), and
+finishes with `Stage 3/3: local runner completed`. The first run takes several
+minutes because it compiles the proving backend; later runs take one to two
+minutes.
 
 **Step 8 (optional). Full test suite**, including the 48 attack cases and three
 broken-contract checks:
@@ -168,6 +242,32 @@ python3 -B scripts/start-counter.py local
 ```
 
 Your results are in `target/counter-local-<time>/manifest.json`.
+
+---
+
+## What the stages mean
+
+In Part 1 you only start the demo and watch. The script does every step below
+by itself, on a private chain that runs only on your computer, using a throwaway
+key it creates for the run. No real or testnet funds are involved.
+
+Two sets of numbers appear. `Stage 1/3` to `3/3` are the launcher's own steps
+(check the tools, run the demo, report the result). The demo itself prints
+`== Stage 1/7` to `7/7`:
+
+| Stage | What the script does |
+| --- | --- |
+| 1/7 local chain | Starts a private CKB chain and creates a throwaway key that holds test coins on it. |
+| 2/7 setup + fresh proof | Compiles the Noir counter circuit, generates a development proving key and verification key, and makes a test proof. |
+| 3/7 contract build | Compiles the counter Type Script (the on-chain rules) with that verification key built in. |
+| 4/7 deployment | Signs and sends a transaction that stores the contract and the verification key on the chain. |
+| 5/7 creation | Creates a counter Cell holding 0. Creation needs no proof; the contract checks the zero start directly. |
+| 6/7 update proof | Builds the transaction that changes the counter from 0 to 1, and makes a proof tied to that exact transaction. |
+| 7/7 pre-signing check, sign, submit, confirm update | Checks that the proof matches the transaction, signs it, sends it, and confirms the chain accepted it with the counter now at 1. |
+
+The full `local` mode adds three more stages in between: range checks (values
+the circuit must reject), the 48 attack cases against the contract, and the three
+deliberately broken contracts. Its numbers run to `10/10`.
 
 ---
 
