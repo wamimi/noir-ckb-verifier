@@ -290,20 +290,54 @@ Next (see docs/try-the-counter.md, Part 2):
 """)
 
 
+def _shown(path):
+    """Path as the user should type it: relative to the current folder when inside it."""
+    rel = os.path.relpath(Path(path).resolve(), Path.cwd())
+    return str(path) if rel.startswith("..") else rel
+
+
 def print_sign_send(work, tx, rpc, owner, update):
-    recheck = f"\npython3 -B scripts/join-counter-testnet.py check --work {work}" if update else ""
-    print(f"""
-Unsigned transaction: {tx}
-Review, then sign and send with YOUR testnet account (password prompt is ckb-cli's, not this tool's):
-
-export COUNTER_TX="{tx}"
-"$COUNTER_CLI" --url "{rpc}" tx info --tx-file "$COUNTER_TX"
-"$COUNTER_CLI" --url "{rpc}" tx sign-inputs --tx-file "$COUNTER_TX" --from-account {owner} --add-signatures --skip-check{recheck}
-"$COUNTER_CLI" --url "{rpc}" tx send --tx-file "$COUNTER_TX" --skip-check
-
-Then, with the returned hash (check status before ever resending):
-python3 -B scripts/join-counter-testnet.py confirm --work {work} --hash <tx hash>
-""")
+    cli = f'"$COUNTER_CLI" --url {rpc}'
+    work, tx = _shown(work), _shown(tx)
+    kind = "update" if update else "creation"
+    steps = [
+        ("Select the transaction file", f'export COUNTER_TX="{tx}"',
+         "No output."),
+        ("Review it", f'{cli} tx info --tx-file "$COUNTER_TX"',
+         ("Two inputs (your counter and your change Cell)" if update else "One input (your funding Cell)") +
+         " and two outputs:\n     your counter (200.0, type-script: some) and your change (type-script: none).\n"
+         "     tx_fee should be about 0.01 CKB. If anything else appears, stop."),
+        ("Sign it. ckb-cli asks for your account password",
+         f'{cli} tx sign-inputs --tx-file "$COUNTER_TX" --from-account "$COUNTER_OWNER" --add-signatures --skip-check',
+         "Your lock-arg and a long signature."),
+    ]
+    if update:
+        steps.append(("Re-check the proof after signing",
+                      f"python3 -B scripts/join-counter-testnet.py check --work {work}",
+                      'A line containing "status": "checked-before-signing". If it fails, do not send.'))
+    send = len(steps) + 1
+    steps += [
+        ("Send it to testnet", f'{cli} tx send --tx-file "$COUNTER_TX" --skip-check',
+         "One transaction hash (0x followed by 64 characters). Copy it.\n"
+         "     Run this only once."),
+        (f"Record it. Replace 0xPASTE_THE_HASH with the hash that step {send} printed",
+         f"python3 -B scripts/join-counter-testnet.py confirm --work {work} --hash 0xPASTE_THE_HASH",
+         ("Confirmed update-<number>: counter is now <new value>." if update else "Confirmed creation: counter is now 0.") + "\n"
+         "     If it says the transaction is not committed yet, wait 30 seconds and run it again."),
+    ]
+    print(f"\nThe {kind} transaction is prepared but NOT signed or sent.")
+    print("Copy and run each command below yourself, one at a time, in this terminal.")
+    print("They use COUNTER_CLI and COUNTER_OWNER, set in Step 3 of docs/try-the-counter.md.\n")
+    missing = [v for v in ("COUNTER_CLI", "COUNTER_OWNER") if not os.environ.get(v)]
+    if missing:
+        print(f"  Not set in this terminal: {', '.join(missing)}. Set them first:\n")
+        if "COUNTER_CLI" in missing:
+            print('     export COUNTER_CLI="<full path to your ckb-cli>"')
+        if "COUNTER_OWNER" in missing:
+            print(f"     export COUNTER_OWNER={owner}")
+        print()
+    for i, (title, cmd, expect) in enumerate(steps, 1):
+        print(f"  {i}. {title}:\n\n     {cmd}\n\n     Expect: {expect}\n")
 
 
 def create(args):
@@ -312,6 +346,7 @@ def create(args):
     state = w.state
     c.require(state["stage"] == "initialized", f"create needs an initialized directory (current stage: {state['stage']})")
     c.owner(args.owner)
+    c.op(args.funding)
     tx = work / "create.json"
     c.require(not tx.exists(), "a creation was already prepared here; use a new work directory")
     w.client("prepare", "create", "--release", work / "release.json", "--rpc", state["rpc"], "--owner", args.owner,
@@ -365,7 +400,7 @@ def confirm(args):
                  application=f"{args.hash}:0", funding=f"{args.hash}:1", tx=None, proof=None)
     w.save_state(state)
     print(f"Confirmed {label}: counter is now {count}. Application Cell {args.hash}:0, change {args.hash}:1.")
-    print(f"Next update: python3 -B scripts/join-counter-testnet.py update --work {work}")
+    print(f"Next update: python3 -B scripts/join-counter-testnet.py update --work {_shown(work)}")
 
 
 def status(args):

@@ -315,9 +315,18 @@ export COUNTER_CLI="$(ls target/counter-tools/*/ckb-cli | head -1)"
 "$COUNTER_CLI" account new
 ```
 
-It prints your new account. Note two things from it:
-- the **testnet address** (starts with `ckt1`);
+If you installed the tools somewhere other than `target/counter-tools/`, set
+`COUNTER_CLI` to the full path of that `ckb-cli` instead, and add
+`--tools <that folder>` to the `init` command in Step 2.
+
+It prints your new account under several headings. You need two values:
+- the **testnet address**: the `testnet:` line under `address:` (starts with
+  `ckt1`). Ignore the `mainnet:` lines and the `address(deprecated):` section;
+  the deprecated one is an older, shorter format of the same account.
 - the **lock_arg** (starts with `0x`, 42 characters). This is your public account ID.
+
+All of these are public; sharing them is safe. Only the password and the wallet
+folder are secret.
 
 ```bash
 export COUNTER_OWNER=0x...your lock_arg...
@@ -325,61 +334,182 @@ export COUNTER_OWNER=0x...your lock_arg...
 
 Keep this terminal open: the next steps reuse these settings.
 
-**Step 4. Get free testnet CKB.** Open the faucet linked from the official
-[CKB testnet page](https://docs.nervos.org/docs/getting-started/blockchain-setup/testnet),
-paste your `ckt1…` address and request CKB. You need **at least 262 CKB in a
+**Step 4. Get free testnet CKB.** Open the
+[CKB testnet faucet](https://faucet.nervos.org), paste your `ckt1…` address and
+request CKB. You need **at least 262 CKB in a
 single payment** (200 locked in your counter, 61 returned to you as change,
 and a tiny fee).
 
-When it arrives, find that payment's ID ("OutPoint" = transaction hash + output
-number):
+**Step 4b. Find the faucet payment's ID.** On CKB, money is not a balance on
+an account. Each payment you receive is a separate box of CKB called a *Cell*.
+To spend a Cell, a transaction must name it exactly, by two things:
+
+- the **transaction hash** of the payment that created it (`0x` + 64 characters);
+- the **output index**: its position in that transaction's list of outputs
+  (`0` for the first, `1` for the second, …).
+
+Together these are the Cell's *OutPoint*. The create step needs the OutPoint of
+your faucet Cell, because that Cell pays for your counter.
+
+List the unspent Cells at your address (use the testnet address from Step 3):
 
 ```bash
 "$COUNTER_CLI" --url https://testnet.ckb.dev wallet get-live-cells --address ckt1...your address...
 ```
 
-Pick the entry with enough capacity and note its `tx_hash` and `output_index`.
-(If that command fails, open your address on the
-[testnet explorer](https://testnet.explorer.nervos.org) and find the faucet
-transaction there.)
+Each entry is one Cell. Pick one that has a capacity of at least 262 CKB and no
+data or type (a faucet payment has neither). Copy its `tx_hash` and its output
+index. If the command fails, open your address on the
+[testnet explorer](https://testnet.explorer.nervos.org), open the faucet
+transaction, and read the transaction hash and which output (counting from 0)
+was paid to your address.
+
+Write them as `hash:index`:
 
 ```bash
 export COUNTER_FUNDING=0x...tx_hash...:0
 ```
 
-(Replace `0` with the output index.)
+Keep the `:` and the number at the end: the hash alone is not enough. Replace
+`0` with the output index if it is not 0. The `create` step checks this
+Cell before building anything and stops if it is not yours, already spent, too
+small or not a plain payment.
 
-**Step 5. Create your counter at 0.**
+**Step 5. Create your counter at 0.** This step has two parts: a script
+prepares the transaction, then you sign and send it yourself with `ckb-cli`.
+The script never signs or sends anything.
+
+**5a. Prepare the transaction:**
 
 ```bash
 python3 -B scripts/join-counter-testnet.py create --work target/my-testnet-counter --owner "$COUNTER_OWNER" --funding "$COUNTER_FUNDING"
 ```
 
-This prepares the transaction but does not sign or send it. It then prints three
-`ckb-cli` commands for you to run:
-1. `tx info`: shows what the transaction does. Read it.
-2. `tx sign-inputs`: signs it with your account (asks for your password).
-3. `tx send`: sends it to testnet and prints a transaction hash.
+It saves an unsigned transaction and prints five numbered commands, each with
+what to expect. The same five commands are written out below. Run them one at a
+time, in order, in the same terminal (they use `COUNTER_CLI` and
+`COUNTER_OWNER` from Step 3).
 
-Copy that hash, then record the result:
+**5b. Run the five commands.**
 
-```bash
-python3 -B scripts/join-counter-testnet.py confirm --work target/my-testnet-counter --hash 0x...the hash...
-```
+1. Select the transaction file (no output):
 
-If `confirm` says the transaction isn't committed yet, wait 30 seconds and run it
-again. **Never send the same transaction twice** without checking first.
+   ```bash
+   export COUNTER_TX="target/my-testnet-counter/create.json"
+   ```
 
-**Step 6. Update it to 1 with a proof made on your machine.**
+2. Review it:
+
+   ```bash
+   "$COUNTER_CLI" --url https://testnet.ckb.dev tx info --tx-file "$COUNTER_TX"
+   ```
+
+   Expected output (your own address appears where `ckt1...` is shown):
+
+   ```text
+   [input] ckt1... => 10000.0, (data-length: 0, type-script: none, lock-kind: sighash(secp))
+   [output] ckt1... => 200.0, (data-length: 9, type-script: some, lock-kind: sighash(secp))
+   [output] ckt1... => 9799.99, (data-length: 0, type-script: none, lock-kind: sighash(secp))
+   input_total: 10000.0 (CKB)
+   output_total: 9999.99 (CKB)
+   tx_fee: 0.01 (CKB)
+   ```
+
+   The first output is your counter: 200 CKB, owned by your address, with the
+   counter Type Script (`type-script: some`) and 9 bytes of counter state. The
+   second output is your change. The amounts differ if your funding Cell was not
+   10,000 CKB. If there are more outputs, or the fee is much larger, stop.
+
+3. Sign it. `ckb-cli` asks for the password you chose in Step 3:
+
+   ```bash
+   "$COUNTER_CLI" --url https://testnet.ckb.dev tx sign-inputs --tx-file "$COUNTER_TX" --from-account "$COUNTER_OWNER" --add-signatures --skip-check
+   ```
+
+   Expected: your `lock-arg` and a long `signature`.
+
+4. Send it to testnet:
+
+   ```bash
+   "$COUNTER_CLI" --url https://testnet.ckb.dev tx send --tx-file "$COUNTER_TX" --skip-check
+   ```
+
+   Expected: one transaction hash, `0x` followed by 64 characters. Copy it.
+   **Run this only once.** If it seems to fail, look the hash up on the
+   [testnet explorer](https://testnet.explorer.nervos.org) before trying again.
+
+5. Record it. Replace `0xPASTE_THE_HASH` with the hash that command 4 printed:
+
+   ```bash
+   python3 -B scripts/join-counter-testnet.py confirm --work target/my-testnet-counter --hash 0xPASTE_THE_HASH
+   ```
+
+   Expected: `Confirmed creation: counter is now 0.` If it says the transaction
+   is not committed yet, wait 30 seconds and run the same command again.
+
+**Step 6. Update it to 1 with a proof made on your machine.** Same pattern:
+prepare, then six commands to run yourself.
+
+**6a. Prepare the update:**
 
 ```bash
 python3 -B scripts/join-counter-testnet.py update --work target/my-testnet-counter
 ```
 
-This builds the update, makes a fresh proof tied to your counter, and checks it.
-It prints the same kind of commands as Step 5, plus one more: after signing, run
-the printed `check` command before sending. It confirms that signing didn't change
-anything the proof depends on. Then send, and `confirm` with the new hash.
+This builds the update transaction, makes a fresh proof bound to your counter
+and to this exact change, and checks it. It takes a minute or two, then prints
+six numbered commands.
+
+**6b. Run the six commands.**
+
+1. Select the transaction file (no output):
+
+   ```bash
+   export COUNTER_TX="target/my-testnet-counter/update-1-proof/transaction.json"
+   ```
+
+   For later updates the number changes (`update-2-proof`, …); use the line the
+   script printed.
+
+2. Review it:
+
+   ```bash
+   "$COUNTER_CLI" --url https://testnet.ckb.dev tx info --tx-file "$COUNTER_TX"
+   ```
+
+   Expected: **two inputs** (your counter, and your change Cell from Step 5)
+   and two outputs: your counter (200.0, `type-script: some`) and your change
+   (`type-script: none`). Fee about 0.01 CKB.
+
+3. Sign it (asks for your password):
+
+   ```bash
+   "$COUNTER_CLI" --url https://testnet.ckb.dev tx sign-inputs --tx-file "$COUNTER_TX" --from-account "$COUNTER_OWNER" --add-signatures --skip-check
+   ```
+
+4. Re-check the proof after signing:
+
+   ```bash
+   python3 -B scripts/join-counter-testnet.py check --work target/my-testnet-counter
+   ```
+
+   Expected: a line containing `"status": "checked-before-signing"`. This
+   confirms that signing did not change anything the proof depends on. If it
+   fails, do not send.
+
+5. Send it to testnet (only once):
+
+   ```bash
+   "$COUNTER_CLI" --url https://testnet.ckb.dev tx send --tx-file "$COUNTER_TX" --skip-check
+   ```
+
+6. Record it. Replace `0xPASTE_THE_HASH` with the hash that command 5 printed:
+
+   ```bash
+   python3 -B scripts/join-counter-testnet.py confirm --work target/my-testnet-counter --hash 0xPASTE_THE_HASH
+   ```
+
+   Expected: `Confirmed update-1: counter is now 1.`
 
 Your counter is now 1. Run Step 6 again to go to 2, 3, …
 

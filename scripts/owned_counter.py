@@ -73,7 +73,7 @@ def network(url,expected):
 def live(url,p):
     r=rpc(url,'get_live_cell',[p,True]);require(r['status']=='live',f'Cell is not live: {p}');return r['cell']
 def op(s):
-    tx,index=s.split(':');require(len(raw(tx))==32,'OutPoint hash length');return dict(tx_hash=tx,index=hex(int(index,0)))
+    require(s.count(':')==1,f'OutPoint must be <tx_hash>:<output_index>, e.g. 0xabc...:0 (got {s!r})');tx,index=s.split(':');require(len(raw(tx))==32,'OutPoint hash length');return dict(tx_hash=tx,index=hex(int(index,0)))
 def owner(arg):
     require(len(raw(arg))==20,'owner identifier must be 20 bytes');return dict(code_hash=OWNER_CODE,hash_type='type',args=arg)
 def base(dep):return dict(version='0x0',cell_deps=[dep],header_deps=[],inputs=[],outputs=[],outputs_data=[],witnesses=[])

@@ -66,8 +66,7 @@ export COUNTER_OWNER="$COUNTER_ACCOUNT"
 
 ## 4. Fund it, and pick one funding Cell
 
-Request testnet CKB from the faucet linked on the
-[CKB testnet page](https://docs.nervos.org/docs/getting-started/blockchain-setup/testnet).
+Request testnet CKB from the [CKB testnet faucet](https://faucet.nervos.org).
 To see exactly how much your release needs:
 
 ```bash

@@ -78,3 +78,32 @@ Onboarding finding: the operator received two 100,000 CKB funding Cells and
 consolidated them before deployment because the client accepts one funding Cell.
 The operator guide documents this extra step; no multi-input builder expansion
 was made. The 200 CKB application has no withdrawal/destruction path.
+
+## First participant run on the existing deployment — 13 October 2026
+
+A new testnet account, separate from the deployment wallet, joined the existing
+deployment through `scripts/join-counter-testnet.py` and
+[Try the counter](../docs/try-the-counter.md), Part 2, on macOS ARM64. It
+deployed nothing; it used the live contract and verification key Cells.
+
+| Step | Result |
+| --- | --- |
+| `init` | All 7 checks passed: bundle integrity, network and owner Lock policy, live code and key Cells equal to the bundle, proving key exports the published key, local toolchain reproduced the circuit and R1CS, test proof and encoding, release files. |
+| Funding | One 10,000 CKB faucet Cell. |
+| Creation | [`0x0b6efcd70f111afd1c885557c84f7b93ef4ee8401dd9fe258b9fb677c888798c`](https://testnet.explorer.nervos.org/transaction/0x0b6efcd70f111afd1c885557c84f7b93ef4ee8401dd9fe258b9fb677c888798c): counter at 0, 200 CKB, fee 0.01 CKB. `confirm`: committed and Cells checked. |
+| Update | [`0xe6589170381a02a249c37be8ab279e6229e2feb8f177f3d572bc63f30089126f`](https://testnet.explorer.nervos.org/transaction/0xe6589170381a02a249c37be8ab279e6229e2feb8f177f3d572bc63f30089126f): counter 0 → 1 with a proof generated on the participant's machine. `check` after signing returned `checked-before-signing`; `confirm`: committed and Cells checked. |
+
+Public statement of the update proof: `old = 0`, `new = 1`, and the two halves of
+the transaction context digest
+(`204566493674163208673454485990746327744`,
+`27652409253724173819971687008433083406`).
+
+Findings from this run, fixed straight after it: the funding
+OutPoint without `:index` produced a Python traceback (now a plain error before
+any work), and the printed sign-and-send commands were not numbered or explained
+(now numbered, with expected output, and identical to the guide).
+
+This run was performed by the project maintainer acting as a participant. It
+shows the participant path works end to end on testnet; it is not an
+independent external reproduction.
+
