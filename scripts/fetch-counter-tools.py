@@ -1,21 +1,81 @@
 #!/usr/bin/env python3
-"""Fetch pinned official Darwin ARM64 CKB tools. No wallet access or network deployment."""
-import argparse,hashlib,json,platform,urllib.request,zipfile
+"""Fetch pinned official CKB, ckb-cli and Nargo executables for this host.
+
+Shows every URL before downloading and asks for consent (or --yes). Verifies the
+archive and the extracted executable against toolchains/platforms.json, writes
+only that executable (mode 0755) and never runs installers, edits shell profiles,
+escalates privileges, touches wallets or contacts a CKB network.
+"""
+import argparse
+from datetime import datetime, timezone
+import json
 from pathlib import Path
-TOOLS=[('ckb','v0.210.0','ckb_v0.210.0_aarch64-apple-darwin-portable','80477890543aa4425666dfe4f74022d4c8237cb9767052fef68e7a7e6b811ef2','800d625b4baaa55cf6408b2f30ad744c4df90d52b94023ce226be875327c9493'),('ckb-cli','v2.0.0','ckb-cli_v2.0.0_aarch64-apple-darwin','e19e0fc8228e3cc9eba5e4e3506f2559a8321cf472a9f5392bc6dc4093308d06','994166d983955fb59b6bab172485b3f65ff60487493b62a6569ad93eaa7adffb')]
-def main():
- p=argparse.ArgumentParser(description=__doc__);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
- if (platform.system(),platform.machine())!=('Darwin','arm64'):raise SystemExit('This tested installer pins Darwin ARM64 only; other hosts require separately validated tool pins.')
- out=a.out.resolve();out.mkdir(parents=True,exist_ok=False);records=[]
- for repo,tag,name,sha,binary_sha in TOOLS:
-  url=f'https://github.com/nervosnetwork/{repo}/releases/download/{tag}/{name}.zip';archive=out/(name+'.zip');urllib.request.urlretrieve(url,archive)
-  if hashlib.sha256(archive.read_bytes()).hexdigest()!=sha:raise ValueError('archive digest mismatch')
-  with zipfile.ZipFile(archive) as z:
-   for entry in z.infolist():
-    if not (out/entry.filename).resolve().is_relative_to(out):raise ValueError('unsafe archive member')
-   z.extractall(out)
-  binary=out/name/repo
-  if hashlib.sha256(binary.read_bytes()).hexdigest()!=binary_sha:raise ValueError('binary digest mismatch')
-  binary.chmod(0o755);records.append(dict(tool=repo,version=tag,url=url,archive_sha256=sha,binary_sha256=binary_sha,binary=str(binary)))
- (out/'manifest.json').write_text(json.dumps(records,indent=2)+'\n');print(json.dumps(records,indent=2))
-if __name__=='__main__':main()
+import sys
+import urllib.request
+
+import counter_platform as cp
+
+
+def plan(tools_dir, key, entry, names):
+    rows = []
+    for name in names:
+        existing = cp.find_tool(tools_dir, key, entry, name)
+        rows.append(dict(tool=name, url=entry["tools"][name]["url"],
+                         destination=str(existing or Path(tools_dir) / key / name),
+                         action="already-present-and-verified" if existing else "download"))
+    return rows
+
+
+def download(url):
+    request = urllib.request.Request(url, headers={"User-Agent": "noir-ckb/counter-tools"})
+    with urllib.request.urlopen(request, timeout=120) as response:  # default TLS verification
+        return response.read()
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--out", type=Path, default=cp.ROOT / "target/counter-tools", help="tools directory")
+    parser.add_argument("--tools", default=",".join(cp.TOOL_NAMES), help="comma-separated subset of ckb,ckb-cli,nargo")
+    parser.add_argument("--list", action="store_true", help="print the plan and exit without downloading")
+    parser.add_argument("--yes", action="store_true", help="consent to the listed downloads without a prompt")
+    args = parser.parse_args(argv)
+    names = [n.strip() for n in args.tools.split(",") if n.strip()]
+    unknown = sorted(set(names) - set(cp.TOOL_NAMES))
+    if unknown:
+        parser.error(f"unknown tool(s): {', '.join(unknown)}")
+    key, entry = cp.detect()
+    tools_dir = args.out.resolve()
+    rows = plan(tools_dir, key, entry, names)
+    print(f"Host platform: {key} ({entry['status']})")
+    for row in rows:
+        print(f"  {row['tool']:8} {row['action']:30} {row['url']}\n           -> {row['destination']}")
+    pending = [row for row in rows if row["action"] == "download"]
+    if args.list or not pending:
+        print("Nothing to download." if not pending else "Plan only; nothing downloaded.")
+        return 0
+    if not args.yes:
+        if not sys.stdin.isatty():
+            parser.error("downloads need --yes in a non-interactive terminal")
+        if input(f"Download {len(pending)} official archive(s) from GitHub? [y/N] ").strip().lower() not in ("y", "yes"):
+            print("Cancelled; nothing downloaded.")
+            return 0
+    records = []
+    for row in pending:
+        pin = entry["tools"][row["tool"]]
+        print(f"Downloading {row['tool']} ...", flush=True)
+        installed = cp.install_tool(download(pin["url"]), pin, row["destination"])
+        records.append(dict(tool=row["tool"], platform=key, url=pin["url"], archive_sha256=pin["archive_sha256"],
+                            binary_sha256=pin["binary_sha256"], binary=str(installed)))
+        print(f"  verified and installed {installed}", flush=True)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    record = tools_dir / f"fetch-{key}-{stamp}.json"
+    record.write_text(json.dumps(records, indent=2) + "\n")
+    print(f"Record: {record}")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except (cp.PlatformError, OSError) as error:
+        sys.exit(f"error: {error}")

@@ -2,7 +2,6 @@
 """Guided source-checkout entry point for the fixed public counter preview."""
 import argparse
 from datetime import datetime, timezone
-import hashlib
 import os
 from pathlib import Path
 import platform
@@ -11,25 +10,27 @@ import socket
 import subprocess
 import sys
 
+import counter_platform as cp
+
 ROOT = Path(__file__).resolve().parents[1]
-BACKEND_REV = "828025f3a0090e2934940956c0f5dc8093eb5532"
-TOOLS = (
-    ("ckb_v0.210.0_aarch64-apple-darwin-portable/ckb", "800d625b4baaa55cf6408b2f30ad744c4df90d52b94023ce226be875327c9493"),
-    ("ckb-cli_v2.0.0_aarch64-apple-darwin/ckb-cli", "994166d983955fb59b6bab172485b3f65ff60487493b62a6569ad93eaa7adffb"),
-)
+BACKEND_REV = cp.load()["versions"]["backend_revision"]
 
 
-def environment():
-    env = os.environ.copy()
-    env["PYTHONDONTWRITEBYTECODE"] = "1"
-    compiler = env.get("CC_riscv64imac_unknown_none_elf") or env.get("CLANG")
-    default = Path("/opt/homebrew/opt/llvm@18/bin/clang")
-    if not compiler and default.is_file():
-        compiler = str(default)
-    if compiler:
-        env["CLANG"] = compiler
-        env["CC_riscv64imac_unknown_none_elf"] = compiler
-    return env
+def host():
+    """(key, entry) for this host, or (None, None) when no pins exist."""
+    try:
+        return cp.detect()
+    except cp.PlatformError:
+        return None, None
+
+
+def environment(tools=None):
+    key, entry = host()
+    if key is None:
+        env = os.environ.copy()
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        return env
+    return cp.tool_environment(os.environ, tools or ROOT / "target/counter-tools", key, entry)
 
 
 def probe(cmd, env, cwd=ROOT, expected=0, contains=None):
@@ -52,8 +53,12 @@ def doctor(args, env):
             failures.append(label)
             print(f"  {remedy}", flush=True)
 
-    check("supported local host", (platform.system(), platform.machine()) == ("Darwin", "arm64"),
-          "Local reproduction is tested on macOS ARM64. Recorded inspection is available separately.")
+    key, entry = host()
+    check(f"pinned host platform ({key or platform.system() + '/' + platform.machine()})", key is not None,
+          "No pinned tools for this host. Supported: macOS ARM64, Ubuntu 24.04 x86_64/ARM64 (Linux pending validation). "
+          "Recorded inspection works anywhere.")
+    if key is not None and entry["status"] != "validated":
+        print(f"NOTE: {key} is {entry['status']}: {entry['status_detail']}", flush=True)
     check("Python >=3.9", sys.version_info >= (3, 9), "Install Python 3.9 or newer.")
     check("pinned clean backend", probe(["git", "rev-parse", "HEAD"], env, args.backend, contains=BACKEND_REV)
           and probe(["git", "diff", "--quiet", "HEAD"], env, args.backend)
@@ -61,35 +66,44 @@ def doctor(args, env):
           f"Clone the backend and check out {BACKEND_REV}; see docs/owned-counter-bootstrap.md.")
     check("Nargo beta.18 and compiler pin", probe(["nargo", "--version"], env, contains="1.0.0-beta.18")
           and probe(["nargo", "--version"], env, contains="99bb8b5cf33d7669adbdef096b12d80f30b4c0c9"),
-          "Install with: noirup --version 1.0.0-beta.18")
+          "Run: python3 scripts/fetch-counter-tools.py (pinned nargo), or: noirup --version 1.0.0-beta.18")
     check("Node.js", probe(["node", "--version"], env), "Install Node.js/npm.")
     check("cached snarkjs 0.7.5", probe(["npx", "--offline", "snarkjs@0.7.5", "--version"], env,
                                       expected=99, contains="snarkjs@0.7.5"),
           "Run: npm exec --yes --package=snarkjs@0.7.5 -- node -e 'console.log(1)'")
-    compiler = env.get("CC_riscv64imac_unknown_none_elf", "clang")
-    check("LLVM 18 target compiler", probe([compiler, "--version"], env, contains="clang version 18."),
-          "Install brew llvm@18 and export CLANG and CC_riscv64imac_unknown_none_elf; see bootstrap.")
-    for version in ("1.95.0", "1.94.1"):
-        check(f"Rust {version}", probe(["rustc", f"+{version}", "--version"], env, contains=version),
-              f"Run: rustup toolchain install {version} --profile minimal")
-    check("CKB RISC-V target", probe(["rustup", "target", "list", "--installed", "--toolchain", "1.94.1"],
-                                     env, contains="riscv64imac-unknown-none-elf"),
+    compiler = env.get("CC_riscv64imac_unknown_none_elf")
+    check("LLVM 18 target compiler", bool(compiler) and cp.clang_major(compiler, env) == 18,
+          (entry["clang_hint"] if entry else "Install clang 18") + "; or export CLANG. See docs/owned-counter-bootstrap.md.")
+    # Query rustup's list instead of running `rustc +x`, which can trigger an automatic toolchain download.
+    installed = {version: installed_toolchain(version, env) for version in ("1.95.0", "1.94.1")}
+    for version, ok in installed.items():
+        check(f"Rust {version}", ok, f"Run: rustup toolchain install {version} --profile minimal")
+    check("CKB RISC-V target", installed["1.94.1"] and probe(["rustup", "target", "list", "--installed", "--toolchain", "1.94.1"],
+                                                            env, contains="riscv64imac-unknown-none-elf"),
           "Run: rustup target add --toolchain 1.94.1 riscv64imac-unknown-none-elf")
     for version, manifest in (("1.95.0", ROOT / "Cargo.toml"),
                               ("1.94.1", ROOT / "contracts/Cargo.toml"),
                               ("1.95.0", args.backend / "Cargo.toml")):
         check(f"offline dependencies: {manifest.parent.name}",
-              probe(["cargo", f"+{version}", "metadata", "--locked", "--offline", "--format-version", "1",
-                     "--manifest-path", str(manifest)], env),
+              installed[version] and probe(["cargo", f"+{version}", "metadata", "--locked", "--offline", "--format-version", "1",
+                                            "--manifest-path", str(manifest)], env),
               f"Run: cargo +{version} fetch --locked --manifest-path {shlex.quote(str(manifest))}")
-    for relative, digest in TOOLS:
-        binary = args.tools / relative
-        ok = binary.is_file() and os.access(binary, os.X_OK) and hashlib.sha256(binary.read_bytes()).hexdigest() == digest
-        check(relative.split("/")[-1] + " pinned executable", ok,
-              f"Run: python3 scripts/fetch-counter-tools.py --out {shlex.quote(str(args.tools))}; use a new directory if it exists.")
+    for name in ("ckb", "ckb-cli"):
+        ok = key is not None and cp.find_tool(args.tools, key, entry, name) is not None
+        check(f"{name} pinned executable", ok,
+              f"Run: python3 scripts/fetch-counter-tools.py --out {shlex.quote(str(args.tools))} (lists URLs and asks first).")
     print("Prerequisite checks passed." if not failures else
           f"Fix {len(failures)} prerequisite check(s), then rerun doctor. Full guide: docs/owned-counter-bootstrap.md.", flush=True)
     return not failures
+
+
+def installed_toolchain(version, env):
+    try:
+        result = subprocess.run(["rustup", "toolchain", "list"], env=env, capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return result.returncode == 0 and any(line.split()[0].startswith(version + "-")
+                                          for line in result.stdout.splitlines() if line.strip())
 
 
 def clean_backend(path, env):
@@ -123,7 +137,8 @@ def validate_local(args):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", nargs="?", choices=("inspect", "live", "doctor", "local"))
+    parser.add_argument("mode", nargs="?", choices=("inspect", "live", "doctor", "quick", "local"),
+                        help="quick: fresh proof + signed local lifecycle; local: quick plus 48 VM cases, range checks and 3 mutations")
     parser.add_argument("--rpc", default="https://testnet.ckb.dev", help="Read-only live inspection endpoint")
     parser.add_argument("--backend", type=Path, default=Path(os.environ.get("COUNTER_BACKEND", ROOT.parent / "Noir-Groth16")))
     parser.add_argument("--tools", type=Path, default=ROOT / "target/counter-tools")
@@ -139,12 +154,14 @@ def main(argv=None):
     if args.mode is None:
         if not sys.stdin.isatty():
             parser.error("Choose inspect, live, doctor or local in a non-interactive terminal.")
-        print("1. Inspect recorded evidence (offline; no wallet)\n2. Check existing testnet transactions (read-only)\n3. Reproduce locally (macOS ARM64)\n4. Check local prerequisites")
-        choice = input("Choose 1–4: ").strip()
-        if choice not in ("1", "2", "3", "4"):
-            parser.error("Choose 1, 2, 3 or 4.")
-        args.mode = {"1": "inspect", "2": "live", "3": "local", "4": "doctor"}[choice]
-    env = environment()
+        print("1. Inspect recorded evidence (offline; no wallet)\n2. Check existing testnet transactions (read-only)\n"
+              "3. Quick local run: fresh proof and signed local transactions (no wallet, no funds)\n"
+              "4. Full local validation: quick run plus 48 VM cases, range checks and 3 mutations\n5. Check local prerequisites")
+        choice = input("Choose 1–5: ").strip()
+        if choice not in ("1", "2", "3", "4", "5"):
+            parser.error("Choose 1, 2, 3, 4 or 5.")
+        args.mode = {"1": "inspect", "2": "live", "3": "quick", "4": "local", "5": "doctor"}[choice]
+    env = environment(args.tools)
     if args.mode in ("inspect", "live"):
         print("This checks evidence integrity/transaction contents. Cryptographic proof verification is a separate step in the reviewer guide.", flush=True)
         return run_script("review-counter.py", ["--rpc", args.rpc] if args.mode == "live" else [], env)
@@ -153,16 +170,24 @@ def main(argv=None):
     if args.mode == "doctor":
         return 0
     validate_local(args)
-    print(f"Fresh run: {args.out}\nCreates a disposable local account and chain, generates a development proof, runs 48 VM cases and three mutations, and checks signed local transactions. No public deployment. Builds/proofs can take time.\nStage 1/3: prerequisites passed. Stage 2/3: local lifecycle.", flush=True)
+    quick = args.mode == "quick"
+    scope = ("fresh development setup and proof, contract build, signed local deployment/creation/update with pre-signing proof check. "
+             "Adversarial VM matrix, range checks and mutations are NOT run in this mode; use 'local' for those."
+             if quick else "the quick lifecycle plus 48 VM cases, range checks and three contract mutations")
+    print(f"Fresh run: {args.out}\nCreates a disposable local account and chain. Runs {scope} No public deployment. Builds/proofs can take time.\nStage 1/3: prerequisites passed. Stage 2/3: local lifecycle.", flush=True)
     if not args.yes:
         if not sys.stdin.isatty():
             parser.error("Local execution needs --yes in a non-interactive terminal.")
         if input("Start this local run? [y/N] ").strip().lower() not in ("y", "yes"):
             print("Local run cancelled.")
             return 0
-    code = run_script("local-owned-counter.py", ["--out", args.out, "--backend", args.backend,
-                      "--ckb", args.tools / TOOLS[0][0], "--ckb-cli", args.tools / TOOLS[1][0],
-                      "--rpc-port", args.rpc_port, "--p2p-port", args.p2p_port, "--mutations"], env)
+    key, entry = host()
+    if key is None:
+        raise ValueError("No pinned tools for this host; local execution is unavailable here.")
+    runner = ["--out", args.out, "--backend", args.backend,
+              "--ckb", cp.find_tool(args.tools, key, entry, "ckb"), "--ckb-cli", cp.find_tool(args.tools, key, entry, "ckb-cli"),
+              "--rpc-port", args.rpc_port, "--p2p-port", args.p2p_port]
+    code = run_script("local-owned-counter.py", runner + (["--quick"] if quick else ["--mutations"]), env)
     if code:
         print(f"Local run failed. Inspect {args.out}/commands.json and manifest.json; do not share wallet/private directories.")
     else:

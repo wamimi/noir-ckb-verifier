@@ -64,8 +64,8 @@ target/noir-ckb/proof-bound-capsule/builds/<run-id>/
 
 ### `noir-ckb prove`
 
-The prove command creates fresh BN254 Groth16 setup and proof artifacts with
-public development entropy. It checks the exact seven-value public vector,
+The prove command creates fresh BN254 Groth16 setup and proof artifacts from a
+single-party development setup (not publicly derivable; not production). It checks the exact seven-value public vector,
 requires all configured negative vectors to fail, performs the arkworks and
 pinned endpoint round trip, and writes CKB Molecule payloads below:
 

@@ -135,7 +135,7 @@ test_status=passed
 ckb_vm_cases_passed=12
 ```
 
-The generated setup uses public development entropy and must not be used in
+The generated setup is a single-party development setup (snarkjs mixes OS randomness with the public `-e` label; the contribution secret is not retained, but the person who ran setup could have kept it and forged proofs) and must not be used in
 production. Current setup instructions are in
 [the generated-proof guide](current-generated-proof-workflow.md); the original
 Week 10 procedure is retained in [`reproducing-week-10.md`](reproducing-week-10.md).

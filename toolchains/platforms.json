@@ -1,0 +1,94 @@
+{
+  "schema": "noir-ckb/counter-platforms/v1",
+  "note": "Single source of host/tool pins for the fixed counter preview. Archive and executable SHA-256 values were computed from the official GitHub release downloads on 2026-10-12; Darwin ARM64 values reproduce the pins used by the recorded Week 15 runs. 'status' records actual end-to-end validation, not download availability.",
+  "versions": {
+    "ckb": "0.210.0 (2592ddf0502cd4adfe886db893cccc866db3c60f)",
+    "ckb-cli": "2.0.0 (80efc21c30e9fc7847407a217034681b6e46c763)",
+    "nargo": "1.0.0-beta.18 (noirc 99bb8b5cf33d7669adbdef096b12d80f30b4c0c9)",
+    "snarkjs": "0.7.5",
+    "rust_host": "1.95.0",
+    "rust_contract": "1.94.1",
+    "clang_major": 18,
+    "backend_revision": "828025f3a0090e2934940956c0f5dc8093eb5532"
+  },
+  "platforms": {
+    "darwin-arm64": {
+      "match": {"system": "Darwin", "machine": ["arm64"]},
+      "status": "validated",
+      "status_detail": "Maintainer macOS ARM64 runs (7 and 9 October 2026) with existing tools and caches; no clean-machine run recorded.",
+      "clang_hint": "brew install llvm@18; export CLANG=\"$(brew --prefix llvm@18)/bin/clang\"",
+      "tools": {
+        "ckb": {
+          "url": "https://github.com/nervosnetwork/ckb/releases/download/v0.210.0/ckb_v0.210.0_aarch64-apple-darwin-portable.zip",
+          "archive_sha256": "80477890543aa4425666dfe4f74022d4c8237cb9767052fef68e7a7e6b811ef2",
+          "member": "ckb_v0.210.0_aarch64-apple-darwin-portable/ckb",
+          "binary_sha256": "800d625b4baaa55cf6408b2f30ad744c4df90d52b94023ce226be875327c9493"
+        },
+        "ckb-cli": {
+          "url": "https://github.com/nervosnetwork/ckb-cli/releases/download/v2.0.0/ckb-cli_v2.0.0_aarch64-apple-darwin.zip",
+          "archive_sha256": "e19e0fc8228e3cc9eba5e4e3506f2559a8321cf472a9f5392bc6dc4093308d06",
+          "member": "ckb-cli_v2.0.0_aarch64-apple-darwin/ckb-cli",
+          "binary_sha256": "994166d983955fb59b6bab172485b3f65ff60487493b62a6569ad93eaa7adffb"
+        },
+        "nargo": {
+          "url": "https://github.com/noir-lang/noir/releases/download/v1.0.0-beta.18/nargo-aarch64-apple-darwin.tar.gz",
+          "archive_sha256": "ed67d9f3490a391f9ae2b454a7f6433df5abfe37e0bbdb0e4e28208da1ef9d41",
+          "member": "nargo",
+          "binary_sha256": "bc92d508702cdfe05f5e54eef8c5dbbf5c7438144100f88231379530328d29e5"
+        }
+      }
+    },
+    "linux-x86_64": {
+      "match": {"system": "Linux", "machine": ["x86_64", "amd64"]},
+      "status": "pending-validation",
+      "status_detail": "Official archives pinned and executables report the expected versions; the full proof and local-node lifecycle has not yet run on this platform. Target environment: Ubuntu 24.04.",
+      "clang_hint": "sudo apt-get install clang-18 lld-18 (Ubuntu 24.04); the launcher finds clang-18 on PATH",
+      "tools": {
+        "ckb": {
+          "url": "https://github.com/nervosnetwork/ckb/releases/download/v0.210.0/ckb_v0.210.0_x86_64-unknown-linux-gnu-portable.tar.gz",
+          "archive_sha256": "f7ea14476229883153eaef2f96aa3ae9e67c6f7254fe642aa06014cc6333d017",
+          "member": "ckb_v0.210.0_x86_64-unknown-linux-gnu-portable/ckb",
+          "binary_sha256": "a6424a34b2adba5011d3ec1d49569c5effacb54b8dcf97cbb99c0c5800300bf0"
+        },
+        "ckb-cli": {
+          "url": "https://github.com/nervosnetwork/ckb-cli/releases/download/v2.0.0/ckb-cli_v2.0.0_x86_64-unknown-linux-gnu.tar.gz",
+          "archive_sha256": "f61ea734a50f4ce91c058b92175950bcb2042847304480123f487d64214d3082",
+          "member": "ckb-cli_v2.0.0_x86_64-unknown-linux-gnu/ckb-cli",
+          "binary_sha256": "6adba0a280e60f81e53eb6d9cfa0d396025f83b5d46e284053c437624ddeeb45"
+        },
+        "nargo": {
+          "url": "https://github.com/noir-lang/noir/releases/download/v1.0.0-beta.18/nargo-x86_64-unknown-linux-gnu.tar.gz",
+          "archive_sha256": "b7c39a6bfdf6f587685c70ce359305a9b19d644e79bbd19692f4d56044d64f2c",
+          "member": "nargo",
+          "binary_sha256": "7da0fdd2eafc9dd551e4289395854bda11c085373788d3867faad9ef4a19025b"
+        }
+      }
+    },
+    "linux-arm64": {
+      "match": {"system": "Linux", "machine": ["aarch64", "arm64"]},
+      "status": "pending-validation",
+      "status_detail": "Official archives pinned; intended for Ubuntu 24.04 containers on Apple Silicon (Colima). Full lifecycle not yet run. The official CKB aarch64 Linux archive is not labelled 'portable'.",
+      "clang_hint": "sudo apt-get install clang-18 lld-18 (Ubuntu 24.04); the launcher finds clang-18 on PATH",
+      "tools": {
+        "ckb": {
+          "url": "https://github.com/nervosnetwork/ckb/releases/download/v0.210.0/ckb_v0.210.0_aarch64-unknown-linux-gnu.tar.gz",
+          "archive_sha256": "dad07124d695c3e803c1ce3998f98932e94a6884c39346ab003747b3825c6bfe",
+          "member": "ckb_v0.210.0_aarch64-unknown-linux-gnu/ckb",
+          "binary_sha256": "9ac84341de84b90fb47af806654668350483b65202ad52f269cfece3e72372bc"
+        },
+        "ckb-cli": {
+          "url": "https://github.com/nervosnetwork/ckb-cli/releases/download/v2.0.0/ckb-cli_v2.0.0_aarch64-unknown-linux-gnu.tar.gz",
+          "archive_sha256": "ddc3b3e08724983ee08e1b96336550e016ba0bc8156ea68e3bbe1f0f2f33f9c2",
+          "member": "ckb-cli_v2.0.0_aarch64-unknown-linux-gnu/ckb-cli",
+          "binary_sha256": "148cd4eb6867bb25a83799fe2a1c6a6f67d3ff33734f0175cd8a006936e292e5"
+        },
+        "nargo": {
+          "url": "https://github.com/noir-lang/noir/releases/download/v1.0.0-beta.18/nargo-aarch64-unknown-linux-gnu.tar.gz",
+          "archive_sha256": "862a43f87b371a163960b0ab5fd920a14502d2af3374607a9b52e5dd66450687",
+          "member": "nargo",
+          "binary_sha256": "3e5c01cc39513547b185ba00df7c871db6bb139806d1b2a582277eb39875459f"
+        }
+      }
+    }
+  }
+}

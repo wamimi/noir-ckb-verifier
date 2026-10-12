@@ -1,9 +1,18 @@
 # Counter source-preview prerequisites
 
 Start at [the reviewer guide](owned-counter-review.md). This is a source checkout,
-not a standalone executable. Supported/reproduced host: **macOS ARM64**. Windows,
-Linux and Intel macOS installers are not validated for this counter path. Existing
-Linux CI is the Capsule path; its green badge does not establish counter execution.
+not a standalone executable: the demo compiles the circuit and contract fresh, so
+Rust, Nargo, Node and LLVM 18 are required.
+
+| Host | Status |
+| --- | --- |
+| macOS ARM64, native | Reproduced by the maintainer (existing caches) |
+| Ubuntu 24.04 x86_64, native or [container](owned-counter-container.md) | Pinned tools; full lifecycle **pending validation** |
+| Ubuntu 24.04 ARM64 (including Apple Silicon via Colima), [container](owned-counter-container.md) | Pinned tools; full lifecycle **pending validation** |
+| Intel macOS, WSL2, other Linux distributions, Windows | Not supported |
+
+Pins for every host live in [`toolchains/platforms.json`](../toolchains/platforms.json).
+Existing Linux CI is the Capsule path; its green badge does not establish counter execution.
 
 The same-machine reproduction used existing package caches. The bootstrap below
 makes those caches explicit; it is **not a claimed fresh-machine installation test**.
@@ -41,7 +50,13 @@ checkout. That sibling is needed for some historical Capsule workflows only.
 
 ## Host tools and versions
 
-Install Git, Xcode Command Line Tools, Python >=3.9, Node.js/npm, Homebrew LLVM 18
+**Ubuntu 24.04 (x86_64 or ARM64):** the container route installs everything below
+for you. Natively, install `git python3 build-essential pkg-config clang-18 lld-18
+nodejs npm` with apt and rustup from <https://rustup.rs/>; the launcher finds
+`clang-18` on PATH. Ubuntu 22.04 does not ship clang-18 in its default repositories.
+Then follow the rustup, cache and tool steps below (skip the macOS-only lines).
+
+**macOS ARM64:** install Git, Xcode Command Line Tools, Python >=3.9, Node.js/npm, Homebrew LLVM 18
 and rustup. These are host installations, not blockchain operations. If missing:
 `xcode-select --install`; get rustup from <https://rustup.rs/>, Homebrew from
 <https://brew.sh/>, and Node from <https://nodejs.org/en/download>.
@@ -65,7 +80,9 @@ Use a Bash or zsh terminal retaining these exports for the subsequent commands.
 The target C compiler is explicit; Apple Clang alone is not the reproduced LLVM.
 Do not change the contract toolchain to match the host toolchain.
 
-Install noirup from the official [Noir installation guide](https://noir-lang.org/docs/getting_started/noir_installation), then:
+Nargo: `python3 scripts/fetch-counter-tools.py` (below) also installs the pinned,
+hash-checked Nargo executable into the tools directory, and the launcher prefers it.
+Alternatively install noirup from the official [Noir installation guide](https://noir-lang.org/docs/getting_started/noir_installation), then:
 
 ```bash
 noirup --version 1.0.0-beta.18
@@ -109,23 +126,35 @@ snarkjs 0.7.5's `--version` prints a banner and returns 99; the setup runner kno
 this. Do not mistake that particular version probe for proof-verification success.
 Actual proof verification must return zero and `OK!`.
 
-Finally install the pinned node and wallet executables into a **new** directory:
+Finally install the pinned node, wallet and Nargo executables for your host:
 
 ```bash
-python3 scripts/fetch-counter-tools.py --out target/counter-tools
+python3 scripts/fetch-counter-tools.py --list   # shows URLs and destinations only
+python3 scripts/fetch-counter-tools.py          # asks before downloading
 ```
 
-Expected: manifest with CKB 0.210.0 and ckb-cli 2.0.0, checked archive and executable
-SHA-256 values. Existing output directories intentionally reject; choose a new
-name and carry it through your next commands. Then run the guided checks and lifecycle:
+Each official GitHub archive and the single extracted executable are checked
+against `toolchains/platforms.json`; only that executable is written (mode 0755)
+under `target/counter-tools/<platform>/`. Tools already present with matching
+digests are skipped; a mismatched existing file is never overwritten. Week 15
+tool directories using the older archive layout are still recognized.
+Then run the guided checks and either lifecycle:
 
 ```bash
 python3 -B scripts/start-counter.py doctor
-python3 -B scripts/start-counter.py local
+python3 -B scripts/start-counter.py quick   # fresh proof + signed local transactions
+python3 -B scripts/start-counter.py local   # quick + 48 VM cases, ranges, 3 mutations
 ```
 
-The launcher also recognizes Homebrew LLVM 18 in its standard ARM64 location and
-sets its target compiler environment for child processes. It does not install tools
+`quick` still performs fresh setup, compilation, proving, snarkjs verification,
+contract build, pre-signing statement check and the signed deployment, creation
+and update on a disposable local chain. Its manifest records `validation: quick`
+and lists the skipped adversarial checks; it is not evidence that the matrix ran.
+
+The doctor queries `rustup toolchain list` rather than invoking `rustc +VERSION`,
+so checking never triggers an automatic toolchain download. The launcher finds an
+explicit `CLANG`, then `clang-18` on PATH, then Homebrew/Ubuntu LLVM 18 locations,
+and sets the target compiler environment for child processes. It does not install tools
 or edit your shell configuration. Use `--tools PATH` for a different downloaded-tool
 directory. The [local quickstart](owned-counter-quickstart.md) retains the direct commands.
 

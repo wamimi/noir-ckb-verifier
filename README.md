@@ -229,7 +229,7 @@ cargo +1.95.0 build --locked --release \
 ./target/release/noir-ckb test
 ```
 
-The proof setup uses public development entropy and is unsuitable for
+The proof setup is a single-party development setup (snarkjs mixes OS randomness with the public `-e` label; the contribution secret is not retained, but the person who ran setup could have kept it and forged proofs) and is unsuitable for
 production. The retained local run covers the complete packaged command path.
 The separate
 [hosted retained-fixture workflow](https://github.com/wamimi/noir-ckb-verifier/actions/runs/31522089140)

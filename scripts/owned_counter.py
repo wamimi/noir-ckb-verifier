@@ -107,7 +107,8 @@ def build(a):
     env=os.environ.copy();env.update({'COUNTER_'+k.upper():p[k] for k in ['network_domain','owner_code_hash','owner_data_hash']})
     vk=setup/'adapter/vk.mol.bin';env['COUNTER_VK_DATA_HASH']=hx(h(vk.read_bytes()))
     env['CARGO_TARGET_DIR']=str(out/'target')
-    env['RUSTFLAGS']=f'-C target-feature=-a --remap-path-prefix={Path.home()}/.cargo/registry/src=/cargo-registry --remap-path-prefix={Path.home()}/.rustup/toolchains=/rustup-toolchains --remap-path-prefix={ROOT}=/build'
+    import counter_platform as cp
+    env['RUSTFLAGS']=f'-C target-feature=-a --remap-path-prefix={cp.cargo_home(env)}/registry/src=/cargo-registry --remap-path-prefix={cp.rustup_home(env)}/toolchains=/rustup-toolchains --remap-path-prefix={ROOT}=/build'
     cmd=['cargo','+1.94.1','build','--locked','--offline','--release','--target','riscv64imac-unknown-none-elf','-p','owned-counter']
     r=subprocess.run(cmd,cwd=ROOT/'contracts',env=env,capture_output=True,text=True)
     write(out/'build.json',dict(command=cmd,env={k:v for k,v in env.items() if k.startswith('COUNTER_') or k in ['RUSTFLAGS','CARGO_TARGET_DIR']},stdout=r.stdout,stderr=r.stderr,exit=r.returncode))

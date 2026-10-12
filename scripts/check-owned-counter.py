@@ -3,6 +3,7 @@
 import argparse,copy,json,os,subprocess
 from pathlib import Path
 import owned_counter as c
+import counter_platform as cp
 
 def resolve(url,p):
     q=c.rpc(url,'get_transaction',[p['tx_hash']]);c.require(q and q['tx_status']['status']=='committed','unconfirmed fixture dependency')
@@ -101,7 +102,7 @@ def main():
     def duplicate_vk(t,cs):
         v=copy.deepcopy(next(x for x in cs if c.hx(c.h(c.raw(x['data'])))==r['policy']['vk_data_hash']));v['out_point']=dict(tx_hash='0x'+'66'*32,index='0x0');cs.append(v);t['cell_deps'].append(c.dep(v['out_point']))
     save('duplicate-vk',50,duplicate_vk)
-    always=next((Path.home()/'.cargo/registry/src').glob('*/ckb-always-success-script-0.0.1/specs/cells/always_success')).read_bytes()
+    always=next((cp.cargo_home()/'registry/src').glob('*/ckb-always-success-script-0.0.1/specs/cells/always_success')).read_bytes()
     def unsupported(t,cs):
         lock=dict(code_hash=c.hx(c.h(always)),hash_type='data1',args='0x');point=dict(tx_hash='0x'+'77'*32,index='0x0');cs.append(dict(out_point=point,output=c.output(100000000000,lock),data=c.hx(always)));t['cell_deps'].append(c.dep(point));t['outputs'][0]['lock']=lock
         next(x for x in cs if x['out_point']==t['inputs'][0]['previous_output'])['output']['lock']=lock

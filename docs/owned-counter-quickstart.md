@@ -9,19 +9,19 @@ The historical Capsule commands, statement and fixtures remain separate.
 
 **No withdrawal, destruction, transfer, recovery or upgrade exists. Application
 capacity remains locked, including if the counter reaches u64 maximum.** Use
-isolated development funds first. Setup uses explicitly public development entropy;
+isolated development funds first. Setup is a single-party development setup (snarkjs mixes OS randomness with the public `-e` label; the contribution secret is not retained, but the person who ran setup could have kept it and forged proofs);
 it is not a production ceremony. No audit, production security or privacy is claimed.
 
 ## Supported environment
 
-The reproduced packaging target is macOS ARM64, Python 3.9.6 or compatible newer
+The reproduced packaging target is macOS ARM64 (Ubuntu 24.04 x86_64/ARM64 pins exist but are pending validation; see [platform pins](../toolchains/platforms.json) and the [container guide](owned-counter-container.md)), Python 3.9.6 or compatible newer
 Python, Cargo/Rust host 1.95.0 and contract 1.94.1 with
 `riscv64imac-unknown-none-elf`, Nargo 1.0.0-beta.18 / noirc
 `99bb8b5cf33d7669adbdef096b12d80f30b4c0c9`, and snarkjs 0.7.5 via npx.
 Node: CKB 0.210.0 (`2592ddf0502cd4adfe886db893cccc866db3c60f`).
 Wallet tool: ckb-cli 2.0.0 (`80efc21c30e9fc7847407a217034681b6e46c763`).
-The installer verifies exact archive and executable SHA-256 pins; it does not
-install into PATH. Other hosts need separately tested binary pins.
+The installer verifies exact archive and executable SHA-256 pins from
+`toolchains/platforms.json`; it does not install into PATH.
 
 Keep a clean checkout of the maintained Noir-Groth16 fork at
 `828025f3a0090e2934940956c0f5dc8093eb5532`. It is based on James Bachini's
