@@ -52,18 +52,18 @@ class MetadataTests(unittest.TestCase):
         data = cp.load()
         self.assertEqual(set(data["platforms"]), {"darwin-arm64", "linux-x86_64", "linux-arm64"})
         for key, entry in data["platforms"].items():
-            self.assertIn(entry["status"], ("validated", "pending-validation"))
+            self.assertIn(entry["status"], ("validated", "lifecycle-validated", "pending-validation"))
             self.assertEqual(set(entry["tools"]), set(cp.TOOL_NAMES), key)
             for pin in entry["tools"].values():
                 for field in ("archive_sha256", "binary_sha256"):
                     self.assertRegex(pin[field], r"^[0-9a-f]{64}$")
                 self.assertTrue(pin["url"].startswith("https://github.com/"))
 
-    def test_only_darwin_is_marked_validated(self):
+    def test_statuses_match_recorded_evidence(self):
         statuses = {k: v["status"] for k, v in cp.load()["platforms"].items()}
         self.assertEqual(statuses["darwin-arm64"], "validated")
+        self.assertEqual(statuses["linux-arm64"], "lifecycle-validated")
         self.assertEqual(statuses["linux-x86_64"], "pending-validation")
-        self.assertEqual(statuses["linux-arm64"], "pending-validation")
 
     def test_week15_darwin_pins_unchanged(self):
         tools = cp.load()["platforms"]["darwin-arm64"]["tools"]

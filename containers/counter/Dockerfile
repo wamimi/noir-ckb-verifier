@@ -7,7 +7,9 @@
 #
 # Build from the repository root (see docs/owned-counter-container.md):
 #   docker build -f containers/counter/Dockerfile -t noir-ckb-counter .
-ARG BASE=ubuntu:24.04
+# Digest resolved by the first verified build (linux/arm64, 12 October 2026).
+# Expected to be the multi-arch index; an x86_64 build confirms it.
+ARG BASE=ubuntu:24.04@sha256:534baea6a22c03a63003dbc8dbe78fe34bc0d7e595d9a9dc9834884ff530eb55
 FROM ${BASE}
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -21,6 +23,7 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 # Shared tool homes stay writable so `docker run --user "$(id -u):$(id -g)"` works on Linux hosts.
+# The backend checkout is root-owned, so it is marked safe for git under any runtime uid.
 ENV HOME=/home/counter \
     RUSTUP_HOME=/opt/rustup \
     CARGO_HOME=/opt/cargo \
@@ -38,14 +41,15 @@ RUN set -eux; \
     curl --proto '=https' --tlsv1.2 -fsSLo /tmp/rustup-init.sha256 "$base/rustup-init.sha256"; \
     echo "$(cut -d' ' -f1 /tmp/rustup-init.sha256)  /tmp/rustup-init" | sha256sum -c -; \
     chmod +x /tmp/rustup-init; \
-    /tmp/rustup-init -y --no-modify-path --profile minimal --default-toolchain none; \
+    HOME=/root /tmp/rustup-init -y --no-modify-path --profile minimal --default-toolchain none; \
     rm /tmp/rustup-init /tmp/rustup-init.sha256; \
     rustup toolchain install 1.95.0 --profile minimal; \
     rustup toolchain install 1.94.1 --profile minimal --target riscv64imac-unknown-none-elf
 
 RUN git clone --quiet "$BACKEND_REPO" /opt/Noir-Groth16 \
  && git -C /opt/Noir-Groth16 checkout --quiet --detach "$BACKEND_REV" \
- && test "$(git -C /opt/Noir-Groth16 rev-parse HEAD)" = "$BACKEND_REV"
+ && test "$(git -C /opt/Noir-Groth16 rev-parse HEAD)" = "$BACKEND_REV" \
+ && git config --system --add safe.directory /opt/Noir-Groth16
 
 # .dockerignore excludes target/, .local/ and local key material.
 COPY . /opt/noir-ckb-verifier

@@ -1,8 +1,10 @@
 # Counter preview in a Linux container
 
-Status: **pending validation.** The image definition and launcher changes exist;
-no complete containerized lifecycle has been recorded yet. Treat a successful run
-on your machine as new evidence and report it (see the end of this page).
+Status: the `quick` lifecycle passed in this container on Apple Silicon
+(Colima, `linux/arm64`) on 12 October 2026; see
+[portable evidence](../evidence/week-15-portable.md). `local` mode (48-case
+matrix and mutations) and `linux/amd64` have not yet passed. Treat a run on
+your machine as new evidence and report it (see the end of this page).
 
 The container runs the same `scripts/start-counter.py` workflow as the native
 path on Ubuntu 24.04, with pinned Rust, clang-18, Nargo, snarkjs, CKB and ckb-cli.
@@ -50,9 +52,8 @@ target, the backend fork at `828025f3…`, locked Cargo dependencies, snarkjs 0.
 and the CKB/ckb-cli/Nargo archives (checked against `toolchains/platforms.json`).
 `.dockerignore` keeps `target/`, `.local/`, key files and wallets out of the image.
 
-The base image is referenced as `ubuntu:24.04`. After a successful first build,
-record its digest (`docker image inspect ubuntu:24.04 --format '{{json .RepoDigests}}'`);
-each run also saves it in `container-provenance.json`.
+The base image is pinned by digest (`ubuntu:24.04@sha256:534baea6…`, resolved by
+the first verified build); each run records it in `container-provenance.json`.
 
 ## 3. Run
 

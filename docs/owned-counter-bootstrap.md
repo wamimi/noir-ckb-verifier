@@ -8,7 +8,7 @@ Rust, Nargo, Node and LLVM 18 are required.
 | --- | --- |
 | macOS ARM64, native | Reproduced by the maintainer (existing caches) |
 | Ubuntu 24.04 x86_64, native or [container](owned-counter-container.md) | Pinned tools; full lifecycle **pending validation** |
-| Ubuntu 24.04 ARM64 (including Apple Silicon via Colima), [container](owned-counter-container.md) | Pinned tools; full lifecycle **pending validation** |
+| Ubuntu 24.04 ARM64 (including Apple Silicon via Colima), [container](owned-counter-container.md) | `quick` lifecycle passed in the container; `local` matrix not yet run |
 | Intel macOS, WSL2, other Linux distributions, Windows | Not supported |
 
 Pins for every host live in [`toolchains/platforms.json`](../toolchains/platforms.json).

@@ -41,7 +41,7 @@ json_string() { python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$1
   echo "  \"image\": $(json_string "$IMAGE"),"
   echo "  \"image_id\": $(json_string "$(docker image inspect "$IMAGE" --format '{{.Id}}')"),"
   echo "  \"image_architecture\": $(json_string "$(docker image inspect "$IMAGE" --format '{{.Os}}/{{.Architecture}}')"),"
-  echo "  \"base_image_digests\": $(docker image inspect ubuntu:24.04 --format '{{json .RepoDigests}}' 2>/dev/null || echo null),"
+  echo "  \"base_image\": $(json_string "$(sed -n 's/^ARG BASE=//p' "$ROOT/containers/counter/Dockerfile")"),"
   echo "  \"docker_server\": $(json_string "$(docker version --format '{{.Server.Version}} {{.Server.Os}}/{{.Server.Arch}}' 2>/dev/null || echo unknown)"),"
   echo "  \"host\": $(json_string "$(uname -sm)"),"
   echo "  \"source_revision\": $(json_string "$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"),"
