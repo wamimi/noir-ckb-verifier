@@ -52,6 +52,8 @@ RUN git clone --quiet "$BACKEND_REPO" /opt/Noir-Groth16 \
  && git config --system --add safe.directory /opt/Noir-Groth16
 
 # .dockerignore excludes target/, .local/ and local key material.
+# Under a non-root uid, Cargo's default target/ must be writable (adapter run, VM tests);
+# target/ itself is opened non-recursively so the pinned tools inside stay read-only.
 COPY . /opt/noir-ckb-verifier
 WORKDIR /opt/noir-ckb-verifier
 
@@ -62,7 +64,8 @@ RUN python3 -B scripts/fetch-counter-tools.py --yes --out /opt/noir-ckb-verifier
  && npm exec --yes --package=snarkjs@0.7.5 -- node -e 'process.exit(0)' \
  && mkdir -p /home/counter target/runs \
  && chmod -R a+rX /opt/rustup /opt/Noir-Groth16 /opt/noir-ckb-verifier \
- && chmod -R a+rwX /opt/cargo /opt/npm-cache /home/counter target/runs
+ && chmod -R a+rwX /opt/cargo /opt/npm-cache /home/counter target/runs \
+ && chmod a+rwX target
 
 ENTRYPOINT ["python3", "-B", "scripts/start-counter.py"]
 CMD ["doctor"]
