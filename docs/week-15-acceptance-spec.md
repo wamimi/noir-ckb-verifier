@@ -50,8 +50,9 @@ on its future executable hash, avoiding a build/setup cycle. The release
 manifest pins circuit/compiler/backend, R1CS, setup provenance, VK and Type ELF.
 Replacing the VK requires a different Type executable/code hash; a transaction
 creator cannot admit an arbitrary VK or weaker relation through args/witness.
-No production ceremony or setup security is claimed. Public demonstration entropy
-must be labeled; operator secrets/keys must never be logged or committed.
+No production ceremony or setup security is claimed. The setup is single-party
+development material and must be labeled as such; operator secrets/keys must
+never be logged or committed.
 
 ## Cell layout and uniqueness
 

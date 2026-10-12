@@ -17,7 +17,11 @@ The [application specification](../docs/week-15-acceptance-spec.md),
 `noir-ckb/owned-counter/v1` profile. It is a **public proof-enforcement example**,
 not a privacy application or general generator. Application capacity has **no
 withdrawal/destruction path**. All setup material is explicitly development-only,
-single-party with public contribution entropy, not a production ceremony.
+single-party development material, not a production ceremony. (The setup
+records in `week-15/` and `week-15-public/` label it "public entropy"; that
+label was inaccurate, because snarkjs also mixes in system randomness, and was
+later corrected in the guides and scripts. The JSON records keep their original
+wording.)
 
 ## Reproduced results
 
