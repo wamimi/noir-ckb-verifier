@@ -20,7 +20,7 @@ existing Week 15 pins exactly.
 | Ubuntu 24.04 ARM64, container (Colima on Apple Silicon) | doctor, quick | doctor passed; `quick-lifecycle-validated`, exit 0, about 3 min | Image built from pinned sources (build about 18 min); run with no network. |
 | Ubuntu 24.04 ARM64, container (Colima on Apple Silicon) | local (full) | `locally-validated`, exit 0, 4 min 48 s: 6/6 range checks, 48/48 VM cases, 3/3 mutations detected, signed lifecycle committed | Same image as the quick run; no network. Maintainer machine; container runs as root under Colima. |
 | Ubuntu x86_64 (cloud workspace) | partial | Pinned tools verified; circuit compiled; local chain, key, preflight passed; stopped at the Rust build | Rust toolchain downloads were blocked by that environment's network policy. Not a lifecycle result. |
-| Ubuntu 24.04 x86_64 and ARM64, GitHub Actions | quick | Run 1 failed: backend git ownership check under a non-root uid. Run 2 passed the doctor and backend build, then failed writing Cargo's default `target/` | Both fixed in the Dockerfile (git-safe backend; writable top-level `target/`); rerun pending. |
+| Ubuntu 24.04 x86_64 and ARM64, GitHub Actions | quick | Run 1 failed: backend git ownership check under a non-root uid. Run 2 passed the doctor and backend build, then failed writing Cargo's default `target/`. **Run 3 (commit `9079b21`) passed on both runners** in 6 min 17 s | Hosted runners, non-root uid, no network during the run; first x86_64 lifecycle; confirms the pinned base digest resolves on amd64. Matrix and mutations not run in CI. |
 
 Circuit identity: the compiled `owned_counter_v1` ACIR bytecode is identical on
 macOS ARM64 and Linux x86_64 (Nargo beta.18), which the testnet "join existing

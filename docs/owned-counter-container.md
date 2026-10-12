@@ -2,8 +2,8 @@
 
 Status: on Apple Silicon (Colima, `linux/arm64`) both `quick` and the full
 `local` mode (48-case matrix, range checks, 3 mutations) passed on 12 October
-2026; see [portable evidence](../evidence/week-15-portable.md). `linux/amd64`
-has not yet passed. Treat a run on
+2026; see [portable evidence](../evidence/week-15-portable.md). On `linux/amd64`
+the `quick` lifecycle passed on a GitHub-hosted runner; `local` has not yet run there. Treat a run on
 your machine as new evidence and report it (see the end of this page).
 
 The container runs the same `scripts/start-counter.py` workflow as the native

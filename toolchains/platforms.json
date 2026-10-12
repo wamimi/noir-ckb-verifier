@@ -51,8 +51,8 @@
           "amd64"
         ]
       },
-      "status": "pending-validation",
-      "status_detail": "Official archives pinned and executables report the expected versions; the full proof and local-node lifecycle has not yet run on this platform. Target environment: Ubuntu 24.04.",
+      "status": "lifecycle-validated",
+      "status_detail": "Quick lifecycle passed in the pinned Ubuntu 24.04 container on a GitHub-hosted ubuntu-24.04 runner (linux/amd64, non-root uid, network none) on 12 October 2026, workflow run 3 on commit 9079b21. The same run also passed quick mode on ubuntu-24.04-arm. The 48-case VM matrix, range checks and mutations have not run on x86_64.",
       "clang_hint": "sudo apt-get install clang-18 lld-18 (Ubuntu 24.04); the launcher finds clang-18 on PATH",
       "tools": {
         "ckb": {

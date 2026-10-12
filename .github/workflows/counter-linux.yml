@@ -2,7 +2,7 @@ name: Counter Linux container
 
 # Builds the pinned counter image and runs the local, no-wallet lifecycle on
 # Ubuntu 24.04 x86_64 and ARM64 hosted runners. Runs on manual dispatch, or on
-# a push to a branch named counter-linux-validation/* (workflow_dispatch only
+# a push to a branch named counter-linux-validation/* (full local mode; workflow_dispatch only
 # appears once this file is on the default branch). Uploads public summaries
 # only (never run/private or wallet directories).
 on:
@@ -37,8 +37,8 @@ jobs:
       - name: Build pinned image
         run: scripts/run-counter-container.sh build
 
-      - name: Run counter (${{ inputs.mode || 'quick' }})
-        run: scripts/run-counter-container.sh "${{ inputs.mode || 'quick' }}"
+      - name: Run counter (${{ inputs.mode || 'local' }})
+        run: scripts/run-counter-container.sh "${{ inputs.mode || 'local' }}"
 
       - name: Collect public summaries
         if: always()
@@ -55,5 +55,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: counter-${{ inputs.mode || 'quick' }}-${{ matrix.runner }}
+          name: counter-${{ inputs.mode || 'local' }}-${{ matrix.runner }}
           path: public-summary/
