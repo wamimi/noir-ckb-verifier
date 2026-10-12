@@ -17,20 +17,28 @@ existing Week 15 pins exactly.
 | Platform | Mode | Result | Scope and caveats |
 | --- | --- | --- | --- |
 | macOS ARM64, native | quick | `quick-lifecycle-validated` in 1 min 30 s | Maintainer machine, existing tools/caches; 40 Python and 6 Rust CLI tests also passed. Not a fresh-machine test. |
-| Ubuntu 24.04 ARM64, container (Colima on Apple Silicon) | doctor, quick | doctor passed; `quick-lifecycle-validated`, exit 0, about 3 min | Image built from pinned sources (build about 18 min); run with no network. Matrix and mutations not run. |
+| Ubuntu 24.04 ARM64, container (Colima on Apple Silicon) | doctor, quick | doctor passed; `quick-lifecycle-validated`, exit 0, about 3 min | Image built from pinned sources (build about 18 min); run with no network. |
+| Ubuntu 24.04 ARM64, container (Colima on Apple Silicon) | local (full) | `locally-validated`, exit 0, 4 min 48 s: 6/6 range checks, 48/48 VM cases, 3/3 mutations detected, signed lifecycle committed | Same image as the quick run; no network. Maintainer machine; container runs as root under Colima. |
 | Ubuntu x86_64 (cloud workspace) | partial | Pinned tools verified; circuit compiled; local chain, key, preflight passed; stopped at the Rust build | Rust toolchain downloads were blocked by that environment's network policy. Not a lifecycle result. |
-| Ubuntu 24.04 x86_64 and ARM64, GitHub Actions | quick | First run failed: backend git check under a non-root uid | Fixed (backend marked git-safe); rerun pending. |
+| Ubuntu 24.04 x86_64 and ARM64, GitHub Actions | quick | Run 1 failed: backend git ownership check under a non-root uid. Run 2 passed the doctor and backend build, then failed writing Cargo's default `target/` | Both fixed in the Dockerfile (git-safe backend; writable top-level `target/`); rerun pending. |
 
 Circuit identity: the compiled `owned_counter_v1` ACIR bytecode is identical on
 macOS ARM64 and Linux x86_64 (Nargo beta.18), which the testnet "join existing
 deployment" path relies on.
 
-Container provenance (ARM64 quick run): image
+Container provenance (both ARM64 runs): image
 `sha256:78e37c6fd181f3a70b9a54eaf7e54e739fbd2dd4e86ea0934124c0fdc39b8c65`,
-`linux/arm64`, Docker server 27.4.0, base
-`ubuntu:24.04@sha256:534baea6a22c03a63003dbc8dbe78fe34bc0d7e595d9a9dc9834884ff530eb55`,
-source `00a812951c9206fa0c942d8f8a6e0d205805b2a3` with uncommitted local paths
-(the earlier documentation moves plus the then-uncommitted container fix).
+`linux/arm64`, Docker server 27.4.0. The build log resolved `ubuntu:24.04` to
+`sha256:534baea6a22c03a63003dbc8dbe78fe34bc0d7e595d9a9dc9834884ff530eb55`.
+The image was built from commit `00a812951c9206fa0c942d8f8a6e0d205805b2a3` plus
+the then-uncommitted rustup `HOME` and git-safe backend changes; it predates the
+base-digest pin and the writable `target/` change.
+
+Correction: those runs' `container-provenance.json` files record the host
+checkout at run time (`00a8129…` for quick, `9c2687e…` for local) and the host
+Dockerfile's base line, not the image's own source. The run script now stamps
+source revision, dirty-path count, Dockerfile hash and base image into image
+labels at build time and copies them into each run's provenance.
 
 Local receipts (isolated development chains, not public transactions):
 
@@ -38,6 +46,7 @@ Local receipts (isolated development chains, not public transactions):
 | --- | --- | --- | --- | --- |
 | macOS ARM64 quick | `0xd84317…f3c2` | `0x69cc1a…4b56` | `0xe4175e…b7c7` | `0xa84582…5283` |
 | Linux ARM64 container quick | `0xaaf3e7…b1c0` | `0x9a3aa5…baa4` | `0x4b310f…09d9` | `0xeece30…c5df` |
+| Linux ARM64 container local | `0x4169ac…d5e8` | `0x382361…f172` | `0x4ddf30…0bd3` | `0x8e13ee…9e01` |
 
 ## Private-input feasibility spike
 

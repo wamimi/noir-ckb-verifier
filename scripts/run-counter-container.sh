@@ -16,7 +16,13 @@ MODE="${1:-}"
 
 case "$MODE" in
   build)
-    exec docker build -f "$ROOT/containers/counter/Dockerfile" -t "$IMAGE" "$ROOT" ;;
+    # Stamp what the image is built from, so runs report the image's source, not the host's.
+    exec docker build -f "$ROOT/containers/counter/Dockerfile" -t "$IMAGE" \
+      --label "org.noir-ckb.source-revision=$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo unknown)" \
+      --label "org.noir-ckb.source-dirty-paths=$(git -C "$ROOT" status --porcelain 2>/dev/null | wc -l | tr -d ' ')" \
+      --label "org.noir-ckb.dockerfile-sha256=$(python3 -c 'import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$ROOT/containers/counter/Dockerfile")" \
+      --label "org.noir-ckb.base-image=$(sed -n 's/^ARG BASE=//p' "$ROOT/containers/counter/Dockerfile")" \
+      "$ROOT" ;;
   doctor|quick|local) ;;
   *)
     sed -n '2,10p' "$0"; exit 2 ;;
@@ -41,11 +47,11 @@ json_string() { python3 -c 'import json,sys; print(json.dumps(sys.argv[1]))' "$1
   echo "  \"image\": $(json_string "$IMAGE"),"
   echo "  \"image_id\": $(json_string "$(docker image inspect "$IMAGE" --format '{{.Id}}')"),"
   echo "  \"image_architecture\": $(json_string "$(docker image inspect "$IMAGE" --format '{{.Os}}/{{.Architecture}}')"),"
-  echo "  \"base_image\": $(json_string "$(sed -n 's/^ARG BASE=//p' "$ROOT/containers/counter/Dockerfile")"),"
+  echo "  \"image_labels\": $(docker image inspect "$IMAGE" --format '{{json .Config.Labels}}'),"
   echo "  \"docker_server\": $(json_string "$(docker version --format '{{.Server.Version}} {{.Server.Os}}/{{.Server.Arch}}' 2>/dev/null || echo unknown)"),"
   echo "  \"host\": $(json_string "$(uname -sm)"),"
-  echo "  \"source_revision\": $(json_string "$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"),"
-  echo "  \"source_dirty_paths\": $(git -C "$ROOT" status --porcelain 2>/dev/null | wc -l | tr -d ' '),"
+  echo "  \"host_checkout_revision\": $(json_string "$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"),"
+  echo "  \"host_checkout_dirty_paths\": $(git -C "$ROOT" status --porcelain 2>/dev/null | wc -l | tr -d ' '),"
   echo "  \"network\": \"none\""
   echo "}"
 } > "$HOST_DIR/container-provenance.json"

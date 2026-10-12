@@ -83,8 +83,8 @@
           "arm64"
         ]
       },
-      "status": "lifecycle-validated",
-      "status_detail": "Quick lifecycle passed in the pinned Ubuntu 24.04 container on Apple Silicon (Colima, linux/arm64, network none) on 12 October 2026: fresh setup and proof, contract build, signed local deployment, creation and update committed and checked. The 48-case VM matrix, range checks and mutations ('local' mode) have not run on this platform. The official CKB aarch64 Linux archive is not labelled 'portable'.",
+      "status": "validated",
+      "status_detail": "Full local mode passed in the pinned Ubuntu 24.04 container on Apple Silicon (Colima, linux/arm64, network none) on 12 October 2026: fresh setup and proof, 6 range checks, 48 CKB-VM cases, 3 detected mutations and a signed local deployment, creation and update. Maintainer machine; no hosted or third-party run yet. The official CKB aarch64 Linux archive is not labelled 'portable'.",
       "clang_hint": "sudo apt-get install clang-18 lld-18 (Ubuntu 24.04); the launcher finds clang-18 on PATH",
       "tools": {
         "ckb": {

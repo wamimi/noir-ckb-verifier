@@ -62,7 +62,7 @@ class MetadataTests(unittest.TestCase):
     def test_statuses_match_recorded_evidence(self):
         statuses = {k: v["status"] for k, v in cp.load()["platforms"].items()}
         self.assertEqual(statuses["darwin-arm64"], "validated")
-        self.assertEqual(statuses["linux-arm64"], "lifecycle-validated")
+        self.assertEqual(statuses["linux-arm64"], "validated")
         self.assertEqual(statuses["linux-x86_64"], "pending-validation")
 
     def test_week15_darwin_pins_unchanged(self):
