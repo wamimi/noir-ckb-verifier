@@ -2,8 +2,8 @@
 
 Recorded 7 October 2026. The operator ran signing and broadcast commands locally.
 The confirmation client reported `committed-and-cells-checked` for deployment,
-creation, and update. This document preserves those existing receipts; its author
-did not rebroadcast transactions or independently rerun the chain queries.
+creation, and update. This record preserves those receipts; no transaction was
+rebroadcast.
 
 ## Public transaction references
 
@@ -54,25 +54,25 @@ withdrawal/destruction path. Owner-controlled code/VK dependencies must be retai
 for application liveness. No wallet files, private keys, or signing secrets are
 included here.
 
-## Subsequent independent read-only recheck — 7 October 2026
+## Read-only recheck — 7 October 2026
 
-The original author statement above describes the receipt-curation pass. During
-the later handoff pass, `python3 -B scripts/review-counter.py --rpc
-https://testnet.ckb.dev` independently queried the public node, checked testnet
+A later read-only check, `python3 -B scripts/review-counter.py --rpc
+https://testnet.ckb.dev`, independently queried the public node, checked testnet
 genesis and all three committed transactions, compared raw transaction contents,
 code/VK lengths and hashes, input linkage, states, owner/capacity, derived statement
 and proof witness hash. [Actual result](week-15-public/live-check-2026-10-07.json):
 successor currently live, count1, same owner and 200 CKB. Initial Cell status was
 `unknown`; its consumption is established by the committed update input reference.
-No signing or broadcast occurred. This is independent read-only checking of the
-operator's transactions, **not independent external reproduction**.
+No signing or broadcast occurred. This is a read-only check of the operator's
+transactions, **not an independent external reproduction**.
 
 [Portable public provenance](week-15-public/deployment.json) now retains the
 original release hash, deployed source hashes, normalized build flags, exact
 artifact identities, setup provenance and receipt hashes. The public proof/VK
-also pass snarkjs verification. The [final source snapshot](week-15-public/source-state.json)
-identifies the uncommitted handoff; recording a real published commit is still
-a publication gate. The old machine-local release was not overwritten.
+also pass snarkjs verification. The counter source was subsequently published
+through `836f2a1fb8426a2f45ce788d4075331b8870854f`; deployed source hashes remain
+in the portable manifest.
+The old machine-local release was not overwritten.
 
 Onboarding finding: the operator received two 100,000 CKB funding Cells and
 consolidated them before deployment because the client accepts one funding Cell.

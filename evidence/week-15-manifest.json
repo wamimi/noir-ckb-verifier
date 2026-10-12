@@ -18,10 +18,8 @@
     "range-context-lo-overflow.json": "ffb32d1e7c1186b1894fd9eeabdb747f8d55b5f595a2eef47e60e1c7e1e66eb6",
     "setup-commands.json": "2ebe5ffb146d13311e607963304b3fe6b1a4b2c5dedc26d04020f7389e6b2bee",
     "mutation-verification-build.json": "38126c560281d50a6ef4d44945511dc943ba72570aa0e2b212ec2e2bbade55da",
-    "preservation.json": "00118c2db7a3d80ee6aeeddbc4ffbbc0db04cf58e050b4b1c32ca2c809509432",
     "mutation-initial_zero-run.json": "987918edc1d6162892ae211f9f66dde930e0dac454ccdf8db564acd92f49601c",
     "mutation-initial_zero-build.json": "f344ea632be3ecb56a7b567657660155c7fb9298b6ac09711ddea0470cb2dd16",
-    "final-source.json": "a32ec645a69482d0d2c8efa0212359161cb8f5e993814b4851473a1743101937",
     "mutation-verification-run.json": "6c34db2927a5c7b287afeb7514e97363954b43d7387f19ce506262bf56f86357",
     "deployment-receipt.json": "5a5d39b424ecc357f62dbc6f6a80424a9670b27df01d951ac879fe70ea3a6de4",
     "range-not-increment.json": "ff76a1eee2e31be9a664c72f7ddb6829111457ac7fd513d9ed4164f74cf9a539",
@@ -36,8 +34,8 @@
     "checked-state.json": "683a6286e3506e39152da18e74598135588b225184dd3b712524458db210d6b4",
     "range-context-hi-overflow.json": "c5ffb9a86a5bfdf6a2d340e751cba34201f48bc125ba6bf17d7c681144918925",
     "matrix-results.json": "601fa7d18ac2de0d88454cce29333ee427a1b91efa408a2fca70b67efadd3630",
-    "source-copy.json": "51248ef38aec9c3bb1b9a8aa4751bdcddb3fec16b90d4979cc288ed5a6a9112d",
     "mutation-capacity-build.json": "cff7d8c5043504eb738a703939b89ccee937af2464ac3a3fb735037118ba04e0",
     "build.json": "9f81193192ee1ff44793973bcbf745b9b556027d5f14daefafe65ecf80e66bef"
-  }
+  },
+  "inventory_note": "Public evidence subset: internal workspace snapshots and preservation bookkeeping are retained locally. Historical execution status and retained artifact hashes are unchanged."
 }

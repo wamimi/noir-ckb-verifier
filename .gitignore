@@ -36,3 +36,24 @@ fuzz/corpus/
 
 # Python client/validation caches
 __pycache__/
+
+# Local maintainer planning, drafts, and internal handoff records
+/.local/
+/docs/owned-counter-demo-recording.md
+/docs/owned-counter-forum-draft.md
+/docs/week-15-outreach.md
+/docs/week-15-delivery-checklist.md
+/docs/week-15-scope-reconciliation.md
+/docs/week-15-report.md
+/docs/week-12-review-request.md
+/evidence/week-15-handoff.md
+/evidence/week-15-rpc-preflight-2026-10-07.json
+/evidence/week-15-public/bootstrap-checks.json
+/evidence/week-15-public/handoff-checks.json
+/evidence/week-15-public/source-state.json
+/evidence/week-15-public/publication-source-state.json
+/evidence/week-15/final-source.json
+/evidence/week-15/source-copy.json
+/evidence/week-15/preservation.json
+/docs/production-readiness-roadmap.md
+/docs/week-12-and-post-program-direction-brief.md
