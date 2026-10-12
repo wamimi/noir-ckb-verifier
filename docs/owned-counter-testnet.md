@@ -1,5 +1,9 @@
 # Counter v1: checked testnet operator batches
 
+**Just want your own counter on testnet?** You do not need this guide or a new
+deployment: [join the existing deployment](owned-counter-testnet-join.md) for about
+262 testnet CKB. This guide is for deploying a separate instance of the contract.
+
 The existing operator-run deployment, initialization and update are confirmed;
 see [receipts](../evidence/week-15-testnet.md). They authorize no further spending.
 This guide is for **your own instance**, after the [local quickstart](owned-counter-quickstart.md).

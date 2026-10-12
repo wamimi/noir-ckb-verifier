@@ -1,0 +1,76 @@
+{
+  "schema": "noir-ckb/counter-join-bundle/v1",
+  "profile": "noir-ckb/owned-counter/v1",
+  "network": "0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606",
+  "policy": {
+    "profile": "noir-ckb/owned-counter/v1",
+    "network_domain": "0x10639e0895502b5688a6be8cf69460d76541bfa4821629d86d62ba0aae3f9606",
+    "owner_code_hash": "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+    "owner_data_hash": "0x709f3fda12f561cfacf92273c57a98fede188a3f1a59b1f888d113f9cce08649",
+    "owner_dep": {
+      "out_point": {
+        "tx_hash": "0xf8de3bb47d055cdf460d93a2a6e1b05f7432f9777c8c474abf4eec1d4aee5d37",
+        "index": "0x0"
+      },
+      "dep_type": "dep_group"
+    },
+    "vk_data_hash": "0x685bc8cd974970ba3a030025f683c7fd6fce0715c2e9f286660634a8b35058fe"
+  },
+  "deployment": {
+    "type": {
+      "tx_hash": "0x0ee39d547101eb348bc72a93f9a08b301353267487f3061f54a0070c44f27ad1",
+      "index": "0x0"
+    },
+    "vk": {
+      "tx_hash": "0x0ee39d547101eb348bc72a93f9a08b301353267487f3061f54a0070c44f27ad1",
+      "index": "0x1"
+    }
+  },
+  "files": {
+    "development.zkey": {
+      "sha256": "0d6e26824295e3d132470a3e2a6309b391340341b1e0da2d43bc2eaf040e2d79",
+      "bytes": 1415705
+    },
+    "verification_key.json": {
+      "sha256": "455f28fbfa1724897406229ce9f7750eba39daeade121554550aa4a2e295d947",
+      "bytes": 3477
+    },
+    "circuit.r1cs": {
+      "sha256": "843ee202c36a13afece0eb111a83621c7fa9b46078cc6c0148d651e8c4096e43",
+      "bytes": 381724
+    },
+    "owned_counter_v1.json": {
+      "sha256": "030021edb85a32385c99f07530bda158269ded089136932303c038555d499a2f",
+      "bytes": 2588
+    }
+  },
+  "artifacts": {
+    "type": {
+      "file": "owned-counter",
+      "sha256": "1bb0449d63dc4c8e0f321bbe3dfbb4cafb790cad2d407ab489444d45fe8b3ed3",
+      "data_hash": "0x79d7e7614ff1689cb6c6fbbd376ab2fa959dc92394abea35cbafb1bd2b7d0a88",
+      "bytes": 113320
+    },
+    "vk": {
+      "file": "vk.mol.bin",
+      "sha256": "6ca575a28d52d017e81bf1d60c27d11036d6fb0baefe1fca4041519c1df643e1",
+      "data_hash": "0x685bc8cd974970ba3a030025f683c7fd6fce0715c2e9f286660634a8b35058fe",
+      "bytes": 430
+    }
+  },
+  "source_release_sha256": "6d659fc15c73c9cee8e3ed2a1de68415cd2b07e0fb9d14d9d857025ce381c887",
+  "backend_revision": "828025f3a0090e2934940956c0f5dc8093eb5532",
+  "nargo": "nargo version = 1.0.0-beta.18\nnoirc version = 1.0.0-beta.18+99bb8b5cf33d7669adbdef096b12d80f30b4c0c9\n(git version hash: 99bb8b5cf33d7669adbdef096b12d80f30b4c0c9, is dirty: false)\n",
+  "constraints": 2339,
+  "setup_note": "Single-party development setup. snarkjs mixed OS randomness into each contribution; the person who ran it could in principle have kept it and forged proofs. Testnet only.",
+  "source_sha256": {
+    "contracts/Cargo.toml": "8531470d72c23e644041c2dcf3520924c488690be60ec23ac6be580d18544745",
+    "contracts/Cargo.lock": "29ced8a3517f7c28a2db8b2f36ba9679fd3bcaf355c342385c3b96defff32e02",
+    "contracts/crates/owned-counter/Cargo.toml": "84b6e4a40564fdb997babe8bdd756bdabf247ed11c846bcc7ee185db23c5e961",
+    "contracts/crates/owned-counter/build.rs": "e200136d4d747561b468558e95f668d07b12c52f46d5966fabbc2c334d4ac1ba",
+    "contracts/crates/owned-counter/src/main.rs": "a993ca4672cfb24d29343bd28930ae5f1011903d0b47a870c4306490f60807f7",
+    "circuits/owned-counter-v1/Nargo.toml": "27b265c2cc252ca252e5c80d706aa5ecfa482ca0caa82b92e54746d763dd2a63",
+    "circuits/owned-counter-v1/src/main.nr": "bff8065c9c91536cec884cf798d49a5481f665726575fe3e4adaf0ce8b43b41a"
+  },
+  "circuit_artifact_note": "owned_counter_v1.json: debug file_map paths replaced with the repository-relative source path; bytecode, ABI and debug symbols unchanged."
+}
