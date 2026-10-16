@@ -23,6 +23,8 @@
 
 - [Private tally v2 design](private-tally-v2-spec.md): hidden value, proof as the
   authority, and the planned multi-party setup ceremony.
+- [Setup ceremony](setup-ceremony.md): how the private tally's keys are made
+  by several contributors, and how to take part or verify it.
 
 ## Toolchain internals
 

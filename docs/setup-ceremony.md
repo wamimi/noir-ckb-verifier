@@ -1,0 +1,175 @@
+# Setup ceremony for the private tally
+
+**Status: not open yet.** Contributions open once the private tally circuit is
+built and frozen (see [private tally v2 design](private-tally-v2-spec.md),
+section 8). Until then this page describes how the ceremony works so that
+contributors know what to expect. When it opens, the opening announcement and
+the `ceremony/private-tally-v2/` folder will give the exact file names and hashes.
+
+## Why a ceremony is needed
+
+Groth16 proofs need a proving key and a verification key made for one specific
+circuit. Making them requires secret random numbers. Anyone who kept those
+numbers could create proofs for false statements, which for the private tally
+would mean changing someone's hidden tally without their key.
+
+A ceremony spreads that secret across many people. Each contributor mixes their
+own fresh randomness into the key and then forgets it. **If at least one
+contributor's randomness is never recovered, nobody can forge proofs.** Nobody
+has to trust any single person, including the coordinator.
+
+The counter example used a single-party development setup. The private tally
+will not be deployed to testnet without this ceremony.
+
+## How it works
+
+The ceremony follows the standard snarkjs Groth16 procedure and has two phases.
+
+**Phase 1 (universal) is reused, not repeated.** It comes from the public
+Perpetual Powers of Tau transcript (the Hermez `powersOfTau28_hez_final_*.ptau`
+files, 54 contributions plus a beacon), checked against the BLAKE2b hashes
+published in the [snarkjs README](https://github.com/iden3/snarkjs#7-prepare-phase-2).
+
+**Phase 2 (circuit-specific) is this ceremony.** It is a relay, one contributor
+at a time:
+
+1. The coordinator freezes the circuit, publishes its R1CS file and hash, the
+   phase 1 file name and hash, and the initial key `tally_0000.zkey`.
+2. Before the first contribution, the coordinator announces the **beacon**: the
+   hash of a CKB mainnet block at a stated future height. Nobody can know that
+   hash in advance, so nobody can choose it to suit them.
+3. Each contributor downloads the latest key, adds their randomness with one
+   `snarkjs` command, and returns the new key plus the **contribution hash** it
+   prints. The coordinator contributes first, under the same rules,
+   so the chain never starts from an uncontributed key.
+4. The coordinator checks every new key with `snarkjs zkey verify` before
+   passing it on. A broken or malicious key is rejected, so files can travel
+   over any channel.
+5. After the last contribution and once the beacon block exists, the coordinator
+   applies the beacon, verifies the final key, exports the verification key and
+   publishes the full transcript.
+6. Each contributor checks that their contribution hash appears in the final
+   transcript.
+
+## Contributing (about 10–15 minutes)
+
+You need a Mac or Linux computer with Node.js 18 or newer (`node --version`).
+You do not need Rust, Noir, CKB tools, a wallet or any money. Nothing in this
+process asks for keys or passwords.
+
+When your turn comes, the coordinator opens a GitHub issue titled
+`Contribution N: <your name>` with a link to the latest key and its SHA-256
+hash. You have 48 hours; after that the turn passes to the next contributor and
+you can be added at the end.
+
+The issue gives you three values to paste: the input file name, the output file
+name and the input file's link. For example:
+
+```bash
+export IN=tally_0002.zkey
+export OUT=tally_0003.zkey
+export URL=https://...the link from the issue...
+```
+
+**Step 1. Make an empty folder and download the key.**
+
+```bash
+mkdir ~/tally-ceremony && cd ~/tally-ceremony
+curl -L -o "$IN" "$URL"
+```
+
+**Step 2. Check you got exactly the right file.** Compare the output with the
+SHA-256 hash in the issue. They must match character for character.
+
+```bash
+shasum -a 256 "$IN"      # Mac
+sha256sum "$IN"          # Linux
+```
+
+**Step 3. Contribute.** Replace the name with how you want to appear in the
+transcript:
+
+```bash
+npx -y snarkjs@0.7.5 zkey contribute "$IN" "$OUT" --name="Your name or handle"
+```
+
+It asks: `Enter a random text. (Entropy):`. Type a long string of random keys
+and press Enter. You don't need to remember it, and don't save it anywhere.
+snarkjs also mixes in 64 random bytes from your operating system. Typing it at
+the prompt, rather than passing it with `-e`, keeps it out of your shell history.
+
+It finishes by printing `Contribution Hash:` followed by four lines of
+hexadecimal. **Copy those four lines.**
+
+**Step 4. Close that terminal window.** The secret only ever existed in that
+command's memory. Neither file contains it. Open a new terminal, `cd
+~/tally-ceremony`, and set `IN` and `OUT` again for the last step.
+
+**Step 5. Send your result.** Zip the new key:
+
+```bash
+zip "${OUT%.zkey}.zip" "$OUT"
+```
+
+Attach the zip in a comment on your issue (drag it into the comment box),
+together with this text:
+
+```text
+I contributed to the noir-ckb private tally ceremony as <your name>.
+Input: <IN file name> (sha256 <hash from step 2>)
+Contribution hash:
+<the four lines from step 3>
+```
+
+**Step 6 (recommended). Post the same text somewhere else you control**, such
+as X, a GitHub Gist or your blog, and link it in the issue. A second, separate
+record makes it hard for anyone, the coordinator included, to replace your
+contribution later without it being noticed. Don't edit it afterwards.
+
+That's it. You can delete the folder.
+
+### Good practice (optional)
+
+- Use your own computer, not a shared or cloud machine.
+- Close other programs while you contribute.
+- For extra assurance, verify the key you received before contributing (see
+  below). The coordinator does this too, but checking yourself means you don't
+  have to trust them.
+
+## Verifying the ceremony yourself
+
+Anyone can check the chain of contributions. You need the frozen R1CS file and
+the phase 1 file named in `ceremony/private-tally-v2/`:
+
+```bash
+npx -y snarkjs@0.7.5 zkey verify circuit.r1cs powersOfTau28_hez_final_NN.ptau tally_final.zkey
+```
+
+It lists every contribution with its name and hash, then the beacon, and ends
+with `ZKey Ok!`. Compare the hashes with the contributors' own posts. To confirm
+the phase 1 file itself, compare its BLAKE2b-512 hash with the one in the
+snarkjs README:
+
+```bash
+python3 -c "import hashlib,sys;h=hashlib.blake2b();f=open(sys.argv[1],'rb');[h.update(c) for c in iter(lambda:f.read(1<<20),b'')];print(h.hexdigest())" powersOfTau28_hez_final_NN.ptau
+```
+
+To confirm the beacon, look up the announced CKB mainnet block height on the
+[CKB explorer](https://explorer.nervos.org) and check that its hash is the
+beacon value in the transcript.
+
+## What the ceremony does and does not guarantee
+
+- It guarantees that nobody can forge private tally proofs, **as long as at
+  least one contributor's randomness was really discarded**.
+- It does not make the circuit correct. A bug in the circuit is a bug whatever
+  the setup; the circuit's tests and review are separate.
+- It covers this one circuit only. Any change to the circuit after it is frozen
+  voids the ceremony, and a new one is needed.
+- This is a public ceremony for a testnet developer preview, not an audited
+  production ceremony.
+
+## Questions
+
+Open an issue on this repository or reply on the
+[Nervos Talk update](https://talk.nervos.org/t/noir-ckb-update-what-i-decided-after-the-direction-check-what-you-can-try-today-and-where-this-is-going/10968).

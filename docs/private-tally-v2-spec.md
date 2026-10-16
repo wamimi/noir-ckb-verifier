@@ -1,6 +1,7 @@
 # Private tally v2 — draft specification
 
-Status: **accepted design, not implemented** (decisions recorded in section 12). Profile `noir-ckb/private-tally/v2`
+Status: **accepted design; circuit implemented (D1 in progress)**, Type Script and client not
+implemented (decisions recorded in section 12). Circuit: [`circuits/private-tally-v2/`](../circuits/private-tally-v2/). Profile `noir-ckb/private-tally/v2`
 is a new, separate application. It does not change `owned-counter/v1`, its
 deployment or its evidence. Feasibility results that informed this draft are in
 [portable evidence](../evidence/week-15-portable.md) (private tally spike).
@@ -60,11 +61,19 @@ public:  c_old, c_new, ctx_lo, ctx_hi
 
 Constraints:
 
-1. `value_old`, `delta` fit in u64 (cast-and-compare, as in v1).
+1. `value_old`, `delta` fit in 64 bits.
 2. If `c_old == 0`: `value_old == 0` and `delta == 0` (creation).
-   Else: `C(value_old, r_old, key) == c_old` and `delta ≤ MAX_DELTA`.
-3. `value_new = value_old + delta` fits in u64; `C(value_new, r_new, key) == c_new`.
-4. `ctx_lo`, `ctx_hi` fit in u128.
+   Else: `C(value_old, r_old, key) == c_old` and `delta` fits in 32 bits
+   (that is, `delta ≤ MAX_DELTA`).
+3. `value_new = value_old + delta` fits in 64 bits; `c_new ≠ 0`;
+   `C(value_new, r_new, key) == c_new`.
+4. `ctx_lo`, `ctx_hi` fit in 128 bits.
+
+Range checks use `Field::assert_max_bit_size`, the standard library method for
+constraining a field element to a bit width. The commitment and domain tags live
+in a shared library package (`commitment`) used by both the circuit and a
+`commit-helper` package that prints commitments for off-circuit tools, so the
+tags are defined once.
 
 `MAX_DELTA = 2^32 − 1` (decided: no application-specific cap in this demo profile;
 a real application sets its own cap in its own profile). Constraint count and the required
@@ -190,8 +199,9 @@ secrets):
 
 Planned participants (subject to their agreement): the maintainer as coordinator
 and contributor, the author of the CKB Groth16 verifier, and the binding
-reviewer. Coordinator and contributor guides are written at D4, once real file
-names and hashes exist.
+reviewer. The contributor guide and the public procedure are in
+[setup ceremony](setup-ceremony.md); file names and hashes are added when the
+ceremony opens at D4.
 
 ## 9. Client and secret handling
 
@@ -216,8 +226,11 @@ names and hashes exist.
 
 ## 10. Required tests
 
-- Spike differential cases (Noir vs backend R1CS) promoted to the regular suite.
-- Every Poseidon2 call ≤ 3 inputs (static check).
+- Spike differential cases (Noir vs backend R1CS) promoted to the regular suite:
+  `scripts/check-private-tally-circuit.py`.
+- Noir unit tests: `nargo test --workspace` in `circuits/private-tally-v2/`.
+- Every Poseidon2 call ≤ 3 inputs, parameter layout and domain tags (static
+  check): `scripts/tests/test_private_tally_circuit.py`.
 - VM matrix: valid create/update/cover update; wrong key, blinding or value;
   proof replayed on another OutPoint, another Cell, another network, as a
   creation, or with `c_old`/`c_new` swapped; zero or non-canonical commitment;

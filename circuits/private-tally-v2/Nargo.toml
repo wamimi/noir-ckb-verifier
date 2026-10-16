@@ -1,0 +1,7 @@
+# noir-ckb/private-tally/v2 (docs/private-tally-v2-spec.md).
+# commitment:    shared library: domain tags and the commitment C(v, r, key)
+# circuit:       the proved statement (private first, then public)
+# commit-helper: prints C(v, r, key); used by the client and the differential check
+[workspace]
+members = ["commitment", "circuit", "commit-helper"]
+default-member = "circuit"

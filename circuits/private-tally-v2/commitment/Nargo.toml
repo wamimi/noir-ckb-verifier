@@ -1,0 +1,11 @@
+[package]
+name = "private_tally_commitment"
+type = "lib"
+authors = []
+
+[dependencies]
+# noir-lang/poseidon v0.2.6 (commit 00f879180a56720169cff92a56778d40678d8e26).
+# Every Poseidon2::hash call must take at most 3 inputs: v0.2.6 keeps a
+# stale-cache bug for longer inputs (fixed in v0.4.0, which does not compile on
+# Noir 1.0.0-beta.18). scripts/tests/test_private_tally_circuit.py enforces this.
+poseidon = { tag = "v0.2.6", git = "https://github.com/noir-lang/poseidon" }
