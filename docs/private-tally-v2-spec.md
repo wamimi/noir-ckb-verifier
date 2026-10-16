@@ -76,8 +76,10 @@ in a shared library package (`commitment`) used by both the circuit and a
 tags are defined once.
 
 `MAX_DELTA = 2^32 − 1` (decided: no application-specific cap in this demo profile;
-a real application sets its own cap in its own profile). Constraint count and the required
-Powers of Tau size are measured during implementation, not assumed.
+a real application sets its own cap in its own profile). Measured on 16 October 2026 with the pinned backend: **3,338 constraints**,
+5 private and 4 public inputs. The Hermez power-12 Powers of Tau file
+(up to 4,096) fits; power 13 is needed only if the circuit grows past about
+4,090 constraints.
 
 ## 4. Cells
 
