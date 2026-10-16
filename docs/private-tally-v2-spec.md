@@ -1,7 +1,7 @@
 # Private tally v2 — draft specification
 
-Status: **accepted design; circuit implemented (D1 in progress)**, Type Script and client not
-implemented (decisions recorded in section 12). Circuit: [`circuits/private-tally-v2/`](../circuits/private-tally-v2/). Profile `noir-ckb/private-tally/v2`
+Status: **accepted design; circuit, development setup and secret handling
+implemented (D1)**; client commands, Type Script and ceremony not implemented (decisions recorded in section 12). Circuit: [`circuits/private-tally-v2/`](../circuits/private-tally-v2/). Profile `noir-ckb/private-tally/v2`
 is a new, separate application. It does not change `owned-counter/v1`, its
 deployment or its evidence. Feasibility results that informed this draft are in
 [portable evidence](../evidence/week-15-portable.md) (private tally spike).

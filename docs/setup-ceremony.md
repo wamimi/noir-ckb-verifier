@@ -26,9 +26,18 @@ will not be deployed to testnet without this ceremony.
 The ceremony follows the standard snarkjs Groth16 procedure and has two phases.
 
 **Phase 1 (universal) is reused, not repeated.** It comes from the public
-Perpetual Powers of Tau transcript (the Hermez `powersOfTau28_hez_final_*.ptau`
-files, 54 contributions plus a beacon), checked against the BLAKE2b hashes
-published in the [snarkjs README](https://github.com/iden3/snarkjs#7-prepare-phase-2).
+[Perpetual Powers of Tau](https://github.com/privacy-ethereum/perpetualpowersoftau#prepared-and-truncated-files)
+transcript: the prepared file `ppot_0080_12.ptau`, which PSE built from the
+transcript's response 0080 and finished with a beacon from an Ethereum
+beacon-chain slot. `snarkjs powersoftau verify` lists 61 contributions plus that
+beacon (iteration exponent 31) and confirms the whole chain; on a laptop this
+check takes about 40 minutes. The file's BLAKE2b-512 hash is
+`3ee85ae13672d1d742117566126f31d678cf72d480f0df8e2aec78d77771433392ae01bb2b11c4ea0e60b244415be0a12a02e51d3f7a4a8b5c1c982fa208c4cd`. The circuit has
+3,338 constraints, so the degree-12 file (4,096 points) is enough. The coordinator
+checks the whole contribution chain with `snarkjs powersoftau verify` and
+publishes the file's BLAKE2b hash. (The older Hermez files linked from the
+snarkjs README are no longer downloadable;
+[snarkjs issue #636](https://github.com/iden3/snarkjs/issues/636).)
 
 **Phase 2 (circuit-specific) is this ceremony.** It is a relay, one contributor
 at a time:
@@ -142,16 +151,17 @@ Anyone can check the chain of contributions. You need the frozen R1CS file and
 the phase 1 file named in `ceremony/private-tally-v2/`:
 
 ```bash
-npx -y snarkjs@0.7.5 zkey verify circuit.r1cs powersOfTau28_hez_final_NN.ptau tally_final.zkey
+npx -y snarkjs@0.7.5 zkey verify circuit.r1cs ppot_0080_12.ptau tally_final.zkey
 ```
 
 It lists every contribution with its name and hash, then the beacon, and ends
 with `ZKey Ok!`. Compare the hashes with the contributors' own posts. To confirm
-the phase 1 file itself, compare its BLAKE2b-512 hash with the one in the
-snarkjs README:
+the phase 1 file itself, run `npx -y snarkjs@0.7.5 powersoftau verify
+ppot_0080_12.ptau` (it checks every contribution in the chain) and compare its
+BLAKE2b-512 hash with the one published in `ceremony/private-tally-v2/`:
 
 ```bash
-python3 -c "import hashlib,sys;h=hashlib.blake2b();f=open(sys.argv[1],'rb');[h.update(c) for c in iter(lambda:f.read(1<<20),b'')];print(h.hexdigest())" powersOfTau28_hez_final_NN.ptau
+python3 -c "import hashlib,sys;h=hashlib.blake2b();f=open(sys.argv[1],'rb');[h.update(c) for c in iter(lambda:f.read(1<<20),b'')];print(h.hexdigest())" ppot_0080_12.ptau
 ```
 
 To confirm the beacon, look up the announced CKB mainnet block height on the
