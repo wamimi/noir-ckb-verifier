@@ -118,5 +118,30 @@ The specification's "removed creation rule" mutation has no counterpart: the
 Type Script has no separate creation rule. It fixes `c_old = 0` and action 0 in
 the public statement, and the circuit enforces the zero start.
 
-Not yet done: client `create`/`update` commands, the launcher's local lifecycle
-for v2 (D3) and the setup ceremony. The circuit is not frozen.
+## Client and local lifecycle (17 October 2026)
+
+Client: `scripts/private-tally-client.py` (build, prepare-deploy, confirm-deploy,
+create, update, check, confirm, status, backup). It prepares unsigned
+transactions only; the run signed the funding inputs with `ckb-cli` and a
+disposable development key.
+
+`scripts/local-private-tally.py` ran on a loopback CKB 0.210.0 dev chain on
+macOS ARM64 (run `private-tally-local-1`, reusing `private-tally-setup-1`), with
+status **`local-lifecycle-validated`**:
+
+| Stage | Local transaction | Result |
+| --- | --- | --- |
+| Deploy Type Script, VK and guard Lock code | `0x5a1c5fa1…a3bc380d` | Committed; data hashes checked |
+| Create at 0 | `0x12c996f5…113de819` | `check` passed before and after signing; committed; state version 1 |
+| Update +7 | `0x2871194e…c82238bb` | Same; state version 2 |
+| Cover update +0 | `0x349f01ad…9a3a2bbb` | Same; new commitment, unchanged value; state version 3 |
+
+Final `status --show-value` reported value 7 at state version 3 with no pending
+operation; the live tally Cell held exactly the commitment in the private state.
+`backup` produced a 0700 copy. Each commitment differed from the previous one,
+including across the zero-delta update. The leak scan of every kept file outside
+the private folders was clean.
+
+Not yet done: the tally in the launcher (`start-counter.py`) and the container,
+Linux runs and CI, a tester guide, and the setup ceremony. The circuit is not
+frozen.
