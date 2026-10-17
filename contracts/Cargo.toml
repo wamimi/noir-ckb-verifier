@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/capsule-binding", "crates/owned-counter"]
+members = ["crates/capsule-binding", "crates/owned-counter", "crates/private-tally"]
 
 [workspace.package]
 edition = "2021"

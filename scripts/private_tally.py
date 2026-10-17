@@ -178,3 +178,49 @@ class Circuit:
         if q.returncode or not m:
             raise RuntimeError("commitment helper failed")
         return int(m.group(1), 16)
+
+
+# ---------------------------------------------------------------- transactions
+# Encodings follow docs/private-tally-v2-spec.md, sections 4-5. Molecule helpers
+# are shared with the owned counter client.
+import owned_counter as _c  # noqa: E402
+
+CONTEXT_PREFIX = b"noir-ckb/private-tally/context/v2\0"
+VERSION = b"\x01"
+
+
+def le32(x):
+    return x.to_bytes(32, "little")
+
+
+def tally_data(commitment):
+    return VERSION + le32(commitment)
+
+
+def type_id(first_input, output_index):
+    return _c.h(_c.cell_input(first_input) + _c.u64(output_index))
+
+
+def type_script(code_hash, tid):
+    return dict(code_hash=_c.hx(code_hash), hash_type="data1", args=_c.hx(VERSION + tid))
+
+
+def guard_lock(guard_data_hash):
+    return dict(code_hash=_c.hx(guard_data_hash), hash_type="data1", args="0x")
+
+
+def witness_args(lock=None, input_type=None, output_type=None):
+    return _c.hx(_c.table([_c.vec(x) if x is not None else b"" for x in (lock, input_type, output_type)]))
+
+
+def context(network, tscript, action, outpoint, c_old, c_new, successor_lock, capacity):
+    """(ctx_lo, ctx_hi) as integers; outpoint is 36 bytes (zeros on creation)."""
+    digest = _c.h(CONTEXT_PREFIX + network + _c.h(PROFILE.encode()) + _c.h(_c.script(tscript))
+                  + _c.raw(tscript["args"])[1:] + bytes([action]) + outpoint + le32(c_old) + le32(c_new)
+                  + _c.h(_c.script(successor_lock)) + _c.u64(capacity))
+    return int.from_bytes(digest[:16], "little"), int.from_bytes(digest[16:], "little")
+
+
+def public_bytes(c_old, c_new, ctx_lo, ctx_hi):
+    """The last 128 bytes of a wire witness: four 32-byte little-endian fields."""
+    return b"".join(le32(v) for v in (c_old, c_new, ctx_lo, ctx_hi))

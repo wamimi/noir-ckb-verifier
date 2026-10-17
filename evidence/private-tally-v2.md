@@ -53,6 +53,37 @@ Secret-handling helpers (`scripts/private_tally.py`): 11 unit tests passed
 without overwriting, backup permissions, leak scan of decimal, hex and raw
 32-byte encodings, commitment helper consistency).
 
-Not yet done: client `create`/`update` commands (they depend on the Type
-Script's context digest), Type Script, CKB-VM matrix, mutations and the setup
-ceremony. The circuit is not frozen.
+## Type Script and CKB-VM matrix (17 October 2026)
+
+Source: `contracts/crates/private-tally/` (Type Script), driver
+`scripts/check-private-tally.py`, runner
+`crates/ckb-integration-tests/tests/private_tally.rs`. The Type Script was built
+with Rust 1.94.1 for `riscv64imac-unknown-none-elf` (113,984 bytes), pinned to an
+isolated test network domain, the development verification key of
+`private-tally-setup-1` and the always-success guard Lock. Four fresh proofs were
+generated for the run (creation, update, zero-delta cover update, and an update
+proved for a different network).
+
+**46 of 46 cases matched their expected outcome** in CKB-VM (ckb-testtool),
+leak scan clean:
+
+| Outcome | Cases |
+| --- | --- |
+| Accepted (6) | Creation (113,067,366 cycles); update 0 → 5 (115,668,811); zero-delta cover update (115,855,014); reordered dependencies; tally at input/output index 1; changed fee change output |
+| 41 args version, 44 Type ID (2) | Unknown args version; wrong Type ID on creation |
+| 42 shape (3) | Duplicate tally output; destruction; two tally inputs |
+| 43 data encoding (2) | Wrong data version; short data |
+| 45 guard Lock (4) | Successor not the guard (creation, update); guard with args; input not the guard |
+| 47 capacity (1) | Capacity changed on update |
+| 48 witness (8) | Proof missing (creation, update), in the wrong WitnessArgs field (creation, update), truncated, trailing byte, oversized witness, wrong wire version |
+| 49 public vector (8) | Other commitment and changed capacity on creation; update proof used as creation; creation proof used as update; wrong input commitment; replay on another OutPoint; replay on another tally Cell; proof made for another network |
+| 50 verification key (3) | Missing, altered and duplicated VK dependency |
+| 51 proof (4) | Valid proof bytes with a recomputed vector for: another commitment (creation), another OutPoint, swapped commitments; proof bytes from a different statement |
+| 52 limits (1) | 65 outputs |
+| 54 commitment (4) | Zero and non-canonical commitment on creation; zero successor; non-canonical input |
+
+The cases with expected code 51 show that rebuilding the public vector for a
+different transition does not help an attacker: the old proof no longer verifies.
+
+Not yet done: mutation tests, client `create`/`update` commands, the launcher's
+local lifecycle for v2 (D3) and the setup ceremony. The circuit is not frozen.
