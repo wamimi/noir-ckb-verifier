@@ -62,7 +62,9 @@ def contributions(verify_output):
 
 
 def norm(h):
-    return re.sub(r"[^0-9a-f]", "", h.lower())
+    h = h.strip().lower()
+    h = h[2:] if h.startswith("0x") else h
+    return re.sub(r"[^0-9a-f]", "", h)
 
 
 def transcript():
@@ -160,7 +162,10 @@ def cmd_open(a):
     verify(DIR / "zkeys/tally_0000.zkey", t)
     t["initial_zkey_sha256"] = sha(DIR / "zkeys/tally_0000.zkey")
     save(t)
-    print(f"Opened. Commit and push ceremony/private-tally-v2/, then announce the beacon height {a.beacon_height}.")
+    if DRY_RUN:
+        print(f"Opened a practice ceremony in {DIR} (nothing to commit or announce).")
+    else:
+        print(f"Opened. Commit and push ceremony/private-tally-v2/, then announce the beacon height {a.beacon_height}.")
 
 
 def cmd_issue(a):
@@ -196,6 +201,12 @@ def cmd_accept(a):
     c.require(len(found) == n, f"expected {n} contributions in the key, found {len(found)}")
     for k, (index, name, h) in zip(t["contributions"], found):
         c.require(k["name"] == name and k["hash"] == h, f"earlier contribution {index} changed; reject this key")
+    if a.rpc:
+        tip = int(c.rpc(a.rpc, "get_tip_block_number", []), 16)
+        c.require(tip < t["beacon"]["height"], f"CKB mainnet is at block {tip}, at or past the beacon height "
+                  f"{t['beacon']['height']}: no contribution may be accepted once the beacon is known")
+    elif not DRY_RUN:
+        raise ValueError("pass --rpc https://mainnet.ckb.dev/rpc so the tool can confirm the beacon block does not exist yet")
     index, name, h = found[-1]
     c.require(name == a.name, f"last contribution is named {name!r}, expected {a.name!r}")
     c.require(norm(a.hash) == h, "the contribution hash the contributor posted does not match the key")
@@ -204,8 +215,8 @@ def cmd_accept(a):
     t["contributions"].append(dict(index=n, name=name, hash=h, input_sha256=sha(src), zkey=dest.name,
                                    zkey_sha256=sha(dest), attestation=a.attestation))
     save(t)
-    print(f"Accepted contribution {n} from {name}. Commit and push {dest.relative_to(ROOT)} and the transcript, "
-          "then close the issue and open the next one.")
+    print(f"Accepted contribution {n} from {name}." + ("" if DRY_RUN else f" Commit and push {dest.relative_to(ROOT)} and "
+          "the transcript, then close the issue and open the next one."))
 
 
 def cmd_finalize(a):
@@ -229,7 +240,7 @@ def cmd_finalize(a):
     c.require(code == 0, out[-1500:])
     t["final"] = dict(beacon_hash="0x" + beacon, zkey_sha256=sha(final), vk_sha256=sha(DIR / "verification_key.json"))
     save(t)
-    print("Finalized. Commit and push, then ask every contributor to find their hash in verify-final.log.")
+    print("Finalized." + ("" if DRY_RUN else " Commit and push, then ask every contributor to find their hash in verify-final.log."))
 
 
 def cmd_check(a):
@@ -263,6 +274,7 @@ def main():
     s.add_argument("--name", required=True)
     s.add_argument("--hash", required=True, help="the four lines the contributor posted (quotes keep the spaces)")
     s.add_argument("--attestation", help="link to the contributor's own post of the hash")
+    s.add_argument("--rpc", help="CKB mainnet RPC; contributions are refused once the beacon block exists")
     s.set_defaults(func=cmd_accept)
     s = sub.add_parser("finalize")
     s.add_argument("--beacon-hash", required=True)
