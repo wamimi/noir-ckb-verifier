@@ -1,7 +1,7 @@
 # Private tally v2 — draft specification
 
 Status: **accepted design; circuit, development setup, secret handling, Type Script
-and CKB-VM matrix implemented (D1–D2)**; mutation tests, client commands, local
+CKB-VM matrix and mutation tests implemented (D1–D2)**; client commands, local
 lifecycle and ceremony not implemented (decisions recorded in section 12). Circuit: [`circuits/private-tally-v2/`](../circuits/private-tally-v2/). Profile `noir-ckb/private-tally/v2`
 is a new, separate application. It does not change `owned-counter/v1`, its
 deployment or its evidence. Feasibility results that informed this draft are in

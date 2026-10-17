@@ -68,7 +68,7 @@ class Matrix:
                   "command failed: " + " ".join(cmd[:4]) + ("" if redact else "\n" + q.stdout[-1500:] + q.stderr[-1500:]))
         return q.stdout
 
-    def build(self):
+    def build(self, contracts=None):
         always = next((cp.cargo_home() / "registry/src").glob("*/ckb-always-success-script-0.0.1/specs/cells/always_success"))
         self.always = always.read_bytes()
         self.vk_mol = (self.setup / "adapter/vk.mol.bin").read_bytes()
@@ -79,7 +79,7 @@ class Matrix:
         if compiler:
             env.update(CLANG=compiler, CC_riscv64imac_unknown_none_elf=compiler)
         self.run(["cargo", "+1.94.1", "build", "--locked", "--offline", "--release", "--target",
-                  "riscv64imac-unknown-none-elf", "-p", "private-tally"], ROOT / "contracts", env)
+                  "riscv64imac-unknown-none-elf", "-p", "private-tally"], contracts or ROOT / "contracts", env)
         elf = self.out / "contract-target/riscv64imac-unknown-none-elf/release/private-tally"
         shutil.copyfile(elf, self.out / "private-tally")
         self.elf = elf.read_bytes()
@@ -150,21 +150,29 @@ class Matrix:
         return tx, self.dep_cells + [f1]
 
     def update_world(self, value_old=0, delta=5, network=TEST_NETWORK, name="update", tscript=None, c_old=None,
-                     r_old=None):
+                     r_old=None, successor=None, out_capacity=TALLY_CAPACITY, noncanonical_new=False):
+        """A tally update with a fresh proof. successor / out_capacity / noncanonical_new build a
+        transition the Type must reject even though its proof is valid for exactly that transaction."""
         tscript = tscript or self.tscript
+        successor = successor or self.guard
         c_old = self.c0 if c_old is None else c_old
         r_old = self.r0 if r_old is None else r_old
         tally = self.cell(point("c1"), TALLY_CAPACITY, self.guard, tscript, pt.tally_data(c_old))
         f2 = self.cell(point("f2"), FUND, self.funding_lock, None, b"")
         r_new = self.secret()
         c_new = self.circuit.commitment(value_old + delta, r_new, self.key)
-        lo, hi = pt.context(network, tscript, 1, c.outpoint(tally["out_point"]), c_old, c_new, self.guard,
-                            TALLY_CAPACITY)
+        # A non-canonical encoding adds the modulus: the same field element, different bytes.
+        encoded_new = c_new + pt.P if noncanonical_new else c_new
+        lo, hi = pt.context(network, tscript, 1, c.outpoint(tally["out_point"]), c_old, encoded_new, successor,
+                            out_capacity)
         payload = self.prove(name, value_old=value_old, r_old=r_old, key=self.key, delta=delta, r_new=r_new,
                              c_old=c_old, c_new=c_new, ctx_lo=lo, ctx_hi=hi)
+        if noncanonical_new:
+            payload = payload[:-128] + pt.public_bytes(c_old, encoded_new, lo, hi)
         tx = self.base_tx([tally["out_point"], f2["out_point"]],
-                          [c.output(TALLY_CAPACITY, self.guard, tscript), c.output(FUND - FEE, self.funding_lock)],
-                          [c.hx(pt.tally_data(c_new)), "0x"], [pt.witness_args(input_type=payload), "0x"])
+                          [c.output(out_capacity, successor, tscript), c.output(FUND - FEE, self.funding_lock)],
+                          [c.hx(pt.VERSION + pt.le32(encoded_new)), "0x"],
+                          [pt.witness_args(input_type=payload), "0x"])
         return tx, self.dep_cells + [tally, f2], payload, c_new
 
     # ------------------------------------------------------------ cases
@@ -207,6 +215,9 @@ class Matrix:
         update = (upd_tx, upd_cells)
         cover = self.update_world(delta=0, name="cover-update")[:2]
         other_net = self.update_world(network=OTHER_NETWORK, name="other-network")[:2]
+        fresh_capacity = self.update_world(name="capacity-fresh", out_capacity=TALLY_CAPACITY - CKB)[:2]
+        fresh_lock = self.update_world(name="successor-fresh", successor=self.funding_lock)[:2]
+        fresh_noncanonical = self.update_world(name="noncanonical-fresh", noncanonical_new=True)[:2]
         P = pt.P
 
         def data(tx, value):
@@ -295,6 +306,10 @@ class Matrix:
             tally_cell(cs)["output"]["type"]["args"] = args
             t["outputs"][0]["type"]["args"] = args
         self.save("update-replayed-on-other-cell", 49, update, other_cell)
+        # Proofs made for exactly these transactions: only the Type's own rules can reject them.
+        self.save("update-capacity-changed-fresh-proof", 47, fresh_capacity)
+        self.save("update-successor-not-guard-fresh-proof", 45, fresh_lock)
+        self.save("update-noncanonical-successor-fresh-proof", 54, fresh_noncanonical)
         self.save("update-capacity-changed", 47, update,
                   lambda t, cs: t["outputs"][0].__setitem__("capacity", hex(TALLY_CAPACITY - CKB)))
         self.save("update-successor-not-guard", 45, update,

@@ -85,5 +85,38 @@ leak scan clean:
 The cases with expected code 51 show that rebuilding the public vector for a
 different transition does not help an attacker: the old proof no longer verifies.
 
-Not yet done: mutation tests, client `create`/`update` commands, the launcher's
-local lifecycle for v2 (D3) and the setup ceremony. The circuit is not frozen.
+A rerun with three added cases (`private-tally-matrix-3`) passed **49 of 49**.
+The added cases carry proofs generated for exactly the offending transaction,
+so only the Type Script's own rules can reject them: capacity changed (47),
+successor Lock not the guard (45), and successor commitment encoded as
+`c + p` (54).
+
+## Mutation tests (17 October 2026)
+
+`scripts/mutate-private-tally.py` rebuilt the Type Script four times, each time
+with one `MUTATION` block removed, and ran a valid update (control) and the
+attack that block exists to stop (target), with fresh proofs for each mutant.
+Run `private-tally-mutations-2`: **4 of 4 as required**, leak scans clean.
+
+| Removed check | Control | Target | Required outcome |
+| --- | --- | --- | --- |
+| `verification` | Accepted | Invalid proof bytes accepted (126,865 cycles, no pairing) | Incorrect acceptance |
+| `guard` | Accepted | Non-guard successor accepted | Incorrect acceptance |
+| `capacity` | Accepted | Capacity change accepted | Incorrect acceptance |
+| `canonical` | Accepted | Rejected with code 51 by the verifier | Second layer |
+
+The `canonical` block cannot be shown necessary by incorrect acceptance,
+because two other layers already block what it checks: the circuit forbids a
+zero commitment, and the pinned verifier (`groth16-ckb` `verifier-core` at
+`d64c769f`) deserializes public inputs with arkworks, which rejects encodings at
+or above the field modulus. The mutation run confirmed that second layer. The
+Type Script keeps the check so that malformed state is rejected before the
+roughly 115-million-cycle verification and independently of the verifier
+library's behaviour.
+
+The specification's "removed creation rule" mutation has no counterpart: the
+Type Script has no separate creation rule. It fixes `c_old = 0` and action 0 in
+the public statement, and the circuit enforces the zero start.
+
+Not yet done: client `create`/`update` commands, the launcher's local lifecycle
+for v2 (D3) and the setup ceremony. The circuit is not frozen.
