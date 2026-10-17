@@ -142,6 +142,31 @@ operation; the live tally Cell held exactly the commitment in the private state.
 including across the zero-delta update. The leak scan of every kept file outside
 the private folders was clean.
 
-Not yet done: the tally in the launcher (`start-counter.py`) and the container,
-Linux runs and CI, a tester guide, and the setup ceremony. The circuit is not
-frozen.
+## Launcher and Linux container (17 October 2026)
+
+The launcher gained `tally-quick` (fresh setup and signed local lifecycle) and
+`tally-local` (the same plus the CKB-VM matrix and mutation tests); the
+container image fetches the pinned `noir-lang/poseidon` dependency at build time
+so runs need no network.
+
+| Platform | Mode | Result |
+| --- | --- | --- |
+| macOS ARM64, native (`start-counter.py tally-quick`) | Fresh setup + lifecycle | `local-lifecycle-validated`; final value 7 at state version 3; leak scan clean |
+| Ubuntu 24.04 ARM64, container (Colima, `--network none`) | `tally-local` | `local-validated`: lifecycle, 49/49 CKB-VM cases, 4/4 mutations as required, leak scan clean |
+
+The container image was built from source revision `341aa59c` with six
+uncommitted paths (the launcher and container changes recorded here), as its
+provenance labels state.
+
+GitHub Actions, workflow `counter-linux.yml` on a push to
+`counter-linux-validation/private-tally` (17 October 2026): both jobs,
+`ubuntu-24.04` (x86_64) and `ubuntu-24.04-arm`, completed successfully. On a
+push the workflow runs the counter's `local` mode and then the tally's
+`tally-local` mode in the pinned container, and a failing step fails the job.
+
+The private tally lifecycle, matrix and mutations have therefore passed on macOS
+ARM64 (lifecycle, matrix and mutations natively), Linux ARM64 (Colima and CI)
+and Linux x86_64 (CI).
+
+Not yet done: a tester guide section, the circuit freeze, and the setup
+ceremony.

@@ -75,6 +75,25 @@ class StartTests(unittest.TestCase):
             self.assertNotIn("--quick", forwarded)
             self.assertNotIn("--mutations", forwarded)
 
+    def test_tally_quick_uses_tally_runner_without_full(self):
+        with patch.object(start, "doctor", return_value=True), patch.object(start, "validate_local"), patch.object(start, "run_script", return_value=0) as run:
+            self.assertEqual(start.main(["tally-quick", "--yes"]), 0)
+            self.assertEqual(run.call_args.args[0], "local-private-tally.py")
+            self.assertNotIn("--full", run.call_args.args[1])
+            out = run.call_args.args[1][run.call_args.args[1].index("--out") + 1]
+            self.assertTrue(Path(out).name.startswith("tally-local-"))
+
+    def test_tally_local_runs_matrix_and_mutations(self):
+        with patch.object(start, "doctor", return_value=True), patch.object(start, "validate_local"), patch.object(start, "run_script", return_value=3) as run:
+            self.assertEqual(start.main(["tally-local", "--yes"]), 3)
+            self.assertEqual(run.call_args.args[0], "local-private-tally.py")
+            self.assertIn("--full", run.call_args.args[1])
+
+    def test_tally_requires_prerequisites(self):
+        with patch.object(start, "doctor", return_value=False), patch.object(start, "run_script") as run:
+            self.assertEqual(start.main(["tally-quick", "--yes"]), 1)
+            run.assert_not_called()
+
     def test_doctor_never_starts_local_runner(self):
         with patch.object(start, "doctor", return_value=True), patch.object(start, "run_script") as run:
             self.assertEqual(start.main(["doctor"]), 0)

@@ -5,7 +5,8 @@ Stages: local chain, development setup (or --setup), Type Script build, signed
 deployment of the Type Script, verification key and guard Lock code, then the
 private tally client end to end: create at 0, update +7, cover update +0, with
 `check` before and after signing, `confirm`, `status` and `backup`. Ends with a
-leak scan of everything kept outside the private folders.
+leak scan of everything kept outside the private folders. With --full it also runs
+the 49-case CKB-VM matrix and the four mutation tests against the same setup.
 
 Development keys stay in the ignored run folder. Never use them on a public network.
 """
@@ -23,8 +24,9 @@ import counter_platform as cp  # noqa: E402
 import owned_counter as c  # noqa: E402
 import private_tally as pt  # noqa: E402
 
-STEPS = ["local chain", "development setup", "Type Script build", "deployment", "create at 0",
-         "update +7", "cover update +0", "status, backup and leak scan"]
+BASE_STEPS = ["local chain", "development setup", "Type Script build", "deployment", "create at 0",
+              "update +7", "cover update +0", "status, backup and leak scan"]
+FULL_STEPS = ["49-case CKB-VM matrix", "mutation tests"]
 
 
 def main():
@@ -35,7 +37,9 @@ def main():
     ap.add_argument("--setup", type=Path, help="reuse a passed setup-private-tally.py output")
     ap.add_argument("--rpc-port", type=int, default=18134)
     ap.add_argument("--p2p-port", type=int, default=18135)
+    ap.add_argument("--full", action="store_true", help="also run the CKB-VM matrix and mutation tests")
     a = ap.parse_args()
+    steps = BASE_STEPS + (FULL_STEPS if a.full else [])
     platform_key, entry = cp.detect()
     out = a.out.resolve()
     c.require(out.is_relative_to(c.ROOT / "target"), "development accounts must stay below ignored target/")
@@ -50,7 +54,9 @@ def main():
     env["CKB_CLI_HOME"] = str(out / "wallet")
     url = f"http://127.0.0.1:{a.rpc_port}"
     logs, node = [], None
-    manifest = dict(status="running", profile=pt.PROFILE, network="isolated-local-development", platform=platform_key)
+    manifest = dict(status="running", profile=pt.PROFILE, network="isolated-local-development", platform=platform_key,
+                    platform_status=entry["status"], validation="full" if a.full else "quick",
+                    skipped=[] if a.full else ["check-private-tally.py (49 CKB-VM cases)", "mutate-private-tally.py (4 mutations)"])
 
     def save():
         (out / "commands.json").write_text(json.dumps(logs, indent=2) + "\n")
@@ -66,7 +72,7 @@ def main():
         return q.stdout
 
     def stage(name):
-        print(f"== Stage {STEPS.index(name) + 1}/{len(STEPS)}: {name}", flush=True)
+        print(f"== Stage {steps.index(name) + 1}/{len(steps)}: {name}", flush=True)
 
     def client(*args):
         return run(["python3", "-B", c.ROOT / "scripts/private-tally-client.py", *args])
@@ -181,8 +187,19 @@ def main():
             secrets_used |= {int(s["key"]), int(s["blinding"])}
         leaks = pt.leak_scan(out, secrets_used, exclude=[out / "private", work / "private", out / "build/target", out / "node", out / "setup/backend-target"])
         c.require(not leaks, f"secret material found in {leaks}")
-        manifest.update(status="local-lifecycle-validated", final_value_matches=True, state_versions=3, leak_scan="clean",
-                        release_sha256=c.sha(release))
+        manifest.update(final_value_matches=True, state_versions=3, leak_scan="clean", release_sha256=c.sha(release))
+        if a.full:
+            stage("49-case CKB-VM matrix")
+            run(["python3", "-B", c.ROOT / "scripts/check-private-tally.py", "--setup", setup, "--out", out / "matrix"])
+            summary = c.read(out / "matrix/summary.json")
+            c.require(summary["status"] == "passed", "CKB-VM matrix failed")
+            stage("mutation tests")
+            run(["python3", "-B", c.ROOT / "scripts/mutate-private-tally.py", "--setup", setup, "--baseline", out / "matrix",
+                 "--out", out / "mutations"])
+            mutations = c.read(out / "mutations/manifest.json")
+            c.require(all(m["detected"] for m in mutations), "a mutation did not behave as required")
+            manifest.update(matrix_cases=summary["cases"], mutations_as_required=len(mutations))
+        manifest["status"] = "local-validated" if a.full else "local-lifecycle-validated"
     except Exception as error:
         manifest["status"] = "failed"
         manifest["error"] = str(error)[-3000:]

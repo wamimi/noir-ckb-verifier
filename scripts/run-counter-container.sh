@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Build or run the pinned Linux counter container (local, no-wallet modes only).
+# Build or run the pinned Linux counter and private tally container (local, no-wallet modes only).
 #
 #   scripts/run-counter-container.sh build      # downloads toolchains (network)
 #   scripts/run-counter-container.sh doctor     # prerequisite checks, no network
 #   scripts/run-counter-container.sh quick      # fresh proof + signed local lifecycle
 #   scripts/run-counter-container.sh local      # quick + 48 VM cases, ranges, 3 mutations
+#   scripts/run-counter-container.sh tally-quick  # private tally: setup + signed local lifecycle
+#   scripts/run-counter-container.sh tally-local  # tally-quick + 49 VM cases, 4 mutations
 #
 # Runs use --network none: the local CKB chain lives on the container's loopback
 # and nothing is downloaded at run time. Results land in target/container-runs/.
@@ -23,9 +25,9 @@ case "$MODE" in
       --label "org.noir-ckb.dockerfile-sha256=$(python3 -c 'import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$ROOT/containers/counter/Dockerfile")" \
       --label "org.noir-ckb.base-image=$(sed -n 's/^ARG BASE=//p' "$ROOT/containers/counter/Dockerfile")" \
       "$ROOT" ;;
-  doctor|quick|local) ;;
+  doctor|quick|local|tally-quick|tally-local) ;;
   *)
-    sed -n '2,10p' "$0"; exit 2 ;;
+    sed -n '2,12p' "$0"; exit 2 ;;
 esac
 
 docker image inspect "$IMAGE" >/dev/null 2>&1 || { echo "Image $IMAGE not found. Run: $0 build" >&2; exit 1; }
