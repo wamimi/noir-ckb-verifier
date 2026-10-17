@@ -142,6 +142,21 @@ operation; the live tally Cell held exactly the commitment in the private state.
 including across the zero-delta update. The leak scan of every kept file outside
 the private folders was clean.
 
-Not yet done: the tally in the launcher (`start-counter.py`) and the container,
-Linux runs and CI, a tester guide, and the setup ceremony. The circuit is not
-frozen.
+## Launcher and Linux container (17 October 2026)
+
+The launcher gained `tally-quick` (fresh setup and signed local lifecycle) and
+`tally-local` (the same plus the CKB-VM matrix and mutation tests); the
+container image fetches the pinned `noir-lang/poseidon` dependency at build time
+so runs need no network.
+
+| Platform | Mode | Result |
+| --- | --- | --- |
+| macOS ARM64, native (`start-counter.py tally-quick`) | Fresh setup + lifecycle | `local-lifecycle-validated`; final value 7 at state version 3; leak scan clean |
+| Ubuntu 24.04 ARM64, container (Colima, `--network none`) | `tally-local` | `local-validated`: lifecycle, 49/49 CKB-VM cases, 4/4 mutations as required, leak scan clean |
+
+The container image was built from source revision `341aa59c` with six
+uncommitted paths (the launcher and container changes recorded here), as its
+provenance labels state.
+
+Not yet done: x86_64 (CI), a tester guide, and the setup ceremony. The circuit
+is not frozen.

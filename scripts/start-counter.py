@@ -137,21 +137,21 @@ def validate_local(args):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", nargs="?", choices=("inspect", "live", "doctor", "quick", "local", "join-test"),
+    parser.add_argument("mode", nargs="?", choices=("inspect", "live", "doctor", "quick", "local", "join-test", "tally-quick", "tally-local"),
                         help="quick: fresh proof + signed local lifecycle; local: quick plus 48 VM cases, range checks and 3 mutations; "
-                             "join-test: rehearse the participant testnet path on a local chain with a second key")
+                             "join-test: rehearse the participant testnet path on a local chain with a second key; "
+                             "tally-quick: private tally setup and signed local lifecycle; tally-local: tally-quick plus 49 VM cases and 4 mutations")
     parser.add_argument("--rpc", default="https://testnet.ckb.dev", help="Read-only live inspection endpoint")
     parser.add_argument("--backend", type=Path, default=Path(os.environ.get("COUNTER_BACKEND", ROOT.parent / "Noir-Groth16")))
     parser.add_argument("--tools", type=Path, default=ROOT / "target/counter-tools")
-    parser.add_argument("--out", type=Path, default=ROOT / "target" / ("counter-local-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")))
+    parser.add_argument("--out", type=Path, default=None)
     parser.add_argument("--rpc-port", type=int, default=18124)
     parser.add_argument("--p2p-port", type=int, default=18125)
     parser.add_argument("--yes", action="store_true", help="Run local reproduction without an interactive prompt")
     args = parser.parse_args(argv)
     args.backend = args.backend.resolve()
     args.tools = args.tools.resolve()
-    args.out = args.out.resolve()
-    print("Public fixed counter · development setup · no arbitrary circuits · no application withdrawal", flush=True)
+    print("Public fixed counter and private tally previews · development setup · no arbitrary circuits · no application withdrawal", flush=True)
     if args.mode is None:
         if not sys.stdin.isatty():
             parser.error("Choose inspect, live, doctor or local in a non-interactive terminal.")
@@ -159,11 +159,19 @@ def main(argv=None):
               "3. Quick local run: fresh proof and signed local transactions (no wallet, no funds)\n"
               "4. Full local validation: quick run plus 48 VM cases, range checks and 3 mutations\n5. Check local prerequisites\n"
               "6. Rehearse the testnet participant path locally (second key joins a local deployment)\n"
-              "   For real testnet participation see docs/try-the-counter.md (Part 2)")
-        choice = input("Choose 1–6: ").strip()
-        if choice not in ("1", "2", "3", "4", "5", "6"):
-            parser.error("Choose 1 to 6.")
-        args.mode = {"1": "inspect", "2": "live", "3": "quick", "4": "local", "5": "doctor", "6": "join-test"}[choice]
+              "   For real testnet participation see docs/try-the-counter.md (Part 2)\n"
+              "7. Private tally quick run: hidden value, fresh proofs and signed local transactions\n"
+              "8. Private tally full validation: quick run plus 49 VM cases and 4 mutations")
+        choice = input("Choose 1–8: ").strip()
+        if choice not in ("1", "2", "3", "4", "5", "6", "7", "8"):
+            parser.error("Choose 1 to 8.")
+        args.mode = {"1": "inspect", "2": "live", "3": "quick", "4": "local", "5": "doctor", "6": "join-test",
+                     "7": "tally-quick", "8": "tally-local"}[choice]
+    tally = args.mode in ("tally-quick", "tally-local")
+    if args.out is None:
+        prefix = "tally-local-" if tally else "counter-local-"
+        args.out = ROOT / "target" / (prefix + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ"))
+    args.out = args.out.resolve()
     env = environment(args.tools)
     if args.mode in ("inspect", "live"):
         print("This checks evidence integrity/transaction contents. Cryptographic proof verification is a separate step in the reviewer guide.", flush=True)
@@ -178,7 +186,11 @@ def main(argv=None):
                       "Adversarial VM matrix, range checks and mutations are NOT run in this mode; use 'local' for those.",
              "local": "the quick lifecycle plus 48 VM cases, range checks and three contract mutations.",
              "join-test": "a deployment by one key, a published bundle, then the participant testnet path (verify, create, update) "
-                          "by a second key through scripts/join-counter-testnet.py. Adversarial matrix not run."}[args.mode]
+                          "by a second key through scripts/join-counter-testnet.py. Adversarial matrix not run.",
+             "tally-quick": "a fresh private tally development setup (single party, not the ceremony), Type Script build, signed local "
+                            "deployment, then create at 0, update +7 and a cover update +0 with pre- and post-signing checks. "
+                            "VM matrix and mutations are NOT run in this mode; use 'tally-local' for those.",
+             "tally-local": "the tally-quick lifecycle plus the 49-case CKB-VM matrix and 4 mutation tests."}[args.mode]
     print(f"Fresh run: {args.out}\nCreates a disposable local account and chain. Runs {scope} No public deployment. Builds/proofs can take time.\nStage 1/3: prerequisites passed. Stage 2/3: local lifecycle.", flush=True)
     if not args.yes:
         if not sys.stdin.isatty():
@@ -192,8 +204,11 @@ def main(argv=None):
     runner = ["--out", args.out, "--backend", args.backend,
               "--ckb", cp.find_tool(args.tools, key, entry, "ckb"), "--ckb-cli", cp.find_tool(args.tools, key, entry, "ckb-cli"),
               "--rpc-port", args.rpc_port, "--p2p-port", args.p2p_port]
-    mode_flag = {"quick": ["--quick"], "local": ["--mutations"], "join-test": ["--join-test"]}[args.mode]
-    code = run_script("local-owned-counter.py", runner + mode_flag, env)
+    if tally:
+        code = run_script("local-private-tally.py", runner + (["--full"] if args.mode == "tally-local" else []), env)
+    else:
+        mode_flag = {"quick": ["--quick"], "local": ["--mutations"], "join-test": ["--join-test"]}[args.mode]
+        code = run_script("local-owned-counter.py", runner + mode_flag, env)
     if code:
         print(f"Local run failed. Inspect {args.out}/commands.json and manifest.json; do not share wallet/private directories.")
     else:

@@ -1,8 +1,9 @@
-# Fixed public counter preview: pinned Linux toolchain for local, no-wallet runs.
+# Counter and private tally previews: pinned Linux toolchain for local, no-wallet runs.
 #
 # Builds an Ubuntu 24.04 image (linux/amd64 or linux/arm64, matching the Docker
 # host) with Rust 1.95.0/1.94.1, clang-18, Node/npm + snarkjs 0.7.5, the pinned
-# Noir-Groth16 backend revision and verified CKB/ckb-cli/Nargo executables.
+# Noir-Groth16 backend revision, verified CKB/ckb-cli/Nargo executables and the
+# private tally's pinned Noir dependency (noir-lang/poseidon v0.2.6, fetched at build).
 # Public-network signing never happens inside this image.
 #
 # Build from the repository root (see docs/owned-counter-container.md):
@@ -62,6 +63,9 @@ RUN python3 -B scripts/fetch-counter-tools.py --yes --out /opt/noir-ckb-verifier
  && cargo +1.94.1 fetch --locked --manifest-path contracts/Cargo.toml \
  && cargo +1.95.0 fetch --locked --manifest-path /opt/Noir-Groth16/Cargo.toml \
  && npm exec --yes --package=snarkjs@0.7.5 -- node -e 'process.exit(0)' \
+ && "$(ls target/counter-tools/*/nargo | head -1)" compile --workspace --program-dir circuits/private-tally-v2 \
+ && rm -rf circuits/private-tally-v2/target \
+ && git config --system --add safe.directory /home/counter/nargo/github.com/noir-lang/poseidon/v0.2.6 \
  && mkdir -p /home/counter target/runs \
  && chmod -R a+rX /opt/rustup /opt/Noir-Groth16 /opt/noir-ckb-verifier \
  && chmod -R a+rwX /opt/cargo /opt/npm-cache /home/counter target/runs \
