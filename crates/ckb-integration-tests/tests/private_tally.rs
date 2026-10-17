@@ -45,7 +45,10 @@ fn private_tally_matrix() {
             }
             _ => false,
         };
-        println!("{} {name}: {result:?}", if matched { "PASS" } else { "FAIL" });
+        println!(
+            "{} {name}: {result:?}",
+            if matched { "PASS" } else { "FAIL" }
+        );
         if !matched {
             failures.push(name.clone());
         }

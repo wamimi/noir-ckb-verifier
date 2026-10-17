@@ -119,7 +119,11 @@ fn proof_payload(source: Source, input_side: bool) -> Result<ckb_std::ckb_types:
     let mut buf = [0u8; 512];
     let len = syscalls::load_witness(&mut buf, 0, 0, source).map_err(|_| WITNESS)?;
     let wa = WitnessArgs::from_slice(&buf[..len]).map_err(|_| WITNESS)?;
-    let field = if input_side { wa.input_type() } else { wa.output_type() };
+    let field = if input_side {
+        wa.input_type()
+    } else {
+        wa.output_type()
+    };
     Ok(field.to_opt().ok_or(WITNESS)?.raw_data())
 }
 
