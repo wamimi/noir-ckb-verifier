@@ -147,8 +147,16 @@ That's it. You can delete the folder.
 
 ## Verifying the ceremony yourself
 
-Anyone can check the chain of contributions. You need the frozen R1CS file and
-the phase 1 file named in `ceremony/private-tally-v2/`:
+Anyone can check the chain of contributions. With this repository checked out
+and the phase 1 file downloaded to `target/ppot_0080_12.ptau`, one command
+re-checks every recorded key, every contribution hash and the beacon:
+
+```bash
+python3 -B scripts/ceremony-private-tally.py check
+```
+
+The same check by hand, with the frozen R1CS file and the phase 1 file named in
+`ceremony/private-tally-v2/`:
 
 ```bash
 npx -y snarkjs@0.7.5 zkey verify circuit.r1cs ppot_0080_12.ptau tally_final.zkey
