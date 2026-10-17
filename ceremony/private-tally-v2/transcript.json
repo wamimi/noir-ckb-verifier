@@ -1,0 +1,17 @@
+{
+  "profile": "noir-ckb/private-tally/v2",
+  "freeze_commit": "774aafdad1d8d56f589509890d1920a7e762157e",
+  "r1cs_sha256": "5bd9cf5e4c3ffec727ac298b055feb0518f213418aaee9694ea388841b59dcef",
+  "constraints": 3338,
+  "ptau": {
+    "file": "ppot_0080_12.ptau",
+    "blake2b": "3ee85ae13672d1d742117566126f31d678cf72d480f0df8e2aec78d77771433392ae01bb2b11c4ea0e60b244415be0a12a02e51d3f7a4a8b5c1c982fa208c4cd",
+    "source": "https://github.com/privacy-ethereum/perpetualpowersoftau#prepared-and-truncated-files"
+  },
+  "beacon": {
+    "network": "CKB mainnet",
+    "height": 20870000
+  },
+  "contributions": [],
+  "initial_zkey_sha256": "fae8844ba9ae7dbf43acc9c20d13aa56d995dac42765d67de7b5028be4f125e2"
+}
