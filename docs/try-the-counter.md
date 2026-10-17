@@ -518,6 +518,48 @@ Your transactions are visible on
 
 ---
 
+## Optional: the private tally (local only)
+
+The private tally is the next example: the Cell holds a hidden number, and
+whoever knows a secret key can add to it with a proof, without a signature.
+Its design is in the [private tally v2 design](private-tally-v2-spec.md). It is
+not on testnet yet: that waits for the [setup ceremony](setup-ceremony.md). You
+can run it locally now, with the same setup as Part 1.
+
+**Container** (after `scripts/run-counter-container.sh build`):
+
+```bash
+scripts/run-counter-container.sh tally-quick
+```
+
+**Native** (after Part 1, option B):
+
+```bash
+python3 -B scripts/start-counter.py tally-quick
+```
+
+Like the counter, this one command does everything by itself on a private local
+chain. It prints eight stages:
+
+| Stage | What the script does |
+| --- | --- |
+| 1 local chain | Starts a private CKB chain and creates a throwaway key with test coins. |
+| 2 development setup | Compiles the tally circuit, makes a development proving key (single party, not the ceremony) and test proofs. |
+| 3 Type Script build | Compiles the tally Type Script with that key built in. |
+| 4 deployment | Signs and sends the Type Script, the verification key and the guard Lock code to the chain. |
+| 5 create at 0 | Generates a secret key and a random blinding factor, proves that a new hidden tally starts at 0, and creates the Cell. |
+| 6 update +7 | Proves that the new hidden value is the old one plus 7, without revealing either, and updates the Cell. |
+| 7 cover update +0 | Updates again adding nothing. On chain this looks like any other update. |
+| 8 status, backup and leak scan | Confirms the private state says 7 and matches the chain, makes a backup, and checks that no secret appears in any kept file. |
+
+It finishes with `Stage 3/3: local runner completed` and a manifest whose status
+is `local-lifecycle-validated`. `tally-local` instead of `tally-quick` also runs
+49 attack cases in CKB-VM and 4 deliberately broken contracts that must be caught.
+
+In the run folder, `tally/public/` holds the transactions and proofs, which
+anyone could see on chain. `tally/private/` holds the key and blinding factors.
+Never share that folder.
+
 ## Part 3: tell us how it went
 
 Please share:
