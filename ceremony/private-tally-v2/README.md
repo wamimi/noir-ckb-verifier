@@ -20,7 +20,7 @@ commands in the [contributor guide](../../docs/setup-ceremony.md#verifying-the-c
 
 | # | Contributor | Input key SHA-256 | Contribution hash | Attestation | Key |
 | --- | --- | --- | --- | --- | --- |
-| — | (none yet) | | | | |
+| 1 | Xiaomao | `fae8844ba9ae7dbf…` | `b00a21cf520183f0…` | [link](https://x.com/nellycyberpro/status/2112485476976431408) | `tally_0001.zkey` |
 
 This is a public ceremony for a testnet developer preview, not an audited
 production ceremony. It guarantees that nobody can forge private tally proofs as

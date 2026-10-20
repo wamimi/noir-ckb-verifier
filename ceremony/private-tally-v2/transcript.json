@@ -12,6 +12,16 @@
     "network": "CKB mainnet",
     "height": 20870000
   },
-  "contributions": [],
+  "contributions": [
+    {
+      "index": 1,
+      "name": "Xiaomao",
+      "hash": "b00a21cf520183f0e69311d569c211afd0b35814bafbb9201d49e8c2fd809536120f22d7fe0175477e90ddc8ccbe49dab117fde35aa345da8a39ab2f3d96724a",
+      "input_sha256": "fae8844ba9ae7dbf43acc9c20d13aa56d995dac42765d67de7b5028be4f125e2",
+      "zkey": "tally_0001.zkey",
+      "zkey_sha256": "a3c80a9886eb2e3b7b22d56875d0b616185551fc30a8f3b622138ef85126ec17",
+      "attestation": "https://x.com/nellycyberpro/status/2112485476976431408"
+    }
+  ],
   "initial_zkey_sha256": "fae8844ba9ae7dbf43acc9c20d13aa56d995dac42765d67de7b5028be4f125e2"
 }
