@@ -57,3 +57,6 @@ __pycache__/
 /evidence/week-15/preservation.json
 /docs/production-readiness-roadmap.md
 /docs/week-12-and-post-program-direction-brief.md
+# Public setup ceremony transcripts: keys and the final verification key are published.
+!ceremony/**/zkeys/*.zkey
+!ceremony/**/verification_key.json
