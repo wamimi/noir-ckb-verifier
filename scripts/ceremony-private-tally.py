@@ -173,22 +173,32 @@ def cmd_issue(a):
     c.require("final" not in t, "ceremony already finalized")
     n = len(t["contributions"]) + 1
     src = latest_zkey(t)
-    print(f"""Title: Contribution {n}: {a.name}
+    guide = "https://github.com/wamimi/noir-ckb-verifier/blob/main/docs/setup-ceremony.md#contributing-about-1015-minutes"
+    print(f"""TITLE (paste into the issue title):
 
-Thank you for contributing! Full guide: docs/setup-ceremony.md
+Contribution {n}: {a.name}
 
-Paste these first:
+BODY (paste everything between the two lines into the issue body):
+----------------------------------------------------------------------
+Thank you for contributing! Follow the guide step by step: {guide}
 
-    export IN={src.name}
-    export OUT=tally_{n:04d}.zkey
-    export URL={RAW}/{src.name}
+**Paste these three lines first:**
 
-SHA-256 of the input (step 2 must print exactly this):
+```bash
+export IN={src.name}
+export OUT=tally_{n:04d}.zkey
+export URL={RAW}/{src.name}
+```
 
-    {sha(src)}
+**SHA-256 of the input** (step 2 must print exactly this):
 
-Please contribute with --name="{a.name}" and reply within 48 hours with the zipped
-output and your contribution hash.""")
+```
+{sha(src)}
+```
+
+Contribute with `--name="{a.name}"`. Within 48 hours, reply here with your zipped
+output (`tally_{n:04d}.zip`) and your four-line contribution hash.
+----------------------------------------------------------------------""")
 
 
 def cmd_accept(a):

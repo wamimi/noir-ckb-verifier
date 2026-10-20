@@ -91,12 +91,31 @@ mkdir ~/tally-ceremony && cd ~/tally-ceremony
 curl -L -o "$IN" "$URL"
 ```
 
+curl shows a progress table while it downloads. A finished download looks like
+this (speed and time vary; the size is about 1.7 MB):
+
+```text
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 1724k  100 1724k    0     0   408k      0  0:00:04  0:00:04 --:--:--  408k
+```
+
+Both percentage columns should read `100`. If the size is only a few hundred
+bytes, the link was wrong and you saved an error page; step 2 catches this too.
+
 **Step 2. Check you got exactly the right file.** Compare the output with the
 SHA-256 hash in the issue. They must match character for character.
 
+On a Mac:
+
 ```bash
-shasum -a 256 "$IN"      # Mac
-sha256sum "$IN"          # Linux
+shasum -a 256 "$IN"
+```
+
+On Linux:
+
+```bash
+sha256sum "$IN"
 ```
 
 **Step 3. Contribute.** Replace the name with how you want to appear in the
@@ -134,10 +153,20 @@ Contribution hash:
 <the four lines from step 3>
 ```
 
-**Step 6 (recommended). Post the same text somewhere else you control**, such
-as X, a GitHub Gist or your blog, and link it in the issue. A second, separate
-record makes it hard for anyone, the coordinator included, to replace your
-contribution later without it being noticed. Don't edit it afterwards.
+**Step 6 (recommended). Post your contribution hash publicly on your own
+account**, then paste the post's link as a comment on your issue. An X post is
+ideal; a GitHub Gist or your blog also works. The issue lives in the
+coordinator's repository, where the coordinator could edit comments; a post on
+your own account cannot be changed by anyone else, so it lets anyone check later
+that the hash in the transcript is the one you produced. Don't edit or delete it
+afterwards. A post that fits in one X post (under 280 characters):
+
+```text
+I contributed to the noir-ckb private tally setup ceremony as <your name> 🔐
+
+Contribution hash:
+<your four lines>
+```
 
 That's it. You can delete the folder.
 
