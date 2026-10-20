@@ -1,10 +1,14 @@
 # Setup ceremony for the private tally
 
-**Status: not open yet.** Contributions open once the private tally circuit is
-built and frozen (see [private tally v2 design](private-tally-v2-spec.md),
-section 8). Until then this page describes how the ceremony works so that
-contributors know what to expect. When it opens, the opening announcement and
-the `ceremony/private-tally-v2/` folder will give the exact file names and hashes.
+**Status: open.** The circuit was frozen at tag `private-tally-v2-circuit-freeze`
+(commit `774aafd`) and the ceremony opened on 17 October 2026. The beacon is the
+hash of **CKB mainnet block 20,870,000**, announced before the first
+contribution; no contribution is accepted once that block exists. File names,
+hashes and every accepted contribution are recorded in
+[`ceremony/private-tally-v2/`](../ceremony/private-tally-v2/). To take part, ask
+for a turn on the
+[Nervos Talk thread](https://talk.nervos.org/t/noir-ckb-update-what-i-decided-after-the-direction-check-what-you-can-try-today-and-where-this-is-going/10968)
+or by opening an issue on this repository.
 
 ## Why a ceremony is needed
 
