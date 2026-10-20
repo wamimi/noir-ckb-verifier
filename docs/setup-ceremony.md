@@ -70,6 +70,17 @@ You need a Mac or Linux computer with Node.js 18 or newer (`node --version`).
 You do not need Rust, Noir, CKB tools, a wallet or any money. Nothing in this
 process asks for keys or passwords.
 
+**Why there are turns.** Each contribution is built on top of the previous
+key. If two people download the same key and contribute at the same time, they
+make two different next keys, and only one of them can go into the chain; the
+other person's work is thrown away. So contributions happen one at a time, and
+a turn just means "the next key number is reserved for you".
+
+**Asking for a turn.** Open an issue on this repository titled
+`Turn request: <your name>`, or reply on the Nervos Talk thread or in the CKB
+Telegram group. Turns go in the order they were asked for. You will get a
+reply when the key before yours has been accepted.
+
 When your turn comes, the coordinator opens a GitHub issue titled
 `Contribution N: <your name>` with a link to the latest key and its SHA-256
 hash. You have 48 hours; after that the turn passes to the next contributor and
