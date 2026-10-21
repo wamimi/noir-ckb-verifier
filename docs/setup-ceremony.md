@@ -81,9 +81,9 @@ a turn just means "the next key number is reserved for you".
 Telegram group. Turns go in the order they were asked for. You will get a
 reply when the key before yours has been accepted.
 
-When your turn comes, the coordinator opens a GitHub issue titled
-`Contribution N: <your name>` with a link to the latest key and its SHA-256
-hash. You have 48 hours; after that the turn passes to the next contributor and
+When your turn comes, the coordinator renames your turn request issue (or, if
+you asked elsewhere, opens one) to `Contribution N: <your name>` and posts a
+link to the latest key and its SHA-256 hash. You have 48 hours; after that the turn passes to the next contributor and
 you can be added at the end.
 
 The issue gives you three values to paste: the input file name, the output file
