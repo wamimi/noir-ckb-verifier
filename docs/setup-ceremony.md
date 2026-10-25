@@ -86,8 +86,13 @@ you asked elsewhere, opens one) to `Contribution N: <your name>` and posts a
 link to the latest key and its SHA-256 hash. You have 48 hours; after that the turn passes to the next contributor and
 you can be added at the end.
 
-The issue gives you three values to paste: the input file name, the output file
-name and the input file's link. For example:
+The issue gives you three lines to paste: the input file name, the output file
+name and the input file's link. **Open a new terminal window** (on a Mac:
+Terminal, from Spotlight with Cmd+Space) and paste them there. It does not
+matter which folder the terminal is in. The lines only store the three values
+for the commands below, and they last only in that window, so **do every
+following step in the same window**. If you close it, paste the three lines
+again. For example:
 
 ```bash
 export IN=tally_0002.zkey

@@ -182,7 +182,7 @@ BODY (paste everything between the two lines into the issue body):
 ----------------------------------------------------------------------
 Thank you for contributing! Follow the guide step by step: {guide}
 
-**Paste these three lines first:**
+**Open a new terminal window and paste these three lines first** (any folder is fine; do every following step in that same window):
 
 ```bash
 export IN={src.name}
