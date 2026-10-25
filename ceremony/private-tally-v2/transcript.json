@@ -21,6 +21,15 @@
       "zkey": "tally_0001.zkey",
       "zkey_sha256": "a3c80a9886eb2e3b7b22d56875d0b616185551fc30a8f3b622138ef85126ec17",
       "attestation": "https://x.com/nellycyberpro/status/2112485476976431408"
+    },
+    {
+      "index": 2,
+      "name": "truthixify",
+      "hash": "1f06854b054d584be0e3f2731fc0f3241b5dd84423ae81d893237f85509a1ccde3991f99279c7e92489cd98ebd414bbbd55a427db973f78470df78ba62ebc457",
+      "input_sha256": "a3c80a9886eb2e3b7b22d56875d0b616185551fc30a8f3b622138ef85126ec17",
+      "zkey": "tally_0002.zkey",
+      "zkey_sha256": "8304e36ee8826f4cd80ba364fd0193f221745376229098e73df03530d4069725",
+      "attestation": null
     }
   ],
   "initial_zkey_sha256": "fae8844ba9ae7dbf43acc9c20d13aa56d995dac42765d67de7b5028be4f125e2"
