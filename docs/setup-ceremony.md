@@ -150,8 +150,17 @@ It finishes by printing `Contribution Hash:` followed by four lines of
 hexadecimal. **Copy those four lines.**
 
 **Step 4. Close that terminal window.** The secret only ever existed in that
-command's memory. Neither file contains it. Open a new terminal, `cd
-~/tally-ceremony`, and set `IN` and `OUT` again for the last step.
+command's memory. Neither file contains it. Then open a new terminal window,
+go back to the folder, and paste the `IN` and `OUT` lines from your issue again
+(the `URL` line is not needed any more). For example, for contribution 3:
+
+```bash
+cd ~/tally-ceremony
+export IN=tally_0002.zkey
+export OUT=tally_0003.zkey
+```
+
+Use the two lines from your own issue, not this example.
 
 **Step 5. Send your result.** Zip the new key:
 
