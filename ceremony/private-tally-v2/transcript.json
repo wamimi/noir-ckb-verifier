@@ -30,6 +30,15 @@
       "zkey": "tally_0002.zkey",
       "zkey_sha256": "8304e36ee8826f4cd80ba364fd0193f221745376229098e73df03530d4069725",
       "attestation": null
+    },
+    {
+      "index": 3,
+      "name": "alienate",
+      "hash": "707e9bd622e8cbb20b499c9a4bce7a07cad3b123b8d35dd8b4cd5ff0ab9b19b16cbd3b36bf2bb8a7f2b157f0d1a21b961fbccac21c06f1e2412de594c652ca8f",
+      "input_sha256": "8304e36ee8826f4cd80ba364fd0193f221745376229098e73df03530d4069725",
+      "zkey": "tally_0003.zkey",
+      "zkey_sha256": "af7c36e723a41516ffd9a29a961fdc78ddc75b8db22bcc1f9c7c2ce89e95d4ca",
+      "attestation": null
     }
   ],
   "initial_zkey_sha256": "fae8844ba9ae7dbf43acc9c20d13aa56d995dac42765d67de7b5028be4f125e2"

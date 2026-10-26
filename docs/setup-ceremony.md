@@ -103,7 +103,8 @@ export URL=https://...the link from the issue...
 **Step 1. Make an empty folder and download the key.**
 
 ```bash
-mkdir ~/tally-ceremony && cd ~/tally-ceremony
+mkdir -p ~/tally-ceremony
+cd ~/tally-ceremony
 curl -L -o "$IN" "$URL"
 ```
 
