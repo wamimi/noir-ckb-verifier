@@ -23,6 +23,7 @@ commands in the [contributor guide](../../docs/setup-ceremony.md#verifying-the-c
 | 1 | Xiaomao | `fae8844ba9ae7dbf…` | `b00a21cf520183f0…` | [link](https://x.com/nellycyberpro/status/2112485476976431408) | `tally_0001.zkey` |
 | 2 | truthixify | `a3c80a9886eb2e3b…` | `1f06854b054d584b…` | — | `tally_0002.zkey` |
 | 3 | alienate | `8304e36ee8826f4c…` | `707e9bd622e8cbb2…` | — | `tally_0003.zkey` |
+| 4 | CECILIA-MULANDI | `af7c36e723a41516…` | `136116c8a5e84f8b…` | — | `tally_0004.zkey` |
 
 This is a public ceremony for a testnet developer preview, not an audited
 production ceremony. It guarantees that nobody can forge private tally proofs as

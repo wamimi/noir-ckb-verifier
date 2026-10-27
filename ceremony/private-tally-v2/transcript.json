@@ -39,6 +39,15 @@
       "zkey": "tally_0003.zkey",
       "zkey_sha256": "af7c36e723a41516ffd9a29a961fdc78ddc75b8db22bcc1f9c7c2ce89e95d4ca",
       "attestation": null
+    },
+    {
+      "index": 4,
+      "name": "CECILIA-MULANDI",
+      "hash": "136116c8a5e84f8b5dd85bcdf028ed4318e5de5dbd8dee4134b722bfbb9ec1e26be80ea3908f0e36b84d19c745babd06dca3584b3b5309c10355aed15fa78e00",
+      "input_sha256": "af7c36e723a41516ffd9a29a961fdc78ddc75b8db22bcc1f9c7c2ce89e95d4ca",
+      "zkey": "tally_0004.zkey",
+      "zkey_sha256": "761dab0d208216f4341b55fd5288a08365bf24b3213d0c4a8165ee199cd1cd7c",
+      "attestation": null
     }
   ],
   "initial_zkey_sha256": "fae8844ba9ae7dbf43acc9c20d13aa56d995dac42765d67de7b5028be4f125e2"
