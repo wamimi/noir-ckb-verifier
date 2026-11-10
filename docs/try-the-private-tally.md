@@ -79,7 +79,8 @@ It first lists exactly what it will do and asks once before doing it:
 
 Nothing touches a wallet, and nothing is installed system-wide except the Rust
 version. It ends with a check of everything and `Ready.` If a line says
-`MISSING`, it prints what to do.
+`MISSING`, it prints what to do. To run it without the question (for example
+from a script), use `install --yes`.
 
 ## 4. Run it
 
@@ -138,6 +139,15 @@ and which account paid. One tally's updates are linkable to each other.
 | Backups | `~/noir-ckb-tally-backups/` | **Never** |
 | Testnet wallet | `~/.ckb-cli-noir-ckb-tally` | **Never** |
 | Transactions and proofs | `target/try-private-tally/my-tally/public` | Safe (they're on chain anyway) |
+
+Everything else it set up takes about 1.8 GB, most of it outside the repository:
+the Rust toolchain and libraries (`~/.rustup`, `~/.cargo`, about 1.5 GB), the
+snarkjs cache (`~/.npm`), and the proving backend cloned next to the repository
+(`../Noir-Groth16`). To clean up, delete those and the `noir-ckb-verifier` folder;
+keep your backups and wallet if you still want your tally.
+
+When `ckb-cli` creates the account it also prints mainnet addresses. The tool
+uses only the testnet one.
 
 ## Running it again
 

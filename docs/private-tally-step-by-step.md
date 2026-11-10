@@ -269,8 +269,9 @@ or anything in `my-tally/private` or your backups.
 | --- | --- |
 | `no matches found` or `No such file` for `ckb-cli` | The tools are missing; run Part 1, option B, step 5 of [Try the counter](try-the-counter.md). |
 | `--ptau is not the ceremony's phase 1 file` | The download was incomplete; run Step 1 again. |
-| `this build's R1CS differs from the frozen ceremony circuit` | Your Nargo or backend version differs; run the doctor again. |
-| `exists; choose a new directory` | That folder is already used; pick a new `--out` name. |
+| `this build's R1CS differs from the frozen ceremony circuit` | The Nargo or backend that ran is not the pinned one. Check `nargo --version` says 1.0.0-beta.18, and that `../Noir-Groth16` is at the pinned commit. |
+| `nargo was not found` | Run `python3 -B scripts/try-private-tally.py install`, which downloads the pinned Nargo; the scripts find it in `target/counter-tools/`. |
+| `exists; choose a new directory` | That folder is already used; pick a new `--out` name. A failed setup run is moved aside automatically, so the same command can be run again. |
 | `funding must be one empty Cell owned by your account` | Use a plain faucet Cell of this account (Step 5), not already spent. |
 | `Check password failed` | The password was mistyped; run the same sign command again. |
 | `not committed yet` | Wait a minute and run the same record command again. Do not send again. |
