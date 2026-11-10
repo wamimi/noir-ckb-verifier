@@ -370,7 +370,7 @@ def main():
     m = Matrix(ap.parse_args())
     ok = False
     try:
-        m.circuit = pt.Circuit(m.private, m.args.nargo)
+        m.circuit = pt.Circuit(m.private, pt.nargo_command(m.args.nargo))
         m.artifact = m.circuit.compile()
         # The artifact embeds source paths, so compare the compiled program and ABI only.
         mine, theirs = c.read(m.artifact), c.read(m.setup / "circuit/private_tally_v2.json")

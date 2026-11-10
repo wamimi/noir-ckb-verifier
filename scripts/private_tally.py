@@ -34,6 +34,20 @@ CREATION_WARNING = (
 )
 
 
+def nargo_command(requested="nargo"):
+    """The Nargo to run: the pinned one from target/counter-tools when the caller
+    did not name a binary, so scripts find the same Nargo as the doctor does."""
+    if requested != "nargo":
+        return requested
+    try:
+        import counter_platform as cp
+        key, entry = cp.detect()
+        found = cp.find_tool(ROOT / "target/counter-tools", key, entry, "nargo")
+    except (ImportError, ValueError, OSError):
+        found = None
+    return str(found) if found else requested
+
+
 def new_secret():
     """Uniform random BN254 scalar in [1, P-1]."""
     return secrets.randbelow(P - 1) + 1

@@ -51,6 +51,24 @@ PSE_PPOT = {
 CTX = ("13", "17")  # fixed test context halves; the Type Script derives real ones
 
 
+def describe(cmd):
+    """A readable name for a logged command: 'snarkjs groth16 verify', 'cargo build', ..."""
+    name = Path(cmd[0]).name
+    if name == "npx":
+        rest = [x for x in cmd[1:] if not x.startswith("-")][1:]
+        return "snarkjs " + (" ".join(rest[:2]) if rest else "--version")
+    if name == "noir-cli":
+        return "backend " + cmd[1]
+    words = [x for x in cmd[1:] if not x.startswith("-") and not x.startswith("+")]
+    return " ".join([name] + words[:1])
+
+
+def outcome(code, expected):
+    if code != expected:
+        return f"FAILED (exit {code})"
+    return {0: "ok", 1: "rejected, as expected", 99: "ok"}.get(expected, "ok")
+
+
 def sha(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
@@ -92,12 +110,21 @@ def main():
     args = ap.parse_args()
     if args.ceremony and not args.ptau:
         ap.error("--ceremony needs --ptau (the phase 1 file the ceremony used)")
+    args.nargo = pt.nargo_command(args.nargo)
     out, backend = args.out.resolve(), args.backend.resolve()
+    previous = out / "manifest.json"
+    if previous.exists() and json.loads(previous.read_text()).get("status") == "failed":
+        # A failed run would otherwise block retrying the same command. Keep it for inspection.
+        import datetime
+        aside = out.with_name(out.name + ".failed-" + datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ"))
+        out.rename(aside)
+        print(f"A previous run here failed; it was moved to {aside.name} and a new run starts.", flush=True)
     out.mkdir(parents=True, exist_ok=False)
     log = []
     manifest = dict(status="running", profile=pt.PROFILE,
-                    setup="DEVELOPMENT ONLY; single-party phase 2 (snarkjs adds OS randomness that is not "
-                          "retained; the contributor could have kept it); NOT the ceremony; NOT production")
+                    setup=("CEREMONY: final key from " + str(args.ceremony)) if args.ceremony else
+                          ("DEVELOPMENT ONLY; single-party phase 2 (snarkjs adds OS randomness that is not "
+                           "retained; the contributor could have kept it); NOT the ceremony; NOT production"))
     secrets_used = set()
 
     def save():
@@ -108,11 +135,15 @@ def main():
         cmd = [str(c) for c in cmd]
         e = os.environ.copy()
         e.update(env or {})
-        q = subprocess.run(cmd, cwd=cwd, env=e, capture_output=True, text=True, timeout=timeout)
+        try:
+            q = subprocess.run(cmd, cwd=cwd, env=e, capture_output=True, text=True, timeout=timeout)
+        except FileNotFoundError:
+            raise RuntimeError(f"{cmd[0]} was not found. Run: python3 -B scripts/try-private-tally.py install "
+                               f"(or put Nargo 1.0.0-beta.18 on PATH / pass --nargo)") from None
         log.append(dict(command=cmd, cwd=str(cwd), env=env or {}, exit=q.returncode,
                         stdout="[redacted]" if redact else q.stdout, stderr="[redacted]" if redact else q.stderr))
         save()
-        print(cmd[:3], q.returncode, flush=True)
+        print(f"  {describe(cmd)}: {outcome(q.returncode, expected)}", flush=True)
         if q.returncode != expected or (expected == 0 and "[ERROR]" in q.stdout):
             raise RuntimeError("command failed: " + " ".join(cmd[:4]) + ("" if redact else "\n" + q.stdout[-1500:] + q.stderr[-1500:]))
         return q.stdout + q.stderr
@@ -131,6 +162,7 @@ def main():
         snark = ["npx", "--offline", "snarkjs@0.7.5"]
         if "snarkjs@0.7.5" not in run(snark + ["--version"], expected=99):
             raise RuntimeError("snarkjs 0.7.5 required (npx cache)")
+        print("Building the proving backend (a few minutes the first time; no output until it finishes) ...", flush=True)
         run(["cargo", "+1.95.0", "build", "--locked", "--offline", "-p", "noir-cli"], backend,
             {"CARGO_TARGET_DIR": str(out / "backend-target")})
         cli = out / "backend-target/debug/noir-cli"

@@ -310,7 +310,7 @@ def build_operation(work, cfg, r, deployment, *, creation, funding, delta=0):
     c.require(0 <= delta <= pt.MAX_DELTA, f"delta must be between 0 and {pt.MAX_DELTA}")
     value_new = value_old + delta
     c.require(value_new < 2**64, "tally would exceed 64 bits")
-    circuit = pt.Circuit(work.private, cfg.get("nargo", "nargo"))
+    circuit = pt.Circuit(work.private, pt.nargo_command(cfg.get("nargo", "nargo")))
     try:
         circuit.compile()
         c_new = circuit.commitment(value_new, blinding, key)

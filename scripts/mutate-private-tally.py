@@ -77,7 +77,7 @@ def main():
         m = matrix.Matrix(argparse.Namespace(setup=args.setup, out=dest / "run", nargo=args.nargo, keep_private=False))
         record = dict(mutation=name, target=TARGETS[name], removed_lines=removed)
         try:
-            m.circuit = pt.Circuit(m.private, args.nargo)
+            m.circuit = pt.Circuit(m.private, pt.nargo_command(args.nargo))
             m.artifact = m.circuit.compile()
             m.build(contracts=dest / "contracts")
             record["mutant_elf_sha256"] = c.sha(m.out / "private-tally")

@@ -23,6 +23,8 @@ import sys
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
+sys.path.insert(0, str(HERE))
+import private_tally as pt  # noqa: E402
 CIRCUIT = ROOT / "circuits/private-tally-v2"
 P = 21888242871839275222246405745257275088548364400416034343698204186575808495617
 MAX_DELTA = 2**32 - 1
@@ -48,6 +50,7 @@ class Harness:
         self.private = self.out / "private"
         self.private.mkdir(mode=0o700)
         self.noir_cli = args.noir_cli.resolve() if args.noir_cli else None
+        args.nargo = pt.nargo_command(args.nargo)
         self.nargo = str(Path(args.nargo).resolve()) if os.sep in args.nargo else args.nargo
         self.secrets = set()
         self.ws = self.private / "private-tally-v2"

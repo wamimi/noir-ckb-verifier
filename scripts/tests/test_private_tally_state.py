@@ -97,13 +97,17 @@ class SecretHandling(unittest.TestCase):
         self.assertEqual(pt.leak_scan(self.tmp, {5}, exclude=[self.private.path]), [])
 
 
-@unittest.skipUnless(os.environ.get("NARGO"), "set NARGO to a Nargo 1.0.0-beta.18 binary to run")
+NARGO = os.environ.get("NARGO") or pt.nargo_command()
+
+
+@unittest.skipUnless(os.environ.get("NARGO") or os.sep in NARGO,
+                     "needs the pinned Nargo (try-private-tally.py install) or NARGO set to a Nargo 1.0.0-beta.18 binary")
 class Commitment(unittest.TestCase):
     def test_helper_matches_across_calls_and_leaves_no_prover_file(self):
         tmp = Path(tempfile.mkdtemp())
         try:
             private = pt.PrivateDir(tmp / "private", create=True)
-            circuit = pt.Circuit(private, os.environ["NARGO"])
+            circuit = pt.Circuit(private, NARGO)
             circuit.compile()
             a = circuit.commitment(3, 11, 13)
             self.assertEqual(a, circuit.commitment(3, 11, 13))
