@@ -1,0 +1,89 @@
+# Draft: shielded CKB pool, single shared Cell variant (R2 compares this with sharding and
+# per-note Cells). Specified only: shared mode is outside generator version 2 and gated on
+# R2, which also fixes effects, tree depth and ring size.
+[binding]
+format = 2
+profile = "noir-ckb/shielded-pool/v1"
+placement = "type"
+envelope = "v1"
+hash_type = "data1"
+
+[binding.circuit.transact]
+package = "circuits/shielded-pool"
+# 2-in 2-out join-split: sum(in notes) + public_in = sum(out notes) + public_out + fee.
+public = ["root", "nullifier_0", "nullifier_1", "commitment_0", "commitment_1", "public_in", "public_out", "fee", "ctx_lo", "ctx_hi"]
+
+[binding.cell]
+args = [{ name = "version", type = "u8", const = 1 }, { name = "id", type = "type_id" }]
+data = [
+  { name = "version", type = "u8", const = 1 },
+  { name = "leaves", type = "u32" },
+  { name = "frontier", type = "field", count = 20 },
+  { name = "roots", type = "field", count = 32 },   # recent roots, so a proof survives 31 later insertions
+  { name = "nullifiers", type = "bytes32" },
+]
+lock = { code_hash = "pin:guard", hash_type = "data1", args = "0x" }
+
+[[binding.action]]
+name = "open"
+id = 0
+shape = "create"
+require = [{ left = "out.data.leaves", op = "eq", const = 0 }]
+free = ["capacity", "frontier", "roots", "nullifiers"]   # must equal the empty-tree constants once R2 fixes them
+
+[[binding.action]]
+name = "deposit"
+id = 1
+shape = "update"
+shared = true
+circuit = "transact"
+proof = "input_type"
+change = ["capacity", "data.leaves", "data.frontier", "data.roots", "data.nullifiers"]
+public = { root = "any:in.data.roots", nullifier_0 = "witness", nullifier_1 = "witness", commitment_0 = "witness", commitment_1 = "witness", public_in = "witness", public_out = "zero", fee = "zero", ctx_lo = "context.lo", ctx_hi = "context.hi" }
+context = ["tag:noir-ckb/shielded-pool/context/v1", "network", "profile", "script_hash", "args.id", "action", "public.nullifier_0", "public.nullifier_1", "public.commitment_0", "public.commitment_1", "public.public_in"]
+effects = [
+  { op = "set-insert", in = "in.data.nullifiers", out = "out.data.nullifiers", key = "public.nullifier_0", proof = "aux.0" },
+  { op = "set-insert", in = "in.data.nullifiers", out = "out.data.nullifiers", key = "public.nullifier_1", proof = "aux.1" },
+  { op = "tree-append", frontier = "out.data.frontier", roots = "out.data.roots", leaves = "out.data.leaves", leaf = "public.commitment_0" },
+  { op = "tree-append", frontier = "out.data.frontier", roots = "out.data.roots", leaves = "out.data.leaves", leaf = "public.commitment_1" },
+  { op = "capacity-add", by = "public.public_in" },
+]
+
+[[binding.action]]
+name = "transfer"
+id = 2
+shape = "update"
+shared = true
+circuit = "transact"
+proof = "input_type"
+change = ["capacity", "data.leaves", "data.frontier", "data.roots", "data.nullifiers"]
+public = { root = "any:in.data.roots", nullifier_0 = "witness", nullifier_1 = "witness", commitment_0 = "witness", commitment_1 = "witness", public_in = "zero", public_out = "zero", fee = "witness", ctx_lo = "context.lo", ctx_hi = "context.hi" }
+context = ["tag:noir-ckb/shielded-pool/context/v1", "network", "profile", "script_hash", "args.id", "action", "public.nullifier_0", "public.nullifier_1", "public.commitment_0", "public.commitment_1", "public.fee"]
+effects = [
+  { op = "set-insert", in = "in.data.nullifiers", out = "out.data.nullifiers", key = "public.nullifier_0", proof = "aux.0" },
+  { op = "set-insert", in = "in.data.nullifiers", out = "out.data.nullifiers", key = "public.nullifier_1", proof = "aux.1" },
+  { op = "tree-append", frontier = "out.data.frontier", roots = "out.data.roots", leaves = "out.data.leaves", leaf = "public.commitment_0" },
+  { op = "tree-append", frontier = "out.data.frontier", roots = "out.data.roots", leaves = "out.data.leaves", leaf = "public.commitment_1" },
+  { op = "capacity-sub", by = "public.fee" },   # the pool pays the miner fee: the relayer needs no CKB
+]
+
+[[binding.action]]
+name = "withdraw"
+id = 3
+shape = "update"
+shared = true
+circuit = "transact"
+proof = "input_type"
+change = ["capacity", "data.leaves", "data.frontier", "data.roots", "data.nullifiers"]
+public = { root = "any:in.data.roots", nullifier_0 = "witness", nullifier_1 = "witness", commitment_0 = "witness", commitment_1 = "witness", public_in = "zero", public_out = "witness", fee = "witness", ctx_lo = "context.lo", ctx_hi = "context.hi" }
+outputs = { payout = { capacity = "public.public_out" } }
+# The recipient is bound through the context, as Tornado binds recipient, relayer and fee.
+context = ["tag:noir-ckb/shielded-pool/context/v1", "network", "profile", "script_hash", "args.id", "action", "public.nullifier_0", "public.nullifier_1", "public.commitment_0", "public.commitment_1", "public.public_out", "public.fee", "payout.lock_hash", "payout.type_hash", "payout.data_hash"]
+effects = [
+  { op = "set-insert", in = "in.data.nullifiers", out = "out.data.nullifiers", key = "public.nullifier_0", proof = "aux.0" },
+  { op = "set-insert", in = "in.data.nullifiers", out = "out.data.nullifiers", key = "public.nullifier_1", proof = "aux.1" },
+  { op = "tree-append", frontier = "out.data.frontier", roots = "out.data.roots", leaves = "out.data.leaves", leaf = "public.commitment_0" },
+  { op = "tree-append", frontier = "out.data.frontier", roots = "out.data.roots", leaves = "out.data.leaves", leaf = "public.commitment_1" },
+  { op = "capacity-sub", by = "public.public_out" },
+  { op = "capacity-sub", by = "public.fee" },
+]

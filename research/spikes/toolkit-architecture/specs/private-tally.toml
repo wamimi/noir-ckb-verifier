@@ -1,0 +1,43 @@
+# noir-ckb/private-tally/v2 written in the draft [binding] format 2.
+# Describes the deployed Type Script (contracts/crates/private-tally); it does not replace it.
+[binding]
+format = 2
+profile = "noir-ckb/private-tally/v2"
+placement = "type"
+envelope = "bare"
+hash_type = "data1"
+limits = { witness = 512 }
+
+[binding.circuit.tally]
+package = "circuits/private-tally-v2/circuit"
+public = ["c_old", "c_new", "ctx_lo", "ctx_hi"]
+
+[binding.cell]
+args = [{ name = "version", type = "u8", const = 1 }, { name = "id", type = "type_id" }]
+data = [{ name = "version", type = "u8", const = 1 }, { name = "commitment", type = "field", nonzero = true }]
+lock = { code_hash = "pin:guard", hash_type = "data1", args = "0x" }
+
+[[binding.action]]
+name = "create"
+id = 0
+shape = "create"
+circuit = "tally"
+proof = "output_type"
+public = { c_old = "zero", c_new = "out.data.commitment", ctx_lo = "context.lo", ctx_hi = "context.hi" }
+context = [
+  "tag:noir-ckb/private-tally/context/v2", "network", "profile", "script_hash", "args.id", "action",
+  "zero:36", "public.c_old", "public.c_new", "out.lock_hash", "out.capacity",
+]
+
+[[binding.action]]
+name = "update"
+id = 1
+shape = "update"
+change = ["data.commitment"]
+circuit = "tally"
+proof = "input_type"
+public = { c_old = "in.data.commitment", c_new = "out.data.commitment", ctx_lo = "context.lo", ctx_hi = "context.hi" }
+context = [
+  "tag:noir-ckb/private-tally/context/v2", "network", "profile", "script_hash", "args.id", "action",
+  "in.outpoint", "public.c_old", "public.c_new", "out.lock_hash", "out.capacity",
+]

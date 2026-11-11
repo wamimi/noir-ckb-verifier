@@ -1,0 +1,137 @@
+diff --git a/crates/noir-acir/Cargo.toml b/crates/noir-acir/Cargo.toml
+index 3cd5847..13616df 100644
+--- a/crates/noir-acir/Cargo.toml
++++ b/crates/noir-acir/Cargo.toml
+@@ -7,6 +7,7 @@ license.workspace = true
+ [dependencies]
+ acir.workspace = true
+ acir_legacy = { git = "https://github.com/noir-lang/noir.git", tag = "v1.0.0-beta.18", package = "acir" }
++acir_rc = { git = "https://github.com/noir-lang/noir.git", tag = "v1.0.0-rc.0", package = "acir" }
+ acir_046 = { version = "0.46.0", package = "acir" }
+ serde.workspace = true
+ serde_json.workspace = true
+diff --git a/crates/noir-acir/src/lib.rs b/crates/noir-acir/src/lib.rs
+index c95c6b3..7aa2148 100644
+--- a/crates/noir-acir/src/lib.rs
++++ b/crates/noir-acir/src/lib.rs
+@@ -222,6 +222,24 @@ fn deserialize_program_base64_compatible(
+         .map_err(|err| ArtifactError::BytecodeDecode(err.to_string()))?;
+ 
+     if let Ok(program) = Program::deserialize_program(&program_bytes) {
++        dump_program(&program);
++        return Ok(program);
++    }
++
++    // Spike: Noir 1.0.0-rc ACIR (msgpack). Decode with the rc `acir` crate, then carry the
++    // program into the runtime representation through its JSON form, as the beta.18 path does.
++    if let Ok(rc_program) =
++        acir_rc::circuit::Program::<acir_rc::FieldElement>::deserialize_program(&program_bytes)
++    {
++        let mut value = serde_json::to_value(rc_program)
++            .map_err(|err| ArtifactError::BytecodeDecode(err.to_string()))?;
++        if std::env::var_os("NOIR_CKB_DUMP_RC_JSON").is_some() {
++            eprintln!("{}", serde_json::to_string(&value).unwrap_or_default());
++        }
++        upgrade_rc_program_json(&mut value)?;
++        let program: Program<FieldElement> = serde_json::from_value(value)
++            .map_err(|err| ArtifactError::BytecodeDecode(format!("rc -> runtime: {err}")))?;
++        dump_program(&program);
+         return Ok(program);
+     }
+ 
+@@ -242,7 +260,94 @@ fn deserialize_program_base64_compatible(
+         value
+     };
+     upgrade_legacy_program_json(&mut value)?;
+-    serde_json::from_value(value).map_err(|err| ArtifactError::BytecodeDecode(err.to_string()))
++    let program: Program<FieldElement> = serde_json::from_value(value)
++        .map_err(|err| ArtifactError::BytecodeDecode(err.to_string()))?;
++    dump_program(&program);
++    Ok(program)
++}
++
++/// Spike aid: print the runtime program as JSON so two compilers' ACIR can be compared.
++fn dump_program(program: &Program<FieldElement>) {
++    if std::env::var_os("NOIR_CKB_DUMP_ACIR_JSON").is_some() {
++        eprintln!("{}", serde_json::to_string(program).unwrap_or_default());
++    }
++}
++
++/// Spike: adapt the JSON form of a Noir 1.0.0-rc program to the runtime (beta.19) form.
++/// The only difference found for the tested programs is `current_witness_index`, which the
++/// rc format dropped; it is recomputed as the highest witness index in the function.
++/// Fails closed: opcodes outside the set exercised by the spike are an error unless
++/// NOIR_CKB_SPIKE_PERMISSIVE is set (used only to survey other circuits).
++fn upgrade_rc_program_json(value: &mut Value) -> Result<(), ArtifactError> {
++    const TESTED: [&str; 5] = ["AssertZero", "BrilligCall", "BlackBoxFuncCall.RANGE", "BlackBoxFuncCall.Poseidon2Permutation", ""];
++    fn unsupported(what: &str) -> ArtifactError {
++        ArtifactError::BytecodeDecode(format!("rc -> runtime: unsupported {what}"))
++    }
++    // Highest witness index anywhere below `v`. Field elements are byte arrays inside
++    // expression terms and are skipped by position, so they are never read as indices.
++    fn walk(v: &Value, key: &str, max: &mut u64) {
++        match v {
++            Value::Object(o) if o.contains_key("linear_combinations") => {
++                for t in o["linear_combinations"].as_array().into_iter().flatten() {
++                    *max = (*max).max(t[1].as_u64().unwrap_or(0));
++                }
++                for t in o["mul_terms"].as_array().into_iter().flatten() {
++                    *max = (*max).max(t[1].as_u64().unwrap_or(0)).max(t[2].as_u64().unwrap_or(0));
++                }
++            }
++            Value::Object(o) => o.iter().for_each(|(k, x)| walk(x, k, max)),
++            Value::Array(a) => a.iter().for_each(|x| walk(x, key, max)),
++            Value::Number(n) if matches!(key, "Witness" | "Simple" | "Array" | "output" | "outputs" | "init") => {
++                *max = (*max).max(n.as_u64().unwrap_or(0));
++            }
++            _ => (),
++        }
++    }
++    let permissive = std::env::var_os("NOIR_CKB_SPIKE_PERMISSIVE").is_some();
++    let functions = value
++        .get_mut("functions")
++        .and_then(Value::as_array_mut)
++        .ok_or_else(|| unsupported("program"))?;
++    for function in functions {
++        let mut max = 0u64;
++        for key in ["private_parameters", "public_parameters", "return_values"] {
++            walk(&function[key], "Witness", &mut max);
++        }
++        for opcode in function["opcodes"].as_array_mut().ok_or_else(|| unsupported("opcodes"))? {
++            // Survey only (permissive): the rc format stores a memory operation as two witness
++            // indices and a `read` flag; the runtime form expects three expressions.
++            if let Some(op) = opcode.get_mut("MemoryOp").and_then(|m| m.get_mut("op")) {
++                let field = |n: u8| Value::from((0..32).map(|i| if i == 31 { n } else { 0 }).collect::<Vec<u8>>());
++                let witness = |w: &Value| serde_json::json!({"mul_terms": [], "linear_combinations": [[field(1), w]], "q_c": field(0)});
++                // The rc field is serialised under the name "read" but holds the operation
++                // kind: false is a read, true is a write (acir `MemOpKind`).
++                let write = op["read"].as_bool().ok_or_else(|| unsupported("memory operation"))?;
++                *op = serde_json::json!({
++                    "operation": {"mul_terms": [], "linear_combinations": [], "q_c": field(if write { 1 } else { 0 })},
++                    "index": witness(&op["index"]),
++                    "value": witness(&op["value"]),
++                });
++            }
++            let (name, body) = opcode
++                .as_object()
++                .and_then(|o| o.iter().next())
++                .ok_or_else(|| unsupported("opcode"))?;
++            let kind = match name.as_str() {
++                "BlackBoxFuncCall" => {
++                    let inner = body.as_object().and_then(|o| o.keys().next()).ok_or_else(|| unsupported("black box call"))?;
++                    format!("{name}.{inner}")
++                }
++                _ => name.clone(),
++            };
++            if !permissive && !TESTED.contains(&kind.as_str()) {
++                return Err(unsupported(&format!("opcode {kind}")));
++            }
++            walk(body, "", &mut max);
++        }
++        let object = function.as_object_mut().ok_or_else(|| unsupported("function"))?;
++        object.insert("current_witness_index".to_string(), Value::from(max));
++    }
++    Ok(())
+ }
+ 
+ fn upgrade_legacy_program_json(value: &mut Value) -> Result<(), ArtifactError> {

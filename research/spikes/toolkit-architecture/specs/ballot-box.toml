@@ -1,0 +1,70 @@
+# Draft: anonymous voting with public choices. One shared ballot box Cell per election.
+# Specified only: shared mode is outside generator version 2 and gated on R2 (set encoding,
+# cycles) and R3 (proofs per block).
+# CKB cannot express "not after" (RFC 0017), so the deadline is enforced by an explicit
+# close action that anyone may send once close_after has passed.
+[binding]
+format = 2
+profile = "noir-ckb/ballot-box/v1"
+placement = "type"
+envelope = "v1"
+hash_type = "data1"
+
+[binding.circuit.vote]
+package = "circuits/ballot"
+# Statement: "I know a secret whose identity commitment is a leaf under voter_root, and
+# nullifier = H(election, secret); choice is 0 or 1."
+public = ["voter_root", "election_lo", "election_hi", "nullifier", "choice", "ctx_lo", "ctx_hi"]
+
+[binding.cell]
+args = [{ name = "version", type = "u8", const = 1 }, { name = "id", type = "type_id" }]
+data = [
+  { name = "version", type = "u8", const = 1 },
+  { name = "status", type = "u8" },            # 0 open, 1 closed
+  { name = "close_after", type = "u64" },      # timestamp, seconds
+  { name = "voter_root", type = "field" },     # fixed when the election opens
+  { name = "nullifiers", type = "bytes32" },   # root of the set of used nullifiers
+  { name = "yes", type = "u64" },
+  { name = "total", type = "u64" },
+]
+lock = { code_hash = "pin:guard", hash_type = "data1", args = "0x" }
+
+[[binding.action]]
+name = "open"
+id = 0
+shape = "create"
+require = [
+  { left = "out.data.status", op = "eq", const = 0 },
+  { left = "out.data.yes", op = "eq", const = 0 },
+  { left = "out.data.total", op = "eq", const = 0 },
+]
+free = ["capacity", "close_after", "voter_root", "nullifiers"]   # nullifiers: must equal the empty-set root once R2 fixes it
+
+[[binding.action]]
+name = "vote"
+id = 1
+shape = "update"
+shared = true            # many users act on the same Cell; the proof must survive another vote landing first
+circuit = "vote"
+proof = "input_type"
+require = [{ left = "in.data.status", op = "eq", const = 0 }]
+change = ["data.nullifiers", "data.yes", "data.total"]
+public = { voter_root = "in.data.voter_root", election_lo = "args.id:lo", election_hi = "args.id:hi", nullifier = "witness", choice = "witness", ctx_lo = "context.lo", ctx_hi = "context.hi" }
+# No OutPoint and no fee inputs: any relayer can assemble and pay. Replay is stopped by the nullifier.
+context = ["tag:noir-ckb/ballot-box/context/v1", "network", "profile", "script_hash", "args.id", "action", "public.nullifier", "public.choice"]
+effects = [
+  { op = "set-insert", in = "in.data.nullifiers", out = "out.data.nullifiers", key = "public.nullifier", proof = "aux.0" },
+  { op = "add", in = "in.data.yes", out = "out.data.yes", by = "public.choice" },
+  { op = "add", in = "in.data.total", out = "out.data.total", by = "const:1" },
+]
+
+[[binding.action]]
+name = "close"
+id = 2
+shape = "update"
+change = ["data.status"]
+require = [
+  { left = "in.data.status", op = "eq", const = 0 },
+  { left = "out.data.status", op = "eq", const = 1 },
+]
+since = { kind = "absolute-timestamp", min = "in.data.close_after" }

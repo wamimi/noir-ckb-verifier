@@ -1,0 +1,101 @@
+[
+  {
+    "circuit": "owned-counter-v1",
+    "old_compile": "ok",
+    "new_compile": "ok",
+    "old_decode": "ok",
+    "new_decode": "ok",
+    "opcodes_old": {
+      "AssertZero": 27,
+      "BlackBoxFuncCall.RANGE": 18,
+      "BrilligCall": 8
+    },
+    "opcodes_new": {
+      "AssertZero": 27,
+      "BlackBoxFuncCall.RANGE": 18,
+      "BrilligCall": 8
+    },
+    "same_program": true,
+    "old_r1cs": "843ee202c36a13afece0eb111a83621c7fa9b46078cc6c0148d651e8c4096e43",
+    "new_r1cs": "843ee202c36a13afece0eb111a83621c7fa9b46078cc6c0148d651e8c4096e43",
+    "same_r1cs": true
+  },
+  {
+    "circuit": "proof-bound-capsule",
+    "old_compile": "ok",
+    "new_compile": "ok",
+    "old_decode": "ok",
+    "new_decode": "ok",
+    "opcodes_old": {
+      "AssertZero": 3
+    },
+    "opcodes_new": {
+      "AssertZero": 3
+    },
+    "same_program": true,
+    "old_r1cs": "7aa020246d9b4f25c113e36eb5b975051086601bd79fc41a5c2b769ca2624a02",
+    "new_r1cs": "7aa020246d9b4f25c113e36eb5b975051086601bd79fc41a5c2b769ca2624a02",
+    "same_r1cs": true
+  },
+  {
+    "circuit": "square-root-public-first",
+    "old_compile": "ok",
+    "new_compile": "ok",
+    "old_decode": "ok",
+    "new_decode": "ok",
+    "opcodes_old": {
+      "AssertZero": 1
+    },
+    "opcodes_new": {
+      "AssertZero": 1
+    },
+    "same_program": true,
+    "old_r1cs": "2c4f0098c2d5163574c733f47ef5fb415c3c7b0c7a3eee42ae3cb36dcaa97efc",
+    "new_r1cs": "2c4f0098c2d5163574c733f47ef5fb415c3c7b0c7a3eee42ae3cb36dcaa97efc",
+    "same_r1cs": true
+  },
+  {
+    "circuit": "square-root (private first)",
+    "old_compile": "ok",
+    "new_compile": "ok",
+    "old_decode": "ok",
+    "new_decode": "ok",
+    "opcodes_old": {
+      "AssertZero": 1
+    },
+    "opcodes_new": {
+      "AssertZero": 1
+    },
+    "same_program": true,
+    "old_r1cs": "2c4f0098c2d5163574c733f47ef5fb415c3c7b0c7a3eee42ae3cb36dcaa97efc",
+    "new_r1cs": "2c4f0098c2d5163574c733f47ef5fb415c3c7b0c7a3eee42ae3cb36dcaa97efc",
+    "same_r1cs": true
+  },
+  {
+    "circuit": "wide (survey circuit)",
+    "old_compile": "ok",
+    "new_compile": "ok",
+    "old_decode": "ok",
+    "new_decode": "ok",
+    "opcodes_old": {
+      "AssertZero": 9,
+      "BlackBoxFuncCall.RANGE": 8,
+      "BlackBoxFuncCall.XOR": 1,
+      "BrilligCall": 5,
+      "MemoryInit": 1,
+      "MemoryOp": 3
+    },
+    "opcodes_new": {
+      "AssertZero": 9,
+      "BlackBoxFuncCall.RANGE": 6,
+      "BlackBoxFuncCall.XOR": 1,
+      "BrilligCall": 5,
+      "MemoryInit": 1,
+      "MemoryOp": 3
+    },
+    "same_program": false,
+    "old_r1cs": "7be657aa2228fbf4b76b054391fbb5861b4cdebb5bc20dd87c6a709bf52c7ba1",
+    "new_r1cs": "4d57d2f8522e78a7bdb5c3fd8acc2a597c8344ee4831edfa481afb5325edb2b2",
+    "same_r1cs": false
+  }
+]

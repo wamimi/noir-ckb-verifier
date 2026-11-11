@@ -1,0 +1,130 @@
+# Draft: two-player Battleship. One game Cell; turns alternate, so the Cell has one writer
+# at a time and proofs bind the consumed OutPoint. Inside generator version 2. Not built;
+# R5 completes the design.
+#
+# The two players' fields are stored as "mover" (must act next) and "waiter". Every turn
+# swaps them with field-from-field checks, so the circuit never needs to know who is A or B
+# and the endings need no proof: a finished game pays the mover (the winner, after the last
+# swap); a stalled game pays the waiter.
+[binding]
+format = 2
+profile = "noir-ckb/battleship/v1"
+placement = "type"
+envelope = "v1"
+hash_type = "data1"
+
+[binding.circuit.board]
+package = "circuits/battleship/board"
+# "board is a commitment to a legal fleet placement that I can open."
+public = ["board", "ctx_lo", "ctx_hi"]
+
+[binding.circuit.join]
+package = "circuits/battleship/join"
+# The board statement, plus: stake_out = 2 * stake_in (the joiner matches the stake).
+public = ["board", "stake_in", "stake_out", "ctx_lo", "ctx_hi"]
+
+[binding.circuit.turn]
+package = "circuits/battleship/turn"
+# "I can open the mover's board. I answered the pending shot truthfully and added a hit to
+# the waiter's count if it hit; the game is finished exactly when that count is 17;
+# otherwise I fired at a cell I had not fired at before."
+public = [
+  "board", "pending_in", "hits_in", "shots_in",
+  "status_out", "pending_out", "hits_out", "shots_out",
+  "ctx_lo", "ctx_hi",
+]
+
+[binding.cell]
+args = [{ name = "version", type = "u8", const = 1 }, { name = "id", type = "type_id" }]
+data = [
+  { name = "version", type = "u8", const = 1 },
+  { name = "status", type = "u8" },          # 0 waiting for a second player, 1 playing, 2 finished
+  { name = "pending", type = "u8" },         # cell 0..99 awaiting an answer, 255 none
+  { name = "timeout", type = "u32" },        # blocks a player has to act
+  { name = "mover_hits", type = "u8" },      # hits scored by the mover
+  { name = "waiter_hits", type = "u8" },
+  { name = "mover_shots", type = "u128" },   # bitmap of cells the mover fired at
+  { name = "waiter_shots", type = "u128" },
+  { name = "mover_board", type = "field" },
+  { name = "waiter_board", type = "field" },
+  { name = "mover_lock", type = "bytes32" }, # payout Lock hashes
+  { name = "waiter_lock", type = "bytes32" },
+]
+lock = { code_hash = "pin:guard", hash_type = "data1", args = "0x" }
+
+[[binding.action]]
+name = "open"            # the first player waits
+id = 0
+shape = "create"
+circuit = "board"
+proof = "output_type"
+require = [
+  { left = "out.data.status", op = "eq", const = 0 },
+  { left = "out.data.pending", op = "eq", const = 255 },
+  { left = "out.data.mover_hits", op = "eq", const = 0 },
+  { left = "out.data.waiter_hits", op = "eq", const = 0 },
+  { left = "out.data.mover_shots", op = "eq", const = 0 },
+  { left = "out.data.waiter_shots", op = "eq", const = 0 },
+  { left = "out.data.mover_board", op = "eq", const = 0 },
+  { left = "out.data.mover_lock", op = "eq", const = 0 },
+  { left = "out.data.timeout", op = "ge", const = 10 },
+]
+free = ["timeout", "waiter_lock"]     # the first player's choices; the context covers them
+public = { board = "out.data.waiter_board", ctx_lo = "context.lo", ctx_hi = "context.hi" }
+context = ["tag:noir-ckb/battleship/context/v1", "network", "profile", "script_hash", "args.id", "action", "out.data", "out.capacity"]
+
+[[binding.action]]
+name = "join"            # the second player joins; the first player moves first
+id = 1
+shape = "update"
+circuit = "join"
+proof = "input_type"
+change = ["capacity", "data.status", "data.mover_board", "data.mover_lock", "data.waiter_board", "data.waiter_lock"]
+require = [
+  { left = "in.data.status", op = "eq", const = 0 },
+  { left = "out.data.status", op = "eq", const = 1 },
+  { left = "out.data.mover_board", op = "eq", right = "in.data.waiter_board" },
+  { left = "out.data.mover_lock", op = "eq", right = "in.data.waiter_lock" },
+]
+free = ["waiter_lock"]                # the joiner's payout Lock; the context covers it
+public = { board = "out.data.waiter_board", stake_in = "in.capacity", stake_out = "out.capacity", ctx_lo = "context.lo", ctx_hi = "context.hi" }
+context = ["tag:noir-ckb/battleship/context/v1", "network", "profile", "script_hash", "args.id", "action", "in.outpoint", "out.data", "out.capacity"]
+
+[[binding.action]]
+name = "turn"
+id = 2
+shape = "update"
+circuit = "turn"
+proof = "input_type"
+change = [
+  "data.status", "data.pending",
+  "data.mover_hits", "data.waiter_hits", "data.mover_shots", "data.waiter_shots",
+  "data.mover_board", "data.waiter_board", "data.mover_lock", "data.waiter_lock",
+]
+require = [
+  { left = "in.data.status", op = "eq", const = 1 },
+  # the swap: everything the proof does not touch moves across unchanged
+  { left = "out.data.mover_board", op = "eq", right = "in.data.waiter_board" },
+  { left = "out.data.waiter_board", op = "eq", right = "in.data.mover_board" },
+  { left = "out.data.mover_lock", op = "eq", right = "in.data.waiter_lock" },
+  { left = "out.data.waiter_lock", op = "eq", right = "in.data.mover_lock" },
+  { left = "out.data.waiter_hits", op = "eq", right = "in.data.mover_hits" },
+  { left = "out.data.mover_shots", op = "eq", right = "in.data.waiter_shots" },
+]
+public = { board = "in.data.mover_board", pending_in = "in.data.pending", hits_in = "in.data.waiter_hits", shots_in = "in.data.mover_shots", status_out = "out.data.status", pending_out = "out.data.pending", hits_out = "out.data.mover_hits", shots_out = "out.data.waiter_shots", ctx_lo = "context.lo", ctx_hi = "context.hi" }
+context = ["tag:noir-ckb/battleship/context/v1", "network", "profile", "script_hash", "args.id", "action", "in.outpoint", "out.data", "out.capacity"]
+
+[[binding.action]]
+name = "settle"          # finished: after the last swap the mover is the winner
+id = 3
+shape = "destroy"
+require = [{ left = "in.data.status", op = "eq", const = 2 }]
+outputs = { payout = { lock_hash = "in.data.mover_lock", capacity = "in.capacity" } }
+
+[[binding.action]]
+name = "timeout"         # nobody joined, or the mover did not act in time: the waiter is paid
+id = 4
+shape = "destroy"
+require = [{ left = "in.data.status", op = "le", const = 1 }]
+since = { kind = "relative-blocks", min = "in.data.timeout" }
+outputs = { payout = { lock_hash = "in.data.waiter_lock", capacity = "in.capacity" } }

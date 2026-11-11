@@ -1,0 +1,39 @@
+# noir-ckb/owned-counter/v1 written in the draft [binding] format 2.
+# Describes the deployed Type Script (contracts/crates/owned-counter); it does not replace it.
+[binding]
+format = 2
+profile = "noir-ckb/owned-counter/v1"
+placement = "type"
+envelope = "bare"
+hash_type = "data1"
+limits = { witness = 512 }
+
+[binding.circuit.counter]
+package = "circuits/owned-counter-v1"
+public = ["old_count", "new_count", "context_lo", "context_hi"]
+
+[binding.cell]
+args = [{ name = "version", type = "u8", const = 1 }, { name = "id", type = "type_id" }]
+data = [{ name = "version", type = "u8", const = 1 }, { name = "count", type = "u64" }]
+# secp256k1-blake160 by type hash; the code behind that type hash is pinned by data hash.
+lock = { code_hash = "pin:owner_code", hash_type = "type", args_len = 20, dep_data_hash = "pin:owner_data" }
+
+[[binding.action]]
+name = "create"
+id = 0
+shape = "create"
+require = [{ left = "out.data.count", op = "eq", const = 0 }]
+signer = "out.lock_hash"
+
+[[binding.action]]
+name = "update"
+id = 1
+shape = "update"
+change = ["data.count"]
+circuit = "counter"
+proof = "input_type"
+public = { old_count = "in.data.count", new_count = "out.data.count", context_lo = "context.lo", context_hi = "context.hi" }
+context = [
+  "tag:noir-ckb/owned-counter/context/v1", "network", "profile", "script_hash", "args.id", "action",
+  "in.outpoint", "in.data", "out.data", "out.lock_hash", "out.capacity",
+]

@@ -1,0 +1,6 @@
+[package]
+name = "wide"
+type = "bin"
+authors = []
+
+[dependencies]
