@@ -1,0 +1,17 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>noir-ckb browser proving spike</title>
+<style>
+  body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem; max-width: 60rem; }
+  table { border-collapse: collapse; margin-top: 1rem; }
+  td, th { border: 1px solid #999; padding: 0.3rem 0.6rem; text-align: right; }
+  td:first-child, th:first-child { text-align: left; }
+  #status { color: #555; }
+</style>
+<h1>Browser proving spike</h1>
+<p>Witness solving runs in the pinned Noir-Groth16 backend compiled to WebAssembly. Proving
+runs in snarkjs. Nothing leaves this page. Times are milliseconds.</p>
+<p id="status">loading…</p>
+<table id="results"></table>
+<script src="snarkjs.min.js"></script>
+<script type="module" src="prove.js"></script>

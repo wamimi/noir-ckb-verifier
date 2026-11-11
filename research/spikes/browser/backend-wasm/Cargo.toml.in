@@ -1,0 +1,26 @@
+[package]
+name = "backend-wasm"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[workspace]
+
+[dependencies]
+noir-acir = { path = "@BACKEND@/crates/noir-acir" }
+noir-r1cs = { path = "@BACKEND@/crates/noir-r1cs" }
+noir-witness = { path = "@BACKEND@/crates/noir-witness" }
+acir = { git = "https://github.com/noir-lang/noir.git", tag = "v1.0.0-beta.19", package = "acir" }
+serde_json = "1"
+getrandom = "=0.4.1"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

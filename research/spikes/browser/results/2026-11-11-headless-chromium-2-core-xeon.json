@@ -1,0 +1,92 @@
+{
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+  "threads": 2,
+  "backendLoadMs": 60,
+  "runs": 3,
+  "circuits": [
+    {
+      "name": "private-tally-v2",
+      "constraints": 3338,
+      "zkeyBytes": 1767656,
+      "witnessMs": [
+        67.5,
+        12.300000000046566,
+        10
+      ],
+      "proveMs": [
+        920.1000000000931,
+        741.3000000000466,
+        760.9000000001397
+      ],
+      "witnessEqualsNativeBackend": true,
+      "verified": true,
+      "publicInputs": 4,
+      "witnessMedianMs": 12,
+      "proveFirstMs": 920,
+      "proveMedianMs": 761
+    },
+    {
+      "name": "spend-1-d20",
+      "constraints": 17483,
+      "zkeyBytes": 9862056,
+      "witnessMs": [
+        70.70000000018626,
+        88,
+        78.10000000009313
+      ],
+      "proveMs": [
+        3960,
+        3934.5,
+        3795.899999999907
+      ],
+      "witnessEqualsNativeBackend": true,
+      "verified": true,
+      "publicInputs": 4,
+      "witnessMedianMs": 78,
+      "proveFirstMs": 3960,
+      "proveMedianMs": 3935
+    },
+    {
+      "name": "joinsplit-2x2-d20",
+      "constraints": 37862,
+      "zkeyBytes": 21008664,
+      "witnessMs": [
+        166.80000000004657,
+        169.69999999995343,
+        163.30000000004657
+      ],
+      "proveMs": [
+        7452.699999999953,
+        7508.100000000093,
+        7695.09999999986
+      ],
+      "witnessEqualsNativeBackend": true,
+      "verified": true,
+      "publicInputs": 10,
+      "witnessMedianMs": 167,
+      "proveFirstMs": 7453,
+      "proveMedianMs": 7508
+    },
+    {
+      "name": "joinsplit-2x2-d32",
+      "constraints": 55046,
+      "zkeyBytes": 28624056,
+      "witnessMs": [
+        305.29999999981374,
+        291.60000000009313,
+        265.79999999981374
+      ],
+      "proveMs": [
+        9701.80000000028,
+        9755.700000000186,
+        9975.399999999907
+      ],
+      "witnessEqualsNativeBackend": true,
+      "verified": true,
+      "publicInputs": 10,
+      "witnessMedianMs": 292,
+      "proveFirstMs": 9702,
+      "proveMedianMs": 9756
+    }
+  ]
+}

@@ -37,7 +37,22 @@ are and run before the product. Proofs, keys and wire formats are unchanged.
 
 ## Measured effect
 
-CKB-VM cycles for the same recorded proofs through a script that links `verifier-core`
+On the repository's pinned toolchain (Rust 1.94.1, macOS ARM64, 11 November 2026), with the
+repository's own benchmark (`cargo test -p integration-tests --test cycles -- --ignored
+--nocapture`) at `d64c769` before and after the patch:
+
+| Public inputs | Before | After | Saved |
+| ---: | ---: | ---: | ---: |
+| 1 | 99,843,490 | 79,186,128 | 20,657,362 (20.7%) |
+| 4 | 100,656,230 | 79,967,436 | 20,688,794 (20.6%) |
+| 8 | 101,702,797 | 81,071,306 | 20,631,491 (20.3%) |
+| 16 | 103,998,027 | 83,333,647 | 20,664,380 (19.9%) |
+| 32 | 108,736,103 | 88,051,450 | 20,684,653 (19.0%) |
+| 64 | 118,483,349 | 97,832,285 | 20,651,064 (17.4%) |
+
+The saving is a constant of about 20.66M cycles per verification.
+
+A second measurement, on a different compiler: CKB-VM cycles for the same recorded proofs through a script that links `verifier-core`
 (`research/spikes/toolkit-architecture/placement`, `verify-linked`), before and after,
 built with Rust 1.97.0 and `-Zbuild-std` (not the repository's pinned 1.94.1):
 
@@ -50,26 +65,21 @@ built with Rust 1.97.0 and `-Zbuild-std` (not the repository's pinned 1.94.1):
 | 32 small public inputs | 105,146,625 | 85,571,072 | −18.6% |
 | 32 full-width public inputs | 186,363,736 | 166,834,832 | −10.5% |
 
-The saving is a constant of about 19.5M cycles per verification. Script size went from
-76,520 to 74,912 bytes.
-
-On the pinned toolchain the same equation, implemented in a separate spike script, verified
-the tally update in 93,265,649 cycles against 114,906,306 for unpatched `verifier-core` in
-the same binary (`research/spikes/throughput`, N = 1). The patch itself has not been
-measured on the pinned toolchain; the commands below do that with this repository's own
-benchmark.
+There the saving was about 19.5M cycles per verification, and the script went from 76,520
+to 74,912 bytes.
 
 ## Tests
 
-On the patched tree, host side (Rust 1.97.0):
+On the patched tree, on the pinned toolchain (11 November 2026):
 
 | Suite | Result |
 | --- | --- |
 | `host` unit tests | 3 passed |
-| `host/tests/differential.rs` (agreement with `ark_groth16`, bit flips in proof, key and inputs) | 26 passed, 1 ignored (the 1,000-sample variant) |
+| `host/tests/differential.rs` (agreement with `ark_groth16`, bit flips in proof, key and inputs) | 26 passed; the ignored 1,000-sample variant also passed with `--ignored` |
 | `host/tests/properties.rs` | 2 passed |
 | `host/tests/single_product.rs` (new) | 4 passed |
-| `integration-tests` | not run: they need the RISC-V binary from `scripts/build-ckb-script.sh`, which needs the pinned toolchain |
+| `integration-tests/tests/verify.rs` (CKB-VM, script built with `scripts/build-ckb-script.sh`) | 8 passed |
+| `integration-tests/tests/cycles.rs` | passed; table above |
 
 The new test file compares `verifier_core::verify` with `ark_groth16::Groth16::verify` and
 requires the same verdict in each case:

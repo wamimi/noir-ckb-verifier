@@ -164,6 +164,7 @@ As R0, section 10. arkworks 0.5 (`ark-bn254`, `ark-ec`, `ark-ff`, `ark-groth16`,
 | A full-block transaction waits for a miner with an empty block template | Target batches of 32 to 64 (0.7B to 1.3B cycles) in normal operation |
 | The same library verified the same proof in 104.9M to 114.9M cycles across four binaries and two compilers; the cause of the spread is unexplained | Quote per-binary numbers; do not quote one number for "a verification" |
 | Batch failure hides the offender; anyone can submit invalid or conflicting items for free | Relayer rule in review item 2 (section 12) |
+| The system secp256k1 Lock rejects any witness over 32,768 bytes among those it hashes (its own group's, and those beyond the input count); a 172-proof payload is about 50 KB | The batch payload sits in the application input's witness, which a fee payer's Lock does not read (R4, section 5); test in R4's plan |
 | Challenges of 128 bits | Standard for this test; 2⁻¹²⁸ per attempt, and each attempt needs new valid-looking proofs |
 
 Open: whether to upstream the four-pair verification to `groth16-ckb` or to carry it in a
@@ -182,11 +183,12 @@ The saving for one proof does not need batching. It was written as a standalone 
 | Tally create | 102,287,071 | 82,706,150 |
 | Counter update | 99,755,219 | 80,217,270 |
 
-These are from Rust 1.97.0; the patch itself was not measured on the pinned toolchain
-(the 114.9M to 93.3M figure in section 2 is the same equation in the batch spike's script).
-The repository's 26 differential tests against arkworks, its 2 property tests and 4 new
-tests passed on the patched tree; its CKB-VM integration tests were not run because they
-need the pinned toolchain. The proposal lists the commands.
+These three rows are from Rust 1.97.0. On the pinned toolchain, `groth16-ckb`'s own
+benchmark went from 99,843,490 to 79,186,128 cycles at one public input and from
+118,483,349 to 97,832,285 at 64: a constant saving of about 20.66M cycles (17.4% to
+20.7%). On the patched tree, on the pinned toolchain, the repository's 26 differential
+tests against arkworks (and the 1,000-sample variant), 2 property tests, 8 CKB-VM
+integration tests and the 4 new tests passed (11 November 2026).
 
 ## 12. External review
 
