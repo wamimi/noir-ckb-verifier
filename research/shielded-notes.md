@@ -2,8 +2,12 @@
 
 Status: **spiked; design chosen; external review not done.** Spike code and exact command:
 [`spikes/shielded-notes`](spikes/shielded-notes/README.md). Constraint counts are from the
-pinned Nargo and backend. Cycle counts are from Rust 1.97.0, not the pinned toolchain;
-earlier spikes put the pinned build 2% to 3.5% above it.
+pinned Nargo and backend; cycle counts are from the pinned toolchain (Rust 1.94.1, macOS
+ARM64, 11 November 2026).
+
+Decision (11 November 2026): the grant deliverable is the **ballot box**, built on the
+generator, with VoteSecure as its first consumer. The pool in this document stays fully
+specified and costed as the next phase and is not a grant deliverable.
 
 ## 1. Problem and definition of done
 
@@ -15,7 +19,7 @@ once. On CKB this state has to live in Cells, and a Cell has one writer at a tim
 | # | Test | State |
 | --- | --- | --- |
 | D1 | Constraint counts for membership at depths 16, 20, 32 from the real backend | Done (spike) |
-| D2 | CKB-VM cycles for sparse-tree absence and insertion, and for a Poseidon2 tree append | Done (spike), not on the pinned toolchain |
+| D2 | CKB-VM cycles for sparse-tree absence and insertion, and for a Poseidon2 tree append | Done (spike, pinned toolchain) |
 | D3 | Shared-state designs compared on throughput, contention and cost, with one chosen | Done (section 4) |
 | D4 | A pool on a local chain: deposit, transfer, withdraw; a double spend, a forged root and a replayed proof are rejected | Not built |
 | D5 | Two users' proofs made against the same pool state both land without either proving again | Not built |
@@ -29,11 +33,11 @@ once. On CKB this state has to live in Cells, and a Cell has one writer at a tim
 | Membership at depth 16 / 20 / 32 | 11,459 / 14,323 / 22,915 constraints | spike |
 | Spend one note at depth 16 / 20 / 32 | 14,619 / 17,483 / 26,075 | spike |
 | Join-split 2-in 2-out at depth 16 / 20 / 32 | 32,134 / 37,862 / 55,046 | spike |
-| Poseidon2 permutation in CKB-VM | 394,000 cycles | spike; port checked against Noir's test vector in the VM |
-| Tree append, one leaf, depth 20 / 32 | 7.92M / 12.67M cycles | spike |
-| Tree append, 64 leaves, root once, depth 20 / 32 | 0.51M / 0.59M cycles per leaf | spike |
-| Nullifier set (BLAKE2b sparse Merkle tree): absent-then-insert, one key | 0.93M to 1.27M cycles for trees of 0 to 10,000 keys | spike |
-| The same, 32 keys in one proof | 1.12M per key | spike |
+| Poseidon2 permutation in CKB-VM | 412,000 cycles | spike; port checked against one Noir test vector in the VM (review item 3) |
+| Tree append, one leaf, depth 20 / 32 | 8.27M / 13.23M cycles | spike |
+| Tree append, 64 leaves, root once, depth 20 / 32 | 0.54M / 0.61M cycles per leaf | spike |
+| Nullifier set (BLAKE2b sparse Merkle tree): absent-then-insert, one key | 0.93M to 1.28M cycles for trees of 0 to 10,000 keys | spike |
+| The same, 32 keys in one proof | 1.13M per key | spike |
 | Set proof size | 564 bytes for one key, 306 per key for 32 (10,000-key tree) | spike |
 
 Consequences:
@@ -43,7 +47,7 @@ Consequences:
   wide margin; shared mode (R0, section 3.8) does not need the fallback of putting the
   update in the circuit.
 - **Hashing the commitment tree in the script is the expensive part**, and it is cheap
-  only in batches: 7.9M for one leaf at depth 20, 0.5M per leaf for 64.
+  only in batches: 8.3M for one leaf at depth 20, 0.54M per leaf for 64.
 - **A join-split needs a power-of-tau file of 2^16** (37,862 or 55,046 constraints); the
   tally needed 2^12.
 
@@ -68,8 +72,8 @@ the previous output of the same Cell.
 
 Per-operation costs used below (measured parts, summed; the sums are estimates):
 join-split verified alone about 120M cycles (10 public inputs, R0 formula plus 3.5%);
-in a batch 19.9M (R3); two nullifier insertions 2.4M; two leaves appended 8.3M alone or
-about 1.0M in a batch of 32 operations.
+in a batch 19.9M (R3); two nullifier insertions 2.4M; two leaves appended 8.7M alone or
+about 1.1M in a batch of 32 operations.
 
 | | A. One serialized Cell | B. K shards, each a full pool | C. A Cell per note plus an accumulator Cell |
 | --- | --- | --- | --- |
@@ -105,7 +109,7 @@ Failure modes of A, found by analysis and not yet by experiment:
 - **Withdrawals below a Cell's minimum** (61 CKB for a plain secp256k1 Cell) are impossible.
 - **Tree exhaustion.** Depth 20 holds 1,048,576 leaves, 524,288 join-splits. A full tree
   freezes deposits and transfers. Depth 32 costs 17,184 more constraints per join-split
-  and about 4.8M more cycles per root computation.
+  and about 5.0M more cycles per root computation.
 
 ## 5. The chosen design
 
@@ -230,16 +234,16 @@ from Noir's solver at v1.0.0-beta.19.
 
 | # | Step | Acceptance test |
 | --- | --- | --- |
-| S1 | Spike part 1 on the pinned toolchain | `spikes/shielded-notes/run.sh` output recorded |
-| S2 | Poseidon2 and tree-append as a script library with vectors | Test plan item 1 |
+| S1 | Spike part 1 on the pinned toolchain | Done 11 November 2026 |
+| S2 | Poseidon2 and tree-append as a script library, with a differential test against Noir's own execution (review item 3) | At least 10,000 random states and 10,000 random two-input hashes give the same output in CKB-VM as `nargo execute` of `noir-lang/poseidon`; a deliberately altered round constant fails the test |
 | S3 | Effects in the generator (`set-insert`, `tree-append`, capacity) | Generated ballot box passes its matrix; two votes against one state both land |
 | S4 | Note scheme reviewed and frozen | Written review; vectors published |
 | S5 | Join-split circuit and development setup | Test plan item 2; constraint count within the budget |
 | S6 | Pool on a local chain | D4 and D5 |
 | S7 | Ceremony and testnet pool, only after S4 and an external look at S6 | Public transcript; a deposit, a transfer and a withdrawal by two outside accounts |
 
-The ballot box needs S1 to S3 only. It is the smaller deliverable and exercises every
-shared-mode mechanism; the pool adds the note scheme and a larger ceremony.
+The ballot box needs S1 to S3 only and is the grant deliverable. It exercises every
+shared-mode mechanism. S4 to S7 (the pool: note scheme, larger ceremony) are the next phase.
 
 ## 10. Risks and open questions
 
@@ -251,13 +255,31 @@ shared-mode mechanism; the pool adds the note scheme and a larger ceremony.
 | Public amounts on deposit and withdrawal link the two when they are unusual | Same |
 | Poseidon2 in the script must match Noir's exactly, forever | Constants generated from Noir's source; vectors in CI; a library change in Noir is a new profile |
 | The Poseidon2 library pinned for beta.18 has a known fault for more than 3 inputs | Every call takes at most 3; the tally's static test is reused |
-| Cycles measured off the pinned toolchain | S1 |
 | A pool is a target with real value; this is pre-audit software | Testnet only, as the rest of the project |
 
-Open: ring size; depth 20 or 32 for the first pool; whether the first shielded
-deliverable should be the ballot box alone, with the pool specified and left for a
-second grant.
+Open: ring size; depth 20 or 32 for the first pool.
 
 ## 11. External review
 
-Not done.
+Not done. Items a reviewer must examine, recorded so they are not lost:
+
+1. **The Poseidon2 port in the script** (`spikes/shielded-notes/vm/contracts/crates/acc-bench/src/poseidon2.rs`).
+   It was checked against a single test vector, the all-zero state, comparing the first 8
+   bytes of two output elements. That does not exercise the round constants' interaction
+   with non-zero inputs, the third and fourth output elements, or the two-input hash
+   wrapper (`hash2`, with its length-dependent initial value). Milestone S2 requires a
+   differential test over many random inputs against Noir's own execution before any
+   script relies on it.
+2. **The note scheme of section 5.1 is a draft.** The position-based nullifier
+   `H3(TAG_NULLIFIER, secret, position)` was chosen in this document and has had no
+   cryptographic review. The precedent to compare against is Zcash Sapling, where the
+   nullifier is a PRF, under a nullifier key, of a value derived from the note commitment
+   and its position. Points to check: whether omitting the commitment from the nullifier
+   is safe given that the circuit ties position to commitment through the Merkle path;
+   whether one `secret` serving as both spending authority and nullifier key is
+   acceptable (Sapling separates them); domain separation between `owner`, `commitment`
+   and `nullifier`; behaviour when the same commitment appears at two positions; and what
+   a party who learns `secret` later can link.
+3. **The measured circuits are not the specified ones** (content-derived nullifier, no
+   dummy inputs, both inputs the same note). Constraint budgets must be re-measured on the
+   real circuit.

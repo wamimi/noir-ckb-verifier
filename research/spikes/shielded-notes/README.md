@@ -29,9 +29,10 @@ Part 2 (constraints) runs when `NARGO`, `BACKEND_CLI` and `SNARKJS` are set.
 
 ## Result (11 November 2026)
 
-**Part 1 was not run on the pinned toolchain**: Rust 1.97.0 (LLVM 22.1.6), `-Zbuild-std`,
-ckb-testtool 1.1.1, Linux x86_64. On the two earlier spikes the pinned build came out 2% to
-3.5% slower than this one. Part 2 used the pinned Nargo 1.0.0-beta.18 and backend
+Part 1 was run on the pinned toolchain (Rust 1.94.1 contracts, Rust 1.95.0 harness, clang
+18, macOS ARM64); the cycle table below is from that run. An earlier run on Rust 1.97.0 is
+kept in `results/` and was 4% to 5% lower on Poseidon2 and within 1% on the sparse tree.
+Part 2 used the pinned Nargo 1.0.0-beta.18 and backend
 `828025f` (built with Rust 1.97.0) and snarkjs 0.7.5.
 
 ### Constraints (`results/constraints-2026-11-11.json`)
@@ -46,18 +47,18 @@ One tree level costs 716 constraints (one Poseidon2 call plus the side selection
 witness satisfied its R1CS. Poseidon2 from `noir-lang/poseidon` v0.2.6, at most 3 inputs
 per call.
 
-### CKB-VM cycles (`results/vm-2026-11-11-rust-1.97.0-build-std.txt`)
+### CKB-VM cycles, pinned toolchain (`results/vm-2026-11-11-pinned-macos-arm64.txt`)
 
-Script size: 48,128 bytes.
+Script size: 66,760 bytes.
 
 | Operation | Cycles |
 | --- | --- |
-| One Poseidon2 permutation | 394,000 |
-| Append one leaf, root recomputed, depth 16 / 20 / 32 | 6.34M / 7.92M / 12.67M |
-| Append 2 leaves, root computed once, depth 20 / 32 | 8.32M / 13.07M |
-| Append 64 leaves, root computed once, depth 20 / 32 | 32.9M / 37.7M (0.51M / 0.59M per leaf) |
-| Sparse Merkle tree (BLAKE2b, 256 levels), one key: prove absent and insert | 0.93M (empty tree), 1.19M (1,000 keys), 1.27M (10,000 keys) |
-| The same for 32 keys in one proof, 10,000-key tree | 35.97M (1.12M per key) |
+| One Poseidon2 permutation | 412,000 |
+| Append one leaf, root recomputed, depth 16 / 20 / 32 | 6.62M / 8.27M / 13.23M |
+| Append 2 leaves, root computed once, depth 20 / 32 | 8.69M / 13.64M |
+| Append 64 leaves, root computed once, depth 20 / 32 | 34.4M / 39.3M (0.54M / 0.61M per leaf) |
+| Sparse Merkle tree (BLAKE2b, 256 levels), one key: prove absent and insert | 0.93M (empty tree), 1.20M (1,000 keys), 1.28M (10,000 keys) |
+| The same for 32 keys in one proof, 10,000-key tree | 36.28M (1.13M per key) |
 | Proof bytes per key, 10,000-key tree | 564 for one key, 306 each for 32 |
 
 Two keys already present were each refused as "absent". The two append methods gave the
@@ -66,8 +67,12 @@ same roots.
 ## What did not work
 
 - `sparse-merkle-tree` 0.6.1 has a hard dependency on `blake2b-rs`, whose C source needs
-  `<string.h>` and does not compile for the bare-metal target. A one-file header shim
-  (`vm/contracts/shim/string.h`) makes it build; the C code is never called.
+  `<string.h>` and `<stdio.h>` and does not compile for the bare-metal target. Two shim
+  headers (`vm/contracts/shim/string.h` and an empty `stdio.h`) make it build; the C code
+  is never called. The spike was first delivered without `stdio.h`: it had been removed
+  after a build that still had a cached object, and the first clean build on the pinned
+  toolchain failed. `stdio.h` is used only by the library's `BLAKE2B_SELFTEST` code. It was
+  added during the pinned rerun.
 - A 100,000-key tree exhausted the memory of the machine building it on the host, so the
   largest tree measured is 10,000 keys.
 - The spend and join-split circuits are for counting, not a reviewed design: the tags are
@@ -75,3 +80,5 @@ same roots.
   leaf position instead), both join-split inputs use the same note, and there is no dummy
   input handling.
 - No proving time was measured (R4).
+- The Poseidon2 port was checked against one test vector (the all-zero state). That is not
+  enough to rely on; see review item 3 in the R2 document.

@@ -1,0 +1,198 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 80b9c6e..94031dd 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2356,9 +2356,9 @@ version = "0.0.0"
+ dependencies = [
+  "ark-bn254",
+  "ark-ec",
++ "ark-ff",
+  "ark-groth16",
+  "ark-serialize",
+- "ark-snark",
+ ]
+ 
+ [[package]]
+diff --git a/host/tests/single_product.rs b/host/tests/single_product.rs
+new file mode 100644
+index 0000000..b186737
+--- /dev/null
++++ b/host/tests/single_product.rs
+@@ -0,0 +1,106 @@
++//! The verifier checks the Groth16 equation as one pairing product. These tests compare it
++//! with `ark_groth16::Groth16::verify` (which computes e(α, β) separately) on the cases the
++//! change could affect: full-width public inputs, several public inputs, boundary values,
++//! and proofs that satisfy a neighbouring equation.
++
++use ark_bn254::{Bn254, Fr, G1Affine};
++use ark_ff::{AdditiveGroup, Field, UniformRand};
++use ark_groth16::{Groth16, Proof, VerifyingKey};
++use ark_serialize::CanonicalSerialize;
++use ark_snark::SNARK;
++use ark_std::rand::{rngs::StdRng, SeedableRng};
++use host::{SquareCircuit, SumCircuit};
++
++fn bytes<T: CanonicalSerialize>(v: &T) -> Vec<u8> {
++    let mut out = Vec::new();
++    v.serialize_compressed(&mut out).expect("serialize");
++    out
++}
++
++fn inputs(public: &[Fr]) -> Vec<u8> {
++    let mut out = bytes(&(public.len() as u32));
++    public.iter().for_each(|x| out.extend(bytes(x)));
++    out
++}
++
++/// Both verifiers on the same statement; they must agree. Returns the shared verdict.
++fn agree(vk: &VerifyingKey<Bn254>, proof: &Proof<Bn254>, public: &[Fr]) -> bool {
++    let ours = verifier_core::verify(&bytes(vk), &bytes(proof), &inputs(public)).is_ok();
++    let reference = matches!(Groth16::<Bn254>::verify(vk, public, proof), Ok(true));
++    assert_eq!(ours, reference, "verifier-core and ark-groth16 disagree");
++    ours
++}
++
++fn square(x: Fr, rng: &mut StdRng) -> (VerifyingKey<Bn254>, Proof<Bn254>, Vec<Fr>) {
++    let circuit = SquareCircuit { x: Some(x), y: Some(x * x) };
++    let (pk, vk) = Groth16::<Bn254>::circuit_specific_setup(circuit.clone(), rng).expect("setup");
++    (vk, Groth16::<Bn254>::prove(&pk, circuit, rng).expect("prove"), vec![x * x])
++}
++
++#[test]
++fn full_width_public_inputs_agree() {
++    let mut rng = StdRng::seed_from_u64(0x51_0001);
++    for _ in 0..25 {
++        let (vk, proof, public) = square(Fr::rand(&mut rng), &mut rng);
++        assert!(agree(&vk, &proof, &public));
++        assert!(!agree(&vk, &proof, &[public[0] + Fr::ONE]));
++        assert!(!agree(&vk, &proof, &[-public[0]]));
++    }
++}
++
++#[test]
++fn boundary_public_inputs_agree() {
++    let mut rng = StdRng::seed_from_u64(0x51_0002);
++    // y = 0 (x = 0), y = 1, and x = -1 (y = 1 again, different witness).
++    for x in [Fr::ZERO, Fr::ONE, -Fr::ONE] {
++        let (vk, proof, public) = square(x, &mut rng);
++        assert!(agree(&vk, &proof, &public));
++        assert!(!agree(&vk, &proof, &[public[0] - Fr::ONE]));
++    }
++}
++
++#[test]
++fn several_public_inputs_agree() {
++    let mut rng = StdRng::seed_from_u64(0x51_0003);
++    for n in [2usize, 4, 16] {
++        let values: Vec<Fr> = (0..n).map(|_| Fr::rand(&mut rng)).collect();
++        let sum: Fr = values.iter().sum();
++        let circuit = SumCircuit { public_inputs: values.iter().copied().map(Some).collect(), sum: Some(sum) };
++        let (pk, vk) = Groth16::<Bn254>::circuit_specific_setup(circuit.clone(), &mut rng).expect("setup");
++        let proof = Groth16::<Bn254>::prove(&pk, circuit, &mut rng).expect("prove");
++        let public = values;
++        assert!(agree(&vk, &proof, &public));
++        // Each public input altered on its own.
++        for i in 0..public.len() {
++            let mut bad = public.clone();
++            bad[i] += Fr::ONE;
++            assert!(!agree(&vk, &proof, &bad), "n = {n}: altered input {i} accepted");
++        }
++        // Two public inputs exchanged.
++        if public.len() > 1 && public[0] != public[1] {
++            let mut bad = public.clone();
++            bad.swap(0, 1);
++            assert!(!agree(&vk, &proof, &bad));
++        }
++    }
++}
++
++#[test]
++fn neighbouring_equations_are_rejected() {
++    let mut rng = StdRng::seed_from_u64(0x51_0004);
++    let (vk, proof, public) = square(Fr::rand(&mut rng), &mut rng);
++    let neg = |p: G1Affine| -> G1Affine { -p };
++    // Sign errors in the product would make one of these pass.
++    assert!(!agree(&vk, &Proof { a: neg(proof.a), ..proof.clone() }, &public));
++    assert!(!agree(&vk, &Proof { c: neg(proof.c), ..proof.clone() }, &public));
++    assert!(!agree(&vk, &Proof { a: neg(proof.a), c: neg(proof.c), ..proof.clone() }, &public));
++    assert!(!agree(&vk, &Proof { a: proof.c, c: proof.a, ..proof.clone() }, &public));
++    // A valid proof under another key.
++    let (other_vk, other_proof, other_public) = square(Fr::rand(&mut rng), &mut rng);
++    assert!(!agree(&vk, &other_proof, &public));
++    assert!(!agree(&other_vk, &proof, &other_public));
++    // Key with α negated: only the e(α, β) term changes.
++    let mut bad_vk = vk.clone();
++    bad_vk.alpha_g1 = neg(vk.alpha_g1);
++    assert!(!agree(&bad_vk, &proof, &public));
++}
+diff --git a/script/Cargo.lock b/script/Cargo.lock
+index 3904cab..5cf8930 100644
+--- a/script/Cargo.lock
++++ b/script/Cargo.lock
+@@ -733,9 +733,9 @@ version = "0.0.0"
+ dependencies = [
+  "ark-bn254",
+  "ark-ec",
++ "ark-ff",
+  "ark-groth16",
+  "ark-serialize",
+- "ark-snark",
+ ]
+ 
+ [[package]]
+diff --git a/script/crates/verifier-core/Cargo.toml b/script/crates/verifier-core/Cargo.toml
+index dc89b6c..273ba6b 100644
+--- a/script/crates/verifier-core/Cargo.toml
++++ b/script/crates/verifier-core/Cargo.toml
+@@ -9,4 +9,4 @@ ark-bn254 = { workspace = true, features = ["curve"] }
+ ark-ec = { workspace = true }
+ ark-groth16 = { workspace = true }
+ ark-serialize = { workspace = true }
+-ark-snark = { workspace = true }
++ark-ff = { workspace = true }
+diff --git a/script/crates/verifier-core/src/lib.rs b/script/crates/verifier-core/src/lib.rs
+index 73ebb84..a12613b 100644
+--- a/script/crates/verifier-core/src/lib.rs
++++ b/script/crates/verifier-core/src/lib.rs
+@@ -40,10 +40,10 @@ extern crate alloc;
+ use alloc::vec::Vec;
+ 
+ use ark_bn254::{Bn254, Fr};
+-use ark_ec::AffineRepr;
+-use ark_groth16::{Groth16, Proof, VerifyingKey};
++use ark_ec::{pairing::Pairing, AffineRepr, CurveGroup};
++use ark_ff::{One, PrimeField};
++use ark_groth16::{Proof, VerifyingKey};
+ use ark_serialize::CanonicalDeserialize;
+-use ark_snark::SNARK;
+ 
+ const G1_AFFINE_LEN: usize = 32;
+ const G2_AFFINE_LEN: usize = 64;
+@@ -171,8 +171,24 @@ pub fn verify(
+         public_inputs.push(fe);
+     }
+ 
+-    match Groth16::<Bn254>::verify(&vk, &public_inputs, &proof) {
+-        Ok(true) => Ok(()),
+-        _ => Err(VerifyError::VerificationFailed),
++    // The Groth16 equation as one pairing product:
++    //
++    //   e(A, B) · e(-α, β) · e(-X, γ) · e(-C, δ) = 1,   X = IC₀ + Σ xᵢ·ICᵢ
++    //
++    // `ark_groth16::Groth16::verify` checks the same equation as
++    // e(A, B) · e(X, -γ) · e(C, -δ) = e(α, β) and computes the right-hand side as a
++    // pairing of its own on every call: four Miller loops and two final
++    // exponentiations. One product needs four Miller loops and one final
++    // exponentiation. The negations are in G1, where they are a field negation.
++    let mut x = vk.gamma_abc_g1[0].into_group();
++    for (input, base) in public_inputs.iter().zip(&vk.gamma_abc_g1[1..]) {
++        x += base.mul_bigint(input.into_bigint());
++    }
++    let g1 = [proof.a, -vk.alpha_g1, (-x).into_affine(), -proof.c];
++    let g2 = [proof.b, vk.beta_g2, vk.gamma_g2, vk.delta_g2];
++    if Bn254::multi_pairing(g1, g2).0.is_one() {
++        Ok(())
++    } else {
++        Err(VerifyError::VerificationFailed)
+     }
+ }

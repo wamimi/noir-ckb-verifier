@@ -151,7 +151,7 @@ As R0, section 10. arkworks 0.5 (`ark-bn254`, `ark-ec`, `ark-ff`, `ark-groth16`,
 | # | Step | Acceptance test |
 | --- | --- | --- |
 | T1 | Spike repeated on the pinned toolchain | Done 11 November 2026: largest N under 3.5B was 172 |
-| T2 | Four-pair single verification proposed to `groth16-ckb` (or carried as a second entry point) | Same accept and reject results as `verifier-core` on its test vectors and on both recorded matrices; cycles at least 10% lower |
+| T2 | Single-product verification proposed to `groth16-ckb` (patch and tests written, section 11) | Upstream integration tests and both recorded matrices pass with the patched verifier on the pinned toolchain; cycles at least 10% lower |
 | T3 | Batch verifier as a library crate with the adversarial and differential tests | Test plan items 2 to 4 pass |
 | T4 | Node behaviour for large transactions | Test plan item 5 recorded |
 | T5 | Batch mode in the generator, with shared mode (R0 milestone M7) | Two voters' proofs in one transaction on a local chain |
@@ -163,13 +163,70 @@ As R0, section 10. arkworks 0.5 (`ark-bn254`, `ark-ec`, `ark-ff`, `ark-groth16`,
 | A node's pool treats very large transactions differently. In `ckb@v0.210.0`, `max_tx_verify_cycles` (default 70M) is the threshold above which a transaction goes through the pausable large-cycle verification queue; the cycle ceiling passed to verification on submission is the consensus block limit (source: `tx-pool/src/process.rs`, `verify_queue.rs`). The tally's 115M-cycle transactions were committed on testnet. Behaviour near 3.5B was not tested | T4. A practical batch is likely well below a full block |
 | A full-block transaction waits for a miner with an empty block template | Target batches of 32 to 64 (0.7B to 1.3B cycles) in normal operation |
 | The same library verified the same proof in 104.9M to 114.9M cycles across four binaries and two compilers; the cause of the spread is unexplained | Quote per-binary numbers; do not quote one number for "a verification" |
-| Batch failure hides the offender | Relayer pre-checks every proof; the script cost of a failed batch is paid by the relayer |
+| Batch failure hides the offender; anyone can submit invalid or conflicting items for free | Relayer rule in review item 2 (section 12) |
 | Challenges of 128 bits | Standard for this test; 2⁻¹²⁸ per attempt, and each attempt needs new valid-looking proofs |
 
 Open: whether to upstream the four-pair verification to `groth16-ckb` or to carry it in a
 `noir-ckb` crate; whether keys should store e(α, β) (384 more bytes per key Cell) to drop
 one more Miller loop.
 
-## 11. External review
+## 11. Proposed upstream: the single-product check in `verifier-core`
 
-Not done.
+The saving for one proof does not need batching. It was written as a standalone change to
+`groth16-ckb`'s `verifier-core`, with a new host test, for proposal to its maintainer:
+[`upstream/groth16-ckb-single-product`](upstream/groth16-ckb-single-product/README.md).
+
+| Same recorded proof through a script linking `verifier-core` | Before | After |
+| --- | --- | --- |
+| Tally update | 104,860,094 | 85,326,519 |
+| Tally create | 102,287,071 | 82,706,150 |
+| Counter update | 99,755,219 | 80,217,270 |
+
+These are from Rust 1.97.0; the patch itself was not measured on the pinned toolchain
+(the 114.9M to 93.3M figure in section 2 is the same equation in the batch spike's script).
+The repository's 26 differential tests against arkworks, its 2 property tests and 4 new
+tests passed on the patched tree; its CKB-VM integration tests were not run because they
+need the pinned toolchain. The proposal lists the commands.
+
+## 12. External review
+
+Not done. Items a reviewer must examine, recorded so they are not lost:
+
+1. **How the batch coefficients are derived.** In
+   `spikes/throughput/contracts/crates/verify-batch/src/main.rs`:
+   - line 37: `blob` is the whole `WitnessArgs.input_type` field: the count N, then for
+     each item its length and its `Groth16Witness` payload (proof and public inputs);
+   - lines 82 to 86: `seed = blake2b_256(key_data_hash ‖ blob)` with CKB's BLAKE2b
+     personalization, computed once, after every item has been decoded and before any
+     coefficient exists;
+   - lines 98 to 107: `r_0 = 1`; for i ≥ 1, `r_i` is the low 128 bits (little-endian) of
+     `blake2b_256(seed ‖ i as u32 LE)`;
+   - lines 127 to 135: the Miller loops and the single final exponentiation.
+
+   This is a Fiat-Shamir transcript over the key hash and all proofs and public inputs,
+   fixed before the coefficients are drawn. What the transcript does **not** contain, and a
+   reviewer should judge: the key's bytes (only their hash, which the script also uses to
+   find the key Cell), the script hash, the network, and any transaction field outside the
+   witness. Also to judge: `r_0 = 1`; 128-bit coefficients; whether hashing the raw blob
+   (with its length prefixes) admits two different parses of one byte string; and that the
+   coefficients are reduced from 128 bits, so no modular bias arises.
+2. **All-or-nothing batches and relayer denial of service.** The check says "all valid" or
+   nothing and cannot name the offender. Cases:
+   - *Invalid proof submitted to a relayer.* It costs the sender nothing. A relayer that
+     batches it loses the whole batch's work.
+   - *Two valid ballots with the same nullifier*, sent to one relayer or to two. The
+     second insertion fails and the batch with it.
+   - *A nullifier inserted by another transaction* between batch assembly and inclusion.
+   - *A ballot proved against a voter root or ring entry that is no longer accepted.*
+
+   On CKB a transaction whose script fails is not committed and pays no fee, so the loss is
+   the relayer's computation and delay, not CKB. Mitigation rule for the relayer
+   specification: (a) verify every proof on its own off-chain before admitting it;
+   (b) admit at most one pending item per nullifier and check it against the current set;
+   (c) re-check every item against the latest state immediately before sending, and
+   rebuild the batch without the items that fail; (d) on an on-chain rejection, re-verify
+   the items singly and drop the failures; never resend a batch unchanged; (e) bound the
+   work spent per submitter connection. None of this was built or tested.
+3. **Only the last proof was altered** in the rejection runs. A bad proof in every
+   position, a proof under another key, a duplicated proof and malformed batches are in
+   the test plan (section 8) and were not run.

@@ -91,8 +91,11 @@ Complete specs for the five applications:
    context stops a third party from altering a value, but the prover chooses it.
 5. **One spec, one script, one kind of Cell, one application Cell per transaction.**
 6. **The generator fails closed.** A spec the linter refuses produces no script.
-7. **Generator version 2 covers single-writer Cells.** Shared mode (section 3.8) and
-   effects are specified, linted and refused by the generator until R2 has measured them.
+7. **Shared mode follows single-writer mode.** The generator is built for single-writer
+   Cells first (milestones M1 to M6). Shared mode (section 3.8) and effects were gated on
+   R2's measurements; R2 found them affordable (a nullifier insertion costs about 1.2M
+   cycles), and the grant deliverable decided on 11 November 2026 is the ballot box, so
+   shared mode is in scope as milestone M7.
 
 ### 3.2 Structure
 
@@ -242,7 +245,7 @@ a named output.
 `placement = "lock"`: it runs only when the Cell is spent and cannot constrain creation.
 Section 6 compares them. Generator version 2 emits Type Scripts only.
 
-### 3.8 Shared Cells (specified, gated on R2)
+### 3.8 Shared Cells
 
 OutPoint binding is correct for a Cell with one writer at a time. For a ballot box or a
 pool it is wrong: the OutPoint changes whenever anyone else's transaction lands first, and
@@ -256,9 +259,11 @@ mutable part of the Cell is updated by effects (`set-insert`, `tree-append`, `ad
 `capacity-add`, `capacity-sub`) computed by the script when the transaction is assembled,
 so a relayer can rebuild the transaction around the same proof.
 
-This moves hashing work into CKB-VM. Until R2 has measured set insertion and tree append
-there, the generator refuses specs that use `shared` or `effects`; the linter accepts them
-and labels them "specified only".
+This moves hashing work into CKB-VM. R2 measured it on the pinned toolchain: about 1.2M
+cycles to prove a nullifier absent and insert it, and 8.3M to append one commitment to a
+depth-20 Poseidon2 tree (0.54M each in a batch of 64). The ballot box needs only the
+first. The spike linter still labels these specs "specified only"; the generator accepts
+them from milestone M7.
 
 CKB cannot express "not after" (RFC 0017), so a ballot box cannot refuse votes after a
 time. The spec uses an explicit `close` action that anyone may send once `close_after` has
@@ -308,8 +313,8 @@ A spec is refused when:
 | Owned counter | update | `signer` and one `require` on a proof-less creation; Lock pinned by type hash with its code pinned by data hash | yes | Spec agrees with the deployed script on 48 of 48 recorded cases |
 | Private tally | create, update | core only | yes | Spec agrees on 49 of 49 recorded cases, two runs |
 | Battleship | open, join, turn (3 circuits, 10 public inputs on `turn`) | `v1` envelope, `require` in all three forms, `since`, payouts; two proof-less endings | yes | Lints; R5 completes it |
-| Ballot box | vote | `shared`, nullifier anchor, effects, explicit `close` | no (gated) | Lints |
-| Shielded pool, single Cell variant | deposit, transfer, withdraw | the above plus `any:`, tree append, capacity effects, bound payout | no (gated) | Lints; R2 may replace the layout |
+| Ballot box | vote | `shared`, nullifier anchor, effects, explicit `close` | from M7; the grant deliverable | Lints |
+| Shielded pool, single Cell variant | deposit, transfer, withdraw | the above plus `any:`, tree append, capacity effects, bound payout | next phase, not a grant deliverable | Lints; layout confirmed by R2 |
 
 Battleship shows what the three checks buy. The players' fields are stored as "mover" and
 "waiter" and every turn swaps them with field-from-field checks. The circuit then never
@@ -476,7 +481,7 @@ target/noir-ckb/<profile>/
 | --- | --- | --- |
 | `noir-ckb new <name>` | Writes a circuit, a spec and an inputs file for the counter pattern | |
 | `noir-ckb check` | Lints the spec against the compiled ABI; prints the cycle and capacity estimate | Any rule of 3.10 |
-| `noir-ckb build --network <devnet|testnet>` | Compiles, lowers, runs or checks the setup, generates and builds the script | Unsupported compiler, opcode or layout; spec uses gated features |
+| `noir-ckb build --network <devnet|testnet>` | Compiles, lowers, runs or checks the setup, generates and builds the script | Unsupported compiler, opcode or layout; spec uses features not yet generated |
 | `noir-ckb test` | Builds and runs the generated matrix and source mutations in CKB-VM | Any case or mutation disagrees |
 | `noir-ckb prove --tx <file>` | Builds the public vector from a transaction, proves, writes the payload into the witness | Public vector differs from what the script will rebuild |
 | `noir-ckb deploy --network testnet` | Prints the deployment transaction for signing with `ckb-cli` | Development setup on testnet without `--development` |
@@ -566,7 +571,7 @@ Each step ends with a command whose output decides pass or fail.
 | M4 | `v1` envelope, several circuits, `since`, named outputs, computed buffers, A17 to A19 | A 16-input test application passes its generated matrix; forced 512-byte buffers fail with 50 |
 | M5 | Battleship from its spec (with R5) | A scripted full game, a timeout and a cancelled game on a local chain; generated matrix and mutations pass |
 | M6 | CLI and first-user path | A person who has not seen the repository follows one page from `noir-ckb new` to a testnet transaction; time recorded |
-| M7 | Shared mode, if R2 and R3 allow | Ballot box spec generates; two voters' proofs made against the same state both land |
+| M7 | Shared mode and batching: the ballot box, the grant deliverable, with VoteSecure as first consumer | Ballot box spec generates; two voters' proofs made against the same state both land; a batch of 100 ballots is accepted in one transaction on a local chain; a second ballot with a used nullifier is rejected |
 
 ## 12. Risks and open questions
 
@@ -586,7 +591,10 @@ Open: whether `noir-ckb new` should default to `tx_hash` for applications with a
 ## 13. External review
 
 Not done. An independent review was started and stopped before it reported. The findings and
-the responses to them belong here before the design is treated as final.
+the responses to them belong here before the design is treated as final. The first thing
+to attack is the Type Script binding: sections 3.4 to 3.6 and 3.10, the Battleship spec,
+and whether any spec the linter accepts lets a prover or a third party change something
+the other party did not agree to.
 
 ## Sources
 
