@@ -1,7 +1,9 @@
 // R4 spike: in-browser witness solving (backend as wasm) and Groth16 proving (snarkjs).
 // For every circuit in circuits/manifest.json: solve, compare the witness with the one the
 // native backend wrote, prove RUNS times, verify, and report times.
-const RUNS = Number(new URLSearchParams(location.search).get("runs") ?? 3);
+const QUERY = new URLSearchParams(location.search);
+const RUNS = Number(QUERY.get("runs") ?? 3);
+const ONLY = QUERY.get("only"); // one circuit by name, for devices with little memory
 const status = (t) => { document.getElementById("status").textContent = t; };
 const bytes = async (url) => new Uint8Array(await (await fetch(url)).arrayBuffer());
 const median = (a) => [...a].sort((x, y) => x - y)[Math.floor(a.length / 2)];
@@ -25,7 +27,7 @@ async function backend() {
 }
 
 async function main() {
-  const manifest = await (await fetch("circuits/manifest.json")).json();
+  const manifest = (await (await fetch("circuits/manifest.json")).json()).filter((c) => !ONLY || c.name === ONLY);
   const be = await backend();
   const results = { userAgent: navigator.userAgent, threads: navigator.hardwareConcurrency, backendLoadMs: Math.round(be.loadMs), runs: RUNS, circuits: [] };
   for (const c of manifest) {

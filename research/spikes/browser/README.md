@@ -21,16 +21,37 @@ and how long does a proof take in a browser?
 BACKEND=/path/to/Noir-Groth16 NARGO=/path/to/nargo SNARKJS=/path/to/node_modules/.bin/snarkjs \
   research/spikes/browser/run.sh            # private tally only
 FULL=1 ... research/spikes/browser/run.sh   # also the three note circuits (slow setup)
+LAN=1 ...  research/spikes/browser/run.sh   # reachable from the local network (a phone)
 ```
 
-## Result (11 November 2026)
+The page is served on localhost only unless `LAN=1` is set; with it, anyone on the same
+network can open the page while the script runs. `?only=<circuit>` runs one circuit, which
+limits memory on small devices; `?runs=N` sets the number of proofs.
+
+## Result on a laptop and a phone (11 November 2026, private tally only)
+
+Built on macOS with the pinned Rust; page opened by hand, numbers read from its table.
+
+| Device | Chip, memory | OS, browser | Threads | Witness, median | Prove, first | Prove, median |
+| --- | --- | --- | --- | --- | --- | --- |
+| MacBook Pro | Apple Silicon | macOS; Chrome and Brave | 12 | 5 ms | 203 ms | 115 ms |
+| Infinix Smart 8 (X6525), entry-level phone | Unisoc T606 (2 × Cortex-A75 + 6 × Cortex-A55), 3 GB | Android 13 (XOS 13.0); Chrome 157.0.8103.50 | 8 | 247 ms | 2,651 ms | 1,813 ms |
+
+Both: witness equal to the native backend's, proof verified. Backend module load: 73 ms
+on the laptop; 5,343 ms on the phone, which fetched it over Wi-Fi from the laptop (a
+first-visit cost). The larger circuits were not run on these devices.
+
+The first version of `run.sh` served the page on every network interface, which is how the
+phone reached it. That was not intended. It now binds to localhost unless `LAN=1` is set.
+
+## Result on a cloud server (11 November 2026, all four circuits)
 
 Machine: 2 cores of an Intel Xeon at 2.1 GHz, 7 GB memory, Linux x86_64; headless Chromium
 153 through Playwright; `navigator.hardwareConcurrency` = 2. snarkjs 0.7.5. Backend
 `828025f` built for wasm32 with Rust 1.97.0 and `-Zbuild-std` (the pinned Rust could not be
 downloaded there). Three runs per circuit; full output in
-`results/2026-11-11-headless-chromium-2-core-xeon.json`. **This is a slow machine; it is
-not a phone and not a laptop.** No other device was measured.
+`results/2026-11-11-headless-chromium-2-core-xeon.json`. It was 2.4 times faster than the entry-level phone above and 6.6 times slower than the
+laptop on the private tally.
 
 | Circuit | Constraints | Witness (ms) | Prove (ms), three runs | Key file | Key, gzip |
 | --- | --- | --- | --- | --- | --- |

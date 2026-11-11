@@ -13,6 +13,10 @@
 #   development 2^16 powers-of-tau file, which takes several minutes.
 # Open the printed URL in a browser. If Playwright is installed, the page is also measured in
 # headless Chromium and the JSON printed.
+# The page is served on localhost only. LAN=1 serves it on every network interface so that
+#   a phone on the same network can open it; this exposes the page (including the
+#   development keys and artifacts, no secrets) to the local network while the script runs.
+# Add ?only=<circuit> to the URL to run one circuit, for devices with little memory.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/../../.." && pwd)"
@@ -49,10 +53,16 @@ python3 "$HERE/prepare.py" --repo "$ROOT" --nargo "$NARGO" --backend-cli "$WORK/
   --snarkjs "$SNARKJS" --web "$WEB" ${EXTRA[@]+"${EXTRA[@]}"}
 
 # 3. Serve and measure.
-(cd "$WEB" && python3 -m http.server "$PORT" > /dev/null 2>&1) &
+BIND=127.0.0.1
+[ "${LAN:-0}" = 1 ] && BIND=0.0.0.0
+(cd "$WEB" && python3 -m http.server "$PORT" --bind "$BIND" > /dev/null 2>&1) &
 SERVER=$!
 trap 'kill $SERVER 2>/dev/null' EXIT
-echo "page: http://localhost:$PORT/   (add ?runs=5 for more runs)"
+echo "page: http://localhost:$PORT/   (add ?runs=5 for more runs, ?only=<circuit> for one circuit)"
+if [ "$BIND" = 0.0.0.0 ]; then
+  ADDR=$(ipconfig getifaddr en0 2>/dev/null || hostname -I 2>/dev/null | awk '{print $1}' || true)
+  echo "LAN=1: also reachable from this network at http://${ADDR:-THIS-MACHINE}:$PORT/ until this script stops"
+fi
 if node -e "require('playwright')" 2>/dev/null; then
   node "$HERE/measure.cjs" "http://localhost:$PORT/" "${RUNS:-3}"
 else

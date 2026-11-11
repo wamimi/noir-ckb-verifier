@@ -1,6 +1,6 @@
 # R4. Proving in a browser, and signing
 
-Status: **spiked on one slow machine; external review not done.** Spike code and exact
+Status: **spiked; the private tally measured on a laptop, an entry-level phone and a server, the larger circuits on the server only; external review not done.** Spike code and exact
 command: [`spikes/browser`](spikes/browser/README.md).
 
 ## 1. Problem and definition of done
@@ -13,8 +13,8 @@ point to proving in the browser. The target was a proof in under 10 seconds.
 | --- | --- | --- |
 | D1 | The pinned backend compiled to wasm32 solves a witness in a browser, byte-identical to the native backend's | Passed (spike), four circuits |
 | D2 | A Groth16 proof made in the browser from that witness verifies | Passed (spike), four circuits |
-| D3 | Time per proof under 10 s for the grant's circuits | Passed on a 2-core server CPU: 0.8 s (tally), 3.9 s (vote-sized), 7.5 s and 9.8 s (join-splits). Not measured on a phone or a laptop |
-| D4 | The same on the pinned Rust, on a laptop and on a mid-range phone, in Chrome, Safari and Firefox | Not done |
+| D3 | Time per proof under 10 s for the grant's circuits | Private tally: 0.12 s on a laptop, 1.8 s on an entry-level phone (first proof 2.7 s). Vote-sized and join-split circuits: measured on a 2-core server only (3.9 s, 7.5 s, 9.8 s); **not measured on the laptop or the phone** |
+| D4 | All circuits on the pinned Rust, on a laptop and a phone, in Chrome, Safari and Firefox | Partly: the private tally on a laptop (Chrome, Brave) and a phone (Chrome), 11 November 2026 |
 | D5 | A page that builds a transaction, proves, and hands it to a wallet or a relayer | Not built |
 
 ## 2. What was believed, and what the spike found
@@ -22,7 +22,7 @@ point to proving in the browser. The target was a proof in under 10 seconds.
 | Belief or goal | Result |
 | --- | --- |
 | The backend compiles to wasm32 | **Held with one change outside the backend**: a randomness hook for `getrandom` 0.4.1 (spike). 4.3 MB module, 0.94 MB compressed |
-| A browser proof takes under 10 seconds | **Held on the machine measured**, with little margin for the depth-32 join-split (9.7 to 10.0 s). The ballot-box circuit is in the 4-second class |
+| A browser proof takes under 10 seconds | **Held for the private tally on every device** (0.12 s laptop, 1.8 s entry-level phone). For the larger circuits it held on the server (3.9 s vote-sized; 9.7 to 10.0 s for the depth-32 join-split), which was 2.4 times faster than the phone on the tally. A vote-sized proof on that phone is therefore expected near 9 to 10 s (estimate: server time × 2.4), at the edge of the target, and is not measured |
 | Witness solving is the slow part | **Broke**: 10 to 300 ms. Proving is over 95% of the time |
 | The in-browser witness is the same as the native one | **Held**: byte-identical for all four circuits |
 | Download size is negligible | **Broke for the larger circuits**: the proving key is 1.8 MB for the tally, 9.9 MB for a vote-sized circuit and 21 to 29 MB for a join-split, and compresses by only about 30% |
@@ -103,18 +103,43 @@ unknown Type Script and extra witness fields without rewriting it. That is test 
 
 ## 6. Measured budgets
 
+Private tally v2 (3,338 constraints, ceremony key, 1.8 MB key file), witness identical to
+the native backend's and proof verified on every device:
+
+| Device | Chip, memory | OS, browser | Threads | Witness, median | Prove, first | Prove, median |
+| --- | --- | --- | --- | --- | --- | --- |
+| MacBook Pro | Apple Silicon | macOS; Chrome and Brave | 12 | 5 ms | 203 ms | 115 ms |
+| Infinix Smart 8 (X6525), entry-level phone | Unisoc T606 (2 × Cortex-A75 + 6 × Cortex-A55), 3 GB | Android 13 (XOS 13.0); Chrome 157.0.8103.50 | 8 | 247 ms | 2,651 ms | 1,813 ms |
+| Cloud server | 2 cores of an Intel Xeon at 2.1 GHz, 7 GB | Linux; headless Chromium 153 | 2 | 12 ms | 920 ms | 761 ms |
+
+The phone is the low-end reference point. Its first proof is slower than later ones
+(2.7 s against 1.8 s); a voter makes one proof, so the first-proof figure is the one that
+counts.
+
+The phone took 5,343 ms to load the 4.3 MB backend module, fetched over Wi-Fi from the
+laptop serving the page (73 ms on the laptop itself, 60 ms on the server). That is a
+first-visit cost of downloading and compiling the module, not a per-proof cost: a real
+application caches the module (HTTP cache or a service worker), and later visits skip the
+download.
+
+Larger circuits, **measured on the cloud server only** (three runs each, spike). They were
+not run on the laptop or the phone:
+
 | Item | Value | Basis |
 | --- | --- | --- |
-| Prove, tally (3,338 constraints) | 0.74 to 0.92 s | spike, 2-core Xeon 2.1 GHz, headless Chromium 153 |
-| Prove, vote-sized (17,483) | 3.8 to 4.0 s | spike |
-| Prove, join-split depth 20 / 32 | 7.5 to 7.7 s / 9.7 to 10.0 s | spike |
-| Witness solving | 10 to 305 ms | spike |
+| Prove, vote-sized (17,483 constraints) | 3.8 to 4.0 s | spike, server |
+| Prove, join-split depth 20 / 32 | 7.5 to 7.7 s / 9.7 to 10.0 s | spike, server |
+| Witness solving | 71 to 305 ms | spike, server |
+| The same on the entry-level phone | about 9 to 10 s (vote-sized), 18 s and 24 s (join-splits) | **estimate**: server time × 2.4, the phone-to-server ratio measured on the tally. Unverified; memory may fail first (below) |
+| Phone memory for a join-split | unknown. The depth-32 key is 28.6 MB on disk; snarkjs holds the key, the witness and several working buffers of similar size in memory. On a 3 GB phone this may not fit a browser tab | not measured |
 | First-visit download for a ballot | about 8 MB compressed (key 6.9, backend 0.94, snarkjs 0.15) | spike |
 | Backend module instantiation | 60 ms | spike |
-| Memory | not measured | |
 
-Proving time grew roughly linearly: about 0.17 ms per constraint plus about 0.6 s
-(least-squares fit of the four median times).
+On the server, proving time grew roughly linearly: about 0.17 ms per constraint plus about
+0.6 s (least-squares fit of the four median times).
+
+To run the larger circuits on a device: `FULL=1 LAN=1 research/spikes/browser/run.sh`, then
+open `http://<address>:8765/?only=spend-1-d20` (one circuit per page load, to limit memory).
 
 ## 7. Pinned tools
 
@@ -142,7 +167,7 @@ version current when D5 is built (surveyed at `0961763`). The spike build used R
 
 | # | Step | Acceptance test |
 | --- | --- | --- |
-| B1 | Spike repeated on the pinned Rust and on a laptop and a phone | Table of D4 recorded; vote-sized proof under 10 s on the phone |
+| B1 | The vote-sized circuit on the laptop and the entry-level phone (the tally was done on both on 11 November 2026) | Vote-sized proof under 10 s on the phone, with memory recorded |
 | B2 | Backend wrapper as a published module with hash-checked loading | Test plan items 2 and 3 in CI |
 | B3 | Ballot page: build the statement, prove, post to a relayer; no wallet | A vote cast from a phone browser lands on a local chain; traffic recording shows no secret |
 | B4 | CCC signing for staked and owned applications | Test plan items 5 and 6 |
@@ -151,7 +176,7 @@ version current when D5 is built (surveyed at `0961763`). The spike build used R
 
 | Risk | Handling |
 | --- | --- |
-| Only one machine was measured, and it is neither a phone nor a laptop | B1 before any public claim about speed |
+| The vote-sized and join-split circuits were measured on one server only; the phone estimate for a vote is at the edge of the 10 s target | Run `?only=spend-1-d20` on the phone (B1) before any claim about ballots; if it misses, use a shallower voter tree or the Rust prover of option B |
 | A 7 MB key on a mobile connection | Cache with a service worker; show progress; the ballot circuit can drop to a shallower tree for small electorates |
 | The page is the trust base: a served page can exfiltrate secrets or swap the statement | Hash-pinned static bundle; reproducible build; publish the bundle hash; a self-hosted copy stays possible |
 | A voter without a wallet depends on a relayer | Any relayer works and none is trusted (R3); a wallet path remains as fallback |
