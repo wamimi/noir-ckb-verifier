@@ -26,6 +26,8 @@ export CARGO_TARGET_RISCV64IMAC_UNKNOWN_NONE_ELF_RUSTFLAGS="${CARGO_TARGET_RISCV
 export SPIKE_BIN="$HERE/contracts/target/riscv64imac-unknown-none-elf/release"
 RUN=${TALLY_RUN:-$ROOT/target/tally-testnet/local/matrix}
 export CASES=${CASES:-tally=$RUN/cases/update-valid.json,$RUN/cases/create-valid.json}
-export SIZES=${SIZES:-1,2,4,8,16,32,64,128,160,172,175,176}
+export SIZES=${SIZES:-1,2,4,8,16,32,64,128,160,172,173,174,175,176}
+COUNTER_RUN=${COUNTER_RUN:-$ROOT/target/week-15-guided-validation-20261009}
+[ -f "$COUNTER_RUN/matrix/update-valid.json" ] && export OTHER_KEY_CASE="$COUNTER_RUN/matrix/update-valid.json"
 echo "size verify-batch: $(wc -c < "$SPIKE_BIN/verify-batch") bytes"
-(cd "$HERE/harness" && $HOST_CARGO test --locked --release -- --nocapture 2>&1 | grep -E "^GROUP|^BATCH|test result: (ok. 1|FAILED)|panicked|^error")
+(cd "$HERE/harness" && $HOST_CARGO test --locked --release -- --nocapture --test-threads 1 2>&1 | grep -E "^GROUP|^BATCH|^ADVERSARIAL|^SUMMARY|test result: (ok|FAILED)|panicked|^error")

@@ -8,7 +8,8 @@ format = 2
 profile = "noir-ckb/ballot-box/v1"
 placement = "type"
 envelope = "v1"
-hash_type = "data1"
+hash_type = "data2"      # the spawned verifier needs the data2 VM (RFC 0050)
+verifier = "spawn"
 
 [binding.circuit.vote]
 package = "circuits/ballot"

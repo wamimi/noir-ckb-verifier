@@ -15,16 +15,18 @@ index 80b9c6e..94031dd 100644
  [[package]]
 diff --git a/host/tests/single_product.rs b/host/tests/single_product.rs
 new file mode 100644
-index 0000000..b186737
+index 0000000..40aea02
 --- /dev/null
 +++ b/host/tests/single_product.rs
-@@ -0,0 +1,106 @@
+@@ -0,0 +1,175 @@
 +//! The verifier checks the Groth16 equation as one pairing product. These tests compare it
 +//! with `ark_groth16::Groth16::verify` (which computes e(α, β) separately) on the cases the
 +//! change could affect: full-width public inputs, several public inputs, boundary values,
-+//! and proofs that satisfy a neighbouring equation.
++//! proofs that satisfy a neighbouring equation, an input combination X that is the
++//! identity, and a key with no public inputs.
 +
-+use ark_bn254::{Bn254, Fr, G1Affine};
++use ark_bn254::{Bn254, Fr, G1Affine, G2Affine};
++use ark_ec::{AffineRepr, CurveGroup};
 +use ark_ff::{AdditiveGroup, Field, UniformRand};
 +use ark_groth16::{Groth16, Proof, VerifyingKey};
 +use ark_serialize::CanonicalSerialize;
@@ -124,6 +126,73 @@ index 0000000..b186737
 +    let mut bad_vk = vk.clone();
 +    bad_vk.alpha_g1 = neg(vk.alpha_g1);
 +    assert!(!agree(&bad_vk, &proof, &public));
++}
++
++/// A key and a proof built from known scalars rather than from a circuit, so the input
++/// combination X = IC₀ + Σ xᵢ·ICᵢ can be chosen. With α = a·G1, β = b·G2, γ = c·G2,
++/// δ = d·G2, A = α and C = s·G1, the equation e(A, B) = e(α, β)·e(X, γ)·e(C, δ) holds for
++/// X = k·G1 exactly when B = (b + (k·c + s·d)/a)·G2. Every scalar is random and nonzero, so
++/// every point of the key and of the proof is a non-identity point.
++fn algebraic(ic: Vec<G1Affine>, k: Fr, rng: &mut StdRng) -> (VerifyingKey<Bn254>, Proof<Bn254>) {
++    let (g1, g2) = (G1Affine::generator(), G2Affine::generator());
++    let [a, b, c, d, s]: [Fr; 5] = core::array::from_fn(|_| Fr::rand(rng));
++    assert!([a, b, c, d, s].iter().all(|v| *v != Fr::ZERO));
++    let vk = VerifyingKey {
++        alpha_g1: (g1 * a).into_affine(),
++        beta_g2: (g2 * b).into_affine(),
++        gamma_g2: (g2 * c).into_affine(),
++        delta_g2: (g2 * d).into_affine(),
++        gamma_abc_g1: ic,
++    };
++    let proof = Proof::<Bn254> {
++        a: vk.alpha_g1,
++        b: (g2 * (b + (k * c + s * d) * a.inverse().expect("a is nonzero"))).into_affine(),
++        c: (g1 * s).into_affine(),
++    };
++    assert!(!proof.a.is_zero() && !proof.b.is_zero() && !proof.c.is_zero());
++    (vk, proof)
++}
++
++#[test]
++fn identity_input_combination_agrees() {
++    let mut rng = StdRng::seed_from_u64(0x51_0005);
++    for _ in 0..10 {
++        // IC₁ = t·G1 and IC₀ = -x·IC₁: both are non-identity points and X = IC₀ + x·IC₁ is
++        // the identity. Its pairing term is one; the verifier must not treat it as an error.
++        let (x, t) = (Fr::rand(&mut rng), Fr::rand(&mut rng));
++        assert!(x != Fr::ZERO && t != Fr::ZERO);
++        let ic1 = (G1Affine::generator() * t).into_affine();
++        let ic0 = (-(ic1 * x)).into_affine();
++        assert!(!ic0.is_zero() && !ic1.is_zero() && (ic0 + ic1 * x).into_affine().is_zero());
++        let (vk, proof) = algebraic(vec![ic0, ic1], Fr::ZERO, &mut rng);
++        assert!(agree(&vk, &proof, &[x]));
++        // Any other public input gives a non-identity X, and the same proof fails.
++        assert!(!agree(&vk, &proof, &[x + Fr::ONE]));
++        assert!(!agree(&vk, &proof, &[Fr::ZERO]));
++        // Identity X with a proof for another X.
++        let (_, other) = algebraic(vec![ic0, ic1], Fr::ONE, &mut rng);
++        assert!(!agree(&vk, &other, &[x]));
++        assert!(!agree(&vk, &Proof { c: (-proof.c), ..proof.clone() }, &[x]));
++    }
++}
++
++#[test]
++fn no_public_inputs_agree() {
++    let mut rng = StdRng::seed_from_u64(0x51_0006);
++    for _ in 0..10 {
++        // A key whose IC holds only the constant term: X = IC₀ and the public-input vector
++        // is empty. This is a different case from one public input whose value is zero.
++        let k = Fr::rand(&mut rng);
++        assert!(k != Fr::ZERO);
++        let ic0 = (G1Affine::generator() * k).into_affine();
++        let (vk, proof) = algebraic(vec![ic0], k, &mut rng);
++        assert!(agree(&vk, &proof, &[]));
++        assert!(!agree(&vk, &Proof { c: (-proof.c), ..proof.clone() }, &[]));
++        let (_, other) = algebraic(vec![ic0], k + Fr::ONE, &mut rng);
++        assert!(!agree(&vk, &other, &[]));
++        // One public input offered to a key that takes none: both verifiers refuse.
++        assert!(!agree(&vk, &proof, &[Fr::ZERO]));
++    }
 +}
 diff --git a/script/Cargo.lock b/script/Cargo.lock
 index 3904cab..5cf8930 100644

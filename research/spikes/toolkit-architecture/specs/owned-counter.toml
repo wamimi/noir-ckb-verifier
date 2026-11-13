@@ -16,7 +16,10 @@ public = ["old_count", "new_count", "context_lo", "context_hi"]
 args = [{ name = "version", type = "u8", const = 1 }, { name = "id", type = "type_id" }]
 data = [{ name = "version", type = "u8", const = 1 }, { name = "count", type = "u64" }]
 # secp256k1-blake160 by type hash; the code behind that type hash is pinned by data hash.
-lock = { code_hash = "pin:owner_code", hash_type = "type", args_len = 20, dep_data_hash = "pin:owner_data" }
+# signs = "transaction" is the spec author's statement about that pinned code: its signature
+# covers the transaction hash, so the signer of a creation fixed every output. The linter
+# cannot check the statement; it only refuses a `signer` exemption without it.
+lock = { code_hash = "pin:owner_code", hash_type = "type", args_len = 20, dep_data_hash = "pin:owner_data", signs = "transaction" }
 
 [[binding.action]]
 name = "create"

@@ -5,8 +5,11 @@
   replay  evaluate a spec against recorded CKB-VM matrix cases and compare the
           predicted outcome of every case with the outcome CKB-VM recorded
 
-This is a research spike, not the generator. It evaluates every rule of a spec
-except the pairing check, so a case the spec lets through is reported as PAIRING.
+This is a research spike, not the generator. `replay` evaluates the rules the two
+deployed applications use (shape, Type ID, Lock rule, data layout, unchanged parts,
+`require`, `signer`, the public vector and the key dependency) and stops before the
+pairing, so a case that passes them is reported as PAIRING whether its proof is valid or
+not. Envelope v1, effects, named outputs and `since` are linted but not evaluated.
 """
 import argparse
 import hashlib
@@ -28,6 +31,8 @@ SHAPES = {"create": (0, 1), "update": (1, 1), "destroy": (1, 0), "spend": (1, 0)
 E = dict(LOAD=40, ARGS=41, SHAPE=42, STATE=43, ID=44, LOCK=45, OWNER=46, CAPACITY=47, WITNESS=48, PUBLIC=49,
          VK=50, PROOF=51, LIMIT=52, REQUIRE=53, FIELD=54, KEEP=55, SINCE=56, OUTPUT=57, EFFECT=58)
 MAX_CELLS = 64
+MAX_PUBLIC = 16
+SINCE_KINDS = ("relative-blocks", "relative-timestamp", "absolute-blocks", "absolute-timestamp")
 MANDATORY_CONTEXT = ("network", "profile", "script_hash", "action")
 OPS = ("eq", "ne", "lt", "le", "gt", "ge")
 EFFECT_OPS = {"set-insert": "R2", "tree-append": "R2", "add": "R2", "capacity-add": "R2", "capacity-sub": "R2"}
@@ -95,6 +100,20 @@ class Spec:
         if placement not in ("type", "lock"):
             err.append("placement must be type or lock")
         envelope = b.get("envelope", "v1")
+        if envelope not in ("bare", "v1"):
+            err.append("envelope must be bare or v1")
+        if b.get("hash_type", "data1") not in HASH_TYPE:
+            err.append("unknown hash_type")
+        # Spawn exists from the data2 VM on (RFC 0050). A script deployed under data2 has a
+        # different script hash from the same code under data1, so the choice is explicit.
+        verifier = b.get("verifier", "spawn" if b.get("hash_type") == "data2" else "linked")
+        if verifier not in ("linked", "spawn"):
+            err.append("verifier must be linked or spawn")
+        elif verifier == "spawn" and b.get("hash_type") != "data2":
+            err.append('verifier = "spawn" needs hash_type = "data2"')
+        for name, c in self.circuits.items():
+            if len(c.get("public", [])) > MAX_PUBLIC:
+                err.append(f"circuit {name}: more than {MAX_PUBLIC} public inputs")
         if not re.fullmatch(r"[a-z0-9./-]+", b.get("profile", "")):
             err.append("profile must be a lowercase ASCII path")
         for part in ("args", "data"):
@@ -104,6 +123,8 @@ class Spec:
             for f in self.cell.get(part, []):
                 if f["type"] not in WIDTH:
                     err.append(f"cell.{part}.{f['name']}: unknown type {f['type']}")
+                if not isinstance(f.get("count", 1), int) or f.get("count", 1) < 1:
+                    err.append(f"cell.{part}.{f['name']}: count must be a positive integer")
         data, _ = self.layout([f for f in self.cell.get("data", []) if f["type"] in WIDTH])
         args, _ = self.layout([f for f in self.cell.get("args", []) if f["type"] in WIDTH])
         ids = [a.get("id") for a in self.actions]
@@ -132,7 +153,6 @@ class Spec:
                     warn.append(f"{n}: effect {e['op']} is provisional until {EFFECT_OPS[e['op']]} fixes its cost and encoding")
             for o in a.get("outputs", {}).values():
                 atoms += [v for v in o.values() if isinstance(v, str)]
-            pinned = set()  # successor fields fixed by an equality check
             for r in a.get("require", []):
                 atoms += [r[k] for k in ("left", "right") if isinstance(r.get(k), str)]
                 if r.get("op") not in OPS or ("const" in r) == ("right" in r) or "left" not in r:
@@ -143,9 +163,16 @@ class Spec:
                     err.append(f"{n}: {r['left']} and {r['right']} differ in width")
                 elif r["op"] not in ("eq", "ne") and self.width(r["left"], data, args) > 16:
                     err.append(f"{n}: ordering checks need an integer of at most 128 bits")
-                m = re.fullmatch(r"out\.data\.(\w+)", r.get("left", ""))
-                if m and r.get("op") == "eq":
-                    pinned.add(m.group(1))
+            if isinstance(a.get("signer"), str):
+                atoms.append(a["signer"])
+            since = a.get("since")
+            if since is not None:
+                if since.get("kind") not in SINCE_KINDS:
+                    err.append(f"{n}: since.kind must be one of {SINCE_KINDS}")
+                if isinstance(since.get("min"), str):
+                    atoms.append(since["min"])
+                elif not isinstance(since.get("min"), int):
+                    err.append(f"{n}: since.min must be a source or an integer")
             if a.get("shared") or a.get("effects"):
                 gated.append(n)
             for atom in atoms:
@@ -156,17 +183,14 @@ class Spec:
             if circuit is None:
                 if a.get("public") or a.get("context"):
                     err.append(f"{n}: public/context without a circuit")
-                if shape == "create" and not a.get("signer"):
-                    unbound = [f for f, (_, _, d) in data.items() if "const" not in d and f not in pinned
-                               and f not in a.get("free", [])]
-                    if unbound:
-                        err.append(f"{n}: created without proof or signer, unbound fields {unbound}")
-                elif a.get("signer"):
-                    warn.append(f"{n}: relies on the signer's Lock covering the whole transaction (sighash-all)")
+                if a.get("free") and shape != "create" and not a.get("signer"):
+                    err.append(f"{n}: free values in a proof-less {shape}: anyone could set them")
             else:
                 if circuit not in self.circuits:
                     err.append(f"{n}: unknown circuit {circuit}")
                     continue
+                if a.get("proof") not in ("input_type", "output_type"):
+                    err.append(f"{n}: proof must be input_type or output_type")
                 declared, mapped = self.circuits[circuit].get("public", []), a.get("public", {})
                 if set(declared) != set(mapped):
                     err.append(f"{n}: public map must cover exactly {declared}")
@@ -196,46 +220,8 @@ class Spec:
                             err.append(f"{n}: shared action reads {atom}, which changes when another user goes first")
                         elif m and m.group(2) in modified:
                             err.append(f"{n}: shared action reads mutable field {m.group(2)}")
-            statement = {m.group(1) for v in a.get("public", {}).values()
-                         for m in [re.fullmatch(r"out\.data\.(\w+)(:lo|:hi)?", v)] if m}
-            in_context = set(data) if "out.data" in a.get("context", []) else {
-                c[9:] for c in a.get("context", []) if c.startswith("out.data.")}
-            free = set(a.get("free", []))
-            for f in sorted(free & set(data)):
-                if circuit and f not in in_context:
-                    err.append(f"{n}: free field {f} must be in the context, or a third party can replace it")
-            if shape == "create":
-                if circuit:
-                    for f, (_, _, d) in data.items():
-                        if "const" not in d and f not in pinned | statement | free:
-                            err.append(f"{n}: field {f} is neither proven, pinned nor declared free at creation"
-                                       + (" (only the context covers it: the prover can set it to anything)" if f in in_context else ""))
-                lock_rule = self.cell.get("lock", {})
-                if not a.get("signer"):
-                    if "args" not in lock_rule and "out.lock_hash" not in atoms and "lock" not in free:
-                        err.append(f"{n}: the Lock of the created Cell is bound nowhere and not declared free")
-                    if "out.capacity" not in atoms and "capacity" not in free:
-                        err.append(f"{n}: the capacity of the created Cell is bound nowhere and not declared free")
-            if shape == "update":
-                bound = pinned | statement | (free & in_context if circuit else free)
-                for e in a.get("effects", []):
-                    for v in e.values():
-                        m = re.fullmatch(r"out\.data\.(\w+)", v) if isinstance(v, str) else None
-                        if m:
-                            bound.add(m.group(1))
-                changed = {c[5:] for c in a.get("change", []) if c.startswith("data.")}
-                for f in sorted(changed - set(data)):
-                    err.append(f"{n}: change names unknown field {f}")
-                for f in sorted(changed & set(data)):
-                    if f not in bound:
-                        err.append(f"{n}: field {f} may change but is neither proven, pinned, an effect target nor declared free"
-                                   + (" (only the context covers it: the prover can set it to anything)" if f in in_context else ""))
-                for f in a.get("change", []):
-                    if f in ("capacity", "lock"):
-                        key = "out.capacity" if f == "capacity" else "out.lock_hash"
-                        if key not in atoms and not any(e.get("op", "").startswith("capacity") for e in a.get("effects", [])) \
-                                and f not in a.get("free", []):
-                            err.append(f"{n}: {f} may change but is bound nowhere")
+            if has_out:
+                err += self.constraints(a, n, shape, circuit, data)
             names = list(a.get("outputs", {}))
             if len(names) != len(set(names)):
                 err.append(f"{n}: duplicate named output")
@@ -252,6 +238,104 @@ class Spec:
             warn.append("generator version 2 will not generate this spec: shared mode or effects in "
                         + ", ".join(gated) + " (specified, gated on R2)")
         return err, warn
+
+    def constraints(self, a, n, shape, circuit, data):
+        """One analysis for every property of the successor Cell: each data field, the Lock
+        and the capacity. A property that the action lets differ from the consumed Cell
+        (every property, on creation) must be exactly one of:
+
+          proven    a statement public input of the action's circuit, in full
+          pinned    fixed by the Lock rule, or by an equality check whose other side is a
+                    constant or is itself anchored (see `anchored`)
+          effect    the target of a script-side effect
+          signed    covered by a Lock declared to sign the whole transaction
+          free      declared as the prover's or creator's choice; with a proof it must be
+                    committed in the context, or a third party could replace it
+
+        Being in the context digest alone is none of these: it commits the prover's choice
+        without constraining it.
+        """
+        err = []
+        props = {f"data.{f}": d for f, (_, _, d) in data.items()}
+        every = set(props) | {"lock", "capacity"}
+        label = lambda p: {"lock": "the Lock", "capacity": "the capacity"}.get(p, f"field {p[5:]}")
+        source = lambda p: {"lock": "out.lock_hash", "capacity": "out.capacity"}.get(p, "out." + p)
+        free = {("data." + x if x in data else x) for x in a.get("free", [])}
+        for x in sorted(free - every):
+            err.append(f"{n}: free names unknown property {x}")
+        changed = every if shape == "create" else set(a.get("change", []))
+        for x in sorted(changed - every):
+            err.append(f"{n}: change names unknown property {x}")
+        changed &= every
+        ctx = a.get("context", []) if circuit else []
+        pubs = list(a.get("public", {}).values()) if circuit else []
+        committed = lambda p: source(p) in ctx or (p.startswith("data.") and "out.data" in ctx)
+        lock_rule = self.cell.get("lock", {})
+
+        def wide(p):  # 32 bytes that are not one field element: two public inputs
+            return p == "lock" or (p in props and props[p]["type"] in ("bytes32", "type_id"))
+
+        how = {}
+        for p in sorted(changed):
+            s = source(p)
+            if p in props and "const" in props[p]:
+                how[p] = "constant"
+            elif p in props and props[p].get("count", 1) > 1:
+                pass  # arrays cannot be statement inputs; effects below
+            elif wide(p):
+                halves = (s + ":lo" in pubs, s + ":hi" in pubs)
+                if all(halves):
+                    how[p] = "proven"
+                elif any(halves):
+                    err.append(f"{n}: only one half of {label(p)} is a public input; both are needed")
+            elif s in pubs:
+                how[p] = "proven"
+            if p not in how and p == "lock" and "code_hash" in lock_rule and "args" in lock_rule:
+                how[p] = "pinned by the Lock rule"
+            if p not in how and p == "capacity" and any(e.get("op", "").startswith("capacity") for e in a.get("effects", [])):
+                how[p] = "effect"
+            if p not in how and any(s in e.values() for e in a.get("effects", [])):
+                how[p] = "effect"
+
+        def prop_of(src):
+            return {"out.lock_hash": "lock", "out.capacity": "capacity"}.get(src, src[4:] if src.startswith("out.data.") else None)
+
+        def anchored(src):
+            """A value no party to this transaction chooses: chain state the action consumes,
+            script args, constants and pins; or a successor property that is itself
+            unchanged or already constrained. Witness values, free values, helper data and
+            other outputs are not anchored."""
+            if src.startswith(("in.", "args.", "const:", "zero", "pin:")) or src in ("network", "profile", "script_hash"):
+                return True
+            q = prop_of(src)
+            return q is not None and (q not in changed or q in how)
+
+        equalities = [(prop_of(r.get("left", "")), r) for r in a.get("require", []) if r.get("op") == "eq"]
+        progress = True
+        while progress:  # an equality pins its left side once its right side is anchored
+            progress = False
+            for q, r in equalities:
+                if q in changed and q not in how and ("const" in r or anchored(r.get("right", ""))):
+                    how[q], progress = "pinned", True
+        signed = a.get("signer") == "out.lock_hash" and "code_hash" in lock_rule and lock_rule.get("signs") == "transaction"
+        if a.get("signer") and not signed and not circuit:
+            err.append(f"{n}: signer gives no exemption: it must be out.lock_hash under a Lock rule that pins the code "
+                       f"and declares signs = \"transaction\"")
+        for p in sorted(changed - set(how)):
+            dangling = [r["right"] for q, r in equalities if q == p and "right" in r]
+            if signed:
+                continue
+            if p in free:
+                if circuit and not committed(p):
+                    err.append(f"{n}: free {label(p)} must be in the context, or a third party can replace it")
+                elif not circuit and shape != "create":
+                    err.append(f"{n}: free {label(p)} in a proof-less {shape}: anyone could set it")
+            elif dangling:
+                err.append(f"{n}: {label(p)} is set equal to {dangling[0]}, which is itself not anchored")
+            else:
+                err.append(f"{n}: {label(p)} may differ but is neither proven, pinned, an effect target nor declared free"
+                           + (" (only the context covers it: the prover can set it to anything)" if committed(p) else ""))
+        return err
 
     @staticmethod
     def width(atom, data, args):
@@ -444,7 +528,7 @@ class Run:
             raise Reject("ARGS")
         if script["hash_type"] != s.b.get("hash_type", "data1"):
             raise Reject("ARGS")
-        if max(len(t.inputs), len(t.outputs), len(t.deps)) >= MAX_CELLS:
+        if max(len(t.inputs), len(t.outputs), len(t.deps)) > MAX_CELLS:  # the scripts accept 64 and refuse the 65th
             raise Reject("LIMIT")
         ins = [(i, c) for i, c in enumerate(t.inputs) if same_code(c["output"]["type"], script)]
         outs = [(i, c) for i, c in enumerate(t.outputs) if same_code(c["output"]["type"], script)]
@@ -492,7 +576,8 @@ class Run:
                 raise Reject("REQUIRE")
         if action.get("signer"):
             want = self.atom(action["signer"], env)
-            if not any(script_hash(c["output"]["lock"]) == want for c in t.inputs):
+            # the first input, as the deployed counter does: the input that fixes the Type ID
+            if not t.inputs or script_hash(t.inputs[0]["output"]["lock"]) != want:
                 raise Reject("OWNER")
         if not action.get("circuit"):
             return "ACCEPT"

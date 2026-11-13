@@ -27,8 +27,8 @@ The format captures those decisions, and the ones a game, a ballot box and a not
 | # | Test a third party can run | State |
 | --- | --- | --- |
 | D1 | Five specs (counter, tally, Battleship, ballot box, shielded pool) pass the linter | Passed (spike) |
-| D2 | A reader of the counter and tally specs gives the verdict and error code of the hand-written scripts on every recorded CKB-VM case | Passed short of the pairing: 49/49 and 48/48 (spike) |
-| D3 | The linter refuses a list of unsafe specs, each for a named reason | 12 of 12 (spike) |
+| D2 | A reader of the counter and tally specs reaches the result of the hand-written scripts on the recorded CKB-VM cases, up to the pairing | Pre-pairing agreement on the recorded subset: 49/49 and 48/48 (spike). An accepted proof and a pairing failure are not told apart, and `v1`, `since`, effects and named outputs have no recorded cases |
+| D3 | The linter refuses a list of unsafe specs, each for a named reason | 29 of 29, each for the expected reason (spike) |
 | D4 | The generated tally and counter scripts accept the recorded proofs with a byte-identical public vector, and reject the recorded rejections | Not built (milestone M2) |
 | D5 | The generated matrix contains every operator of section 8 and every source mutation is detected | Not built (M3) |
 | D6 | Battleship, generated from its spec, plays a full game on a local chain | Not built (M5) |
@@ -86,9 +86,13 @@ Complete specs for the five applications:
 3. **Fixed width everywhere.** Cell data, args and every context item have a fixed length.
 4. **Unchanged unless declared, and declared means constrained.** On an update the Lock,
    the capacity and every data field must be equal before and after unless listed under
-   `change`. A listed field must be a statement public input, pinned by an equality check,
-   the target of an effect, or declared `free`. Being in the context is not enough: the
-   context stops a third party from altering a value, but the prover chooses it.
+   `change`; on creation all of them count as changed. One analysis covers data fields, the
+   Lock and the capacity alike. Each changed property must be exactly one of: *proven* (a
+   statement public input, in full: both halves of a 32-byte value); *pinned* (by the Lock
+   rule, or by an equality check whose other side is a constant or is itself anchored,
+   section 3.4); the target of an effect; or declared `free` and, when the action has a
+   proof, committed in the context. Being in the context is not a constraint: it stops a
+   third party from altering a value, but the prover chooses it.
 5. **One spec, one script, one kind of Cell, one application Cell per transaction.**
 6. **The generator fails closed.** A spec the linter refuses produces no script.
 7. **Shared mode follows single-writer mode.** The generator is built for single-writer
@@ -169,10 +173,10 @@ A 32-byte source used as a public input takes two public inputs, `<source>:lo` a
 | `shape` | Number of application Cells consumed and created. Cells with the same code but other args count too, so two instances never share a transaction |
 | `change` | The only parts allowed to differ between input and successor |
 | `require = [...]` | The declarative checks, below |
-| `free = [...]` | Values the creator or prover chooses. With a proof they must be in the context |
-| `signer = <32-byte source>` | Some input of the transaction has this Lock hash |
+| `free = [...]` | Data fields, `lock` or `capacity` that the creator or prover chooses. With a proof each must be in the context |
+| `signer = "out.lock_hash"` | Input 0 of the transaction has the successor's Lock hash (input 0 is the input the Type ID is derived from; the deployed counter checks the same input). It exempts a proof-less creation from rule 4 only under a Lock rule that pins the Lock's code and declares `signs = "transaction"`, see below |
 | `since = { kind, min }` | The consumed Cell's `since` is of this kind and at least `min`; consensus enforces the wait (RFC 0017) |
-| `outputs = { name = {...} }` | A further output with these properties must exist (a payout); two named outputs may not be the same output |
+| `outputs = { name = {...} }` | A further output with these properties must exist (a payout); two named outputs may not be the same output. Decided after review, not in the spike: a named output must have no Type and empty data unless the spec states `type_hash` and `data_hash`, because a Type can restrict spending of an output whose Lock is right (RFC 0022: Lock and Type run independently) |
 | `circuit`, `proof`, `public`, `context` | The proof, where it sits, and the two channels |
 | `shared`, `effects` | Shared mode; specified, not generated in version 2 |
 
@@ -186,9 +190,22 @@ require = [
 ]
 ```
 
-An `eq` check on a successor field pins it. Ordering checks do not pin a field and are not
-allowed on hashes or field elements. There is no arithmetic and no conditional: anything
-beyond these three forms is a circuit rule.
+An `eq` check pins a successor property only when its other side is *anchored*: a constant;
+a value of the consumed Cell, the args or a compiled pin; or another successor property that
+is unchanged or already proven, pinned or an effect target. An equality with a witness
+value, a `free` property or a second unpinned property pins nothing, and the linter refuses
+the spec (two fields set equal to each other and to nothing else are the simplest case).
+Ordering checks do not pin a field and are not allowed on hashes or field elements. There is
+no arithmetic and no conditional: anything beyond these three forms is a circuit rule.
+
+`signer` and what it does not prove. A matching Lock hash on an input shows that the Lock
+script ran; what its witness covers is the Lock's own business (RFC 0022). The format
+therefore accepts `signer` as a reason to leave a creation's data, Lock and capacity
+otherwise unconstrained only when the Lock rule pins the Lock's code and carries
+`signs = "transaction"`. That key is the spec author's statement that the pinned code
+checks a signature over the transaction hash, as secp256k1-blake160 sighash-all does; the
+linter cannot verify it and the build output prints it as an assumption. Without it the
+creation needs explicit constraints like any other action.
 
 ### 3.5 Selecting the action, and the payload envelope
 
@@ -211,6 +228,11 @@ application output's index on creation. Taking the action byte from the witness 
 because the same byte is in the context: a proof made for one action fails the public
 vector comparison under another, and an action without a proof is fully decided by its
 checks. Shared mode adds an `aux` field in a later envelope version.
+
+Size (computed from the schema, checked by the external review): the table costs 16 bytes of
+header, 1 action byte and two 4-byte length prefixes, so a `v1` payload is 25 bytes plus
+one byte per named output longer than the bare payload. An earlier version of this document
+said 12.
 
 ### 3.6 The context digest, and what "bound" means
 
@@ -298,13 +320,20 @@ A spec is refused when:
 1. a circuit's `public` list differs from the compiled Noir ABI, or an action's map does not cover it exactly;
 2. a context lacks a tag, a mandatory item or a freshness anchor;
 3. a source does not exist for the action's shape or placement;
-4. a changed field is neither proven, pinned, an effect target nor declared `free` (context alone is refused, with that reason);
-5. a `free` field of a proven action is missing from the context;
-6. at creation a data field, the Lock or the capacity is bound nowhere and not declared `free`;
+4. a changed data field, a changed Lock or a changed capacity (all of them, at creation) is neither proven, pinned, an effect target nor declared `free`; context alone is refused, with that reason; an equality whose other side is not anchored is refused, with that reason; one half of a 32-byte value as a public input is refused;
+5. a `free` data field, Lock or capacity of a proven action is missing from the context;
+6. `signer` is used as an exemption without a Lock rule that pins the code and declares `signs = "transaction"`, or is not `out.lock_hash`;
 7. a `witness` public input is used nowhere;
 8. a check is not one of the three forms, compares different widths, or orders a hash;
 9. a `shared` action's proof reads anything another user's action can change;
-10. `envelope = "bare"` is used with two actions of one shape; action ids repeat; two named outputs could coincide.
+10. `envelope = "bare"` is used with two actions of one shape; action ids repeat; two named outputs could coincide;
+11. a circuit has more than 16 public inputs; a field count is not a positive integer; `envelope`, `hash_type`, `verifier`, the proof location or a `since` kind is outside its closed list; a `signer` or `since` source does not exist;
+12. `verifier = "spawn"` is used without `hash_type = "data2"`.
+
+The spike linter is still a Python program over a parsed TOML dictionary. The generator
+needs a closed, typed schema that rejects unknown keys before any of these rules run
+(milestone M2); until then "lints" means "passed these rules", not "has a defined meaning
+for every key".
 
 ### 3.11 The five applications
 
@@ -326,15 +355,29 @@ draft needed with constants only.
 
 Command: `research/spikes/toolkit-architecture/run.sh`.
 
-- Reader against recorded CKB-VM results: tally 49/49 (ceremony-key run) and 49/49
-  (development-key run); counter 48/48, two of them rejected by the secp256k1 Lock, which
-  is outside the spec. Same error code wherever the hand-written script rejected before
-  the pairing. The pairing itself was not evaluated.
+- Reader against recorded CKB-VM results, pre-pairing agreement on the recorded subset:
+  tally 49/49 (ceremony-key run) and 49/49 (development-key run); counter 48/48, two of
+  them rejected by the secp256k1 Lock, which is outside the spec. Same error code wherever
+  the hand-written script rejected before the pairing. The pairing was not evaluated, so a
+  recorded acceptance and a recorded error 51 both count as agreement. This shows that the
+  format can state the two deployed rule sets; it does not show that generated Rust would
+  be correct, and it says nothing about `v1`, `since`, effects or named outputs.
 - Weakened tally specs disagreed with the record (13, 2 and 38 mismatches).
-- Twelve unsafe spec edits were each refused. Three of them were not refused by the first
-  linter and led to rules 4, 5 and 6: a joiner able to rewrite the opponent's fields
-  because only the context covered them; a free field outside the context; a creation
-  whose Lock and capacity nobody stated.
+- 29 unsafe or malformed spec edits were each refused, and each for the expected reason
+  (the test fails if a spec is refused for another reason). Three were not refused by the
+  first linter: a joiner able to rewrite the opponent's fields because only the context
+  covered them; a free field outside the context; a creation whose Lock and capacity nobody
+  stated. The external review (section 13) then found that the fix had been applied to data
+  fields only. Before the correction of 11 November 2026 the linter accepted a changed Lock
+  or capacity that was merely mentioned in the context, a free Lock or capacity outside the
+  context, an equality with an unconstrained field, one half of a hash as a proof of the
+  whole, and a `signer` under any Lock. Seventeen cases were added for these.
+- Three of the five specs failed the corrected linter and were changed. The tally creation
+  and Battleship `open` left the capacity to the creator with only the context naming it:
+  both now declare `free = ["capacity"]`, which is what the deployed tally does. The counter
+  creation relied on `signer` under a Lock rule that did not say what the Lock signs: its
+  Lock rule now carries `signs = "transaction"`. None of the three changes alters what a
+  script would check; they make an existing choice explicit.
 
 ### 3.13 What held and what broke
 
@@ -345,6 +388,7 @@ Command: `research/spikes/toolkit-architecture/run.sh`.
 | OutPoint binding suits every application | **Broke** for shared Cells (3.8). |
 | Being in the context digest constrains a value | **Broke.** It only fixes the prover's choice. Found by a negative test on Battleship `join`. |
 | Every context item is tested by the existing matrices | **Broke.** `out.lock_hash` and `out.capacity` on update are shadowed by an earlier check; no transaction can make the digest decide (operator S1). |
+| The linter rules for "pinned", "bound" and `signer` were complete | **Broke** in external review (section 13, findings 1, 2, 5): the rules were syntactic and covered data fields only. |
 | The 512-byte buffers are general | **Broke**: 6 public inputs at most (section 4). |
 | "About 117M cycles regardless of circuit size" | **Broke as stated** (section 2): 96M to 186M depending on the public inputs. |
 | A deadline can close a vote | **Broke** (3.8). |
@@ -364,9 +408,12 @@ Command: `research/spikes/toolkit-architecture/run.sh`.
 **Where the limit is.** Both scripts read the witness and the key into stack arrays:
 `let mut buf = [0u8; 512]` in `proof_payload` (tally) or `run` (counter), and
 `let mut vk_buf = [0u8; 512]` in `run`. A longer witness returns error 48, a longer key
-error 50. With 302 + 32n key bytes the key buffer allows n ≤ 6; with 182 + 32n witness
-bytes the witness buffer allows n ≤ 10, less if the same witness carries a signature
-(computed). Both deployed applications use n = 4. Battleship's `turn` uses 10.
+error 50. With 302 + 32n key bytes the key buffer allows n ≤ 6. A bare `WitnessArgs` with
+nothing else in it is 182 + 32n bytes, so the witness buffer allows n ≤ 10; with the `v1`
+envelope it is 207 + 32n plus one byte per named output, which allows n ≤ 9 (527 bytes at
+n = 10, 719 at n = 16; computed, confirmed by the review's `check_sizes.py`). Anything else
+in the same `WitnessArgs`, such as a Lock signature of 65 bytes plus its 4-byte prefix,
+comes on top. Both deployed applications use n = 4. Battleship's `turn` uses 10.
 
 **What raising it costs.**
 
@@ -388,14 +435,21 @@ bytes the witness buffer allows n ≤ 10, less if the same witness carries a sig
 | C. Hash the statement values into one digest in the script | Needs a circuit-friendly hash in CKB-VM; cost unknown until R2 | Not in version 2 |
 | D. Move bind-only facts to the context | Free: the context is two 128-bit inputs however many facts it holds | Already rule 3.1.2 |
 
-**Decision.** The generator computes both buffer sizes from the spec and refuses n > 16.
+**Decision.** The generator computes the key buffer from n and the witness buffer from the
+Molecule schema (n, the envelope and the named outputs) plus a declared allowance for the
+other `WitnessArgs` fields (`limits.witness_other`, default 0 for a Type under a guard
+Lock; a co-located Lock signature must be declared). It refuses n > 16.
 At 16 full-width inputs verification measured 141M cycles on Rust 1.97.0; 16 is a
 budget line, not a technical limit, and R3 may move it. Statement inputs should be
 integers wherever the application allows, and a spec's cycle estimate is printed by
 `noir-ckb build` from the declared types.
 
 Acceptance test: a generated script for a 10-input and a 16-input circuit accepts a valid
-proof; the same scripts built with the buffers forced to 512 bytes reject with 50.
+proof. The same scripts built with both buffers forced to 512 bytes reject: with 48 at
+witness loading wherever the witness exceeds 512 bytes (every `v1` witness from n = 10,
+every witness at n = 16), and with 50 at key loading where only the key does (bare
+envelope, n = 7 to 10). An earlier version of this test expected 50 in every case; the
+witness is loaded first.
 
 ## 5. Prior art
 
@@ -452,15 +506,39 @@ needs a proof-gated Lock should use zk-Lock.
 | Application script size | 113,464 bytes (tally, pinned) | about 41,800 bytes (estimate: tally minus the measured linked/thin difference of 71,672) |
 | Capacity locked per application | about 113,500 CKB | about 41,900 CKB, plus one shared 103,560-byte verifier for all applications (estimate) |
 | Cycles | baseline | +144,900 (0.13%) (spike, pinned) |
-| Needs | `data1` or later | `data2` |
+| Needs | `data1` or later | `data2`. The same code under `data2` has another script hash than under `data1`: Cells of the deployed `data1` applications cannot move to it without a migration |
 | Audit surface per application | binding code + pairing code | binding code only; the verifier binary is the same for all |
 | Risk | none new | measured in ckb-testtool only, not on a node; the child must verify the same bytes the parent compared |
 
-**Chosen: spawned, with linked kept as a build option** (`verifier = "spawn" | "linked"`
-under `[binding]`, default `spawn`). The child reads the same witness field and the same
-key dependency as the parent, both identified by the parent's pinned key hash, so there is
-no second copy of the proof that could differ. The placement spike was repeated on the
-pinned toolchain; the decision remains conditional on one testnet transaction (M1).
+**Chosen: spawned for new applications, linked for the two deployed ones**
+(`verifier = "spawn" | "linked"` under `[binding]`). `spawn` requires `hash_type = "data2"`
+and the linter refuses it otherwise; with `data1` the verifier is linked. The placement
+spike was repeated on the pinned toolchain; the decision remains conditional on one testnet
+transaction (M1).
+
+What the spike did and did not show. It measured the cost of spawning. Its parent decodes a
+bare payload and does not compare a public vector; parent and child both read group-input
+witness 0 and take `input_type` before `output_type`; the child takes the key hash from the
+first 32 bytes of the running script's args. None of that is the generator's interface:
+application args are a version and a Type ID, keys are compiled pins, creation reads
+`output_type` at the output's index, and `v1` wraps the proof. The interface below is
+specified and has not been run.
+
+Parent-to-child interface, version 1 (to be exercised end to end in M1):
+
+| Item | How it is passed | Why |
+| --- | --- | --- |
+| Verifier identity | The parent spawns the Cell dependency whose data hash equals its compiled `verifier` pin | Other code cannot be substituted without a hash collision |
+| Interface version | `argv[0] = "1"` | The child refuses a version it does not know |
+| Key | `argv[1]` = data hash of the key Cell (the parent's compiled `vk.<circuit>` pin for the selected action) | Several circuits per application |
+| Witness | `argv[2]` = source (`input` or `output`), `argv[3]` = absolute index in the transaction, `argv[4]` = `input_type` or `output_type` | Creation and update read different places; no "first group input" convention |
+| Envelope | `argv[5]` = `bare` or `v1`; under `v1` the child verifies the `proof` field of the `BindingPayload` | The child must verify the bytes the parent compared |
+| Result | Exit code 0, or 50 (key) or 51 (proof); the parent returns a non-zero exit code or a spawn error unchanged as a rejection | |
+
+The parent compares the reconstructed public vector with the payload's before it spawns;
+the child loads the same witness field again by the same absolute index, so both act on the
+same bytes of the same transaction. Tests M1 must contain: a child given another index, a
+child given another key hash, a verifier dependency with other code, and a creation.
 
 ## 7. Exact interfaces
 
@@ -519,7 +597,7 @@ Every case is derived from the spec; none is written by hand. Three families.
 | A13 shape: duplicate output, duplicate input, destruction where no action allows it | 42 | 3 |
 | A14 key dependency: missing, altered, duplicated | 50 | 3 |
 | A15 invalid proof | 51 | 1 |
-| A16 limits: 64 inputs, outputs, dependencies | 52 | 1 |
+| A16 limits: 65 inputs, outputs, dependencies rejected; exactly 64 accepted | 52, accept | 1 |
 | A17 each `require`: boundary value on each side | 53 | 0 (new) |
 | A18 `since`: one below the minimum, wrong kind | 56 | 0 (new) |
 | A19 named output: wrong Lock, wrong capacity, same index twice | 57 | 0 (new) |
@@ -538,6 +616,23 @@ least one case must change from reject to accept. S1 covers shadowed context ite
 the shadowing check removed, the case must now be rejected with 49 by the digest. A
 mutation that nothing detects fails `noir-ckb test`.
 
+**What the generated tests cannot show.** All three families are derived from the spec. A
+rule the application needs and the spec does not state is missing from the script, from the
+mutation targets and from the expected results at once, and every case passes. The
+generated matrix therefore tests that the script does what the spec says, not that the spec
+says enough. Two things are added for the second question and neither is generated:
+
+- *Application properties*, written by the developer in a separate file as statements over
+  whole transactions with an expected verdict ("nobody but the mover can change
+  `mover_board`", "a finished game pays exactly one output to the winner"). `noir-ckb test`
+  runs them against the generated script; a project without any prints a warning.
+- *Circuit relation tests.* For every statement public input the developer supplies at
+  least one assignment that violates the intended relation, with its own consistent public
+  vector and witness; proving must fail. An earlier version of this document proposed to
+  prove with two values and require the second proof to fail against the first vector.
+  That tests that the proof is bound to its public inputs, which Groth16 already
+  guarantees; it does not test that the circuit restricts the value.
+
 ## 9. Budgets
 
 | Item | Budget | Basis |
@@ -547,7 +642,7 @@ mutation that nothing detects fails `noir-ckb test`.
 | Spawn overhead | 0.15M cycles | spike, pinned |
 | Battleship `turn` (10 inputs: 1 field, 2 bitmaps, 5 bytes, 2 context halves) | about 107M cycles on Rust 1.97.0; 111M to 118M on the pinned build with the spread | estimate from the slopes |
 | Application script | 45,000 bytes or less with a spawned verifier | estimate; acceptance test in M1 |
-| Witness | 182 + 32n bytes plus 12 + (number of named outputs) for the envelope | computed |
+| Witness | Bare: 182 + 32n bytes. `v1`: 207 + 32n plus one byte per named output. Other `WitnessArgs` fields (a Lock signature) are extra and budgeted separately | computed from the Molecule schema |
 | `noir-ckb check` | under 1 second | target |
 
 ## 10. Pinned tools
@@ -565,10 +660,10 @@ Each step ends with a command whose output decides pass or fail.
 
 | # | Step | Acceptance test |
 | --- | --- | --- |
-| M1 | Shared verifier deployed once on testnet (placement confirmed on the pinned toolchain on 11 November 2026: 0.13% overhead) | One testnet transaction through a spawned verifier |
+| M1 | Shared verifier deployed once on testnet (placement confirmed on the pinned toolchain on 11 November 2026: 0.13% overhead) | One testnet transaction through a spawned verifier using the interface of section 6.3, plus the four interface tests listed there on a local chain |
 | M2 | Generator core: specs in, crate out, for `bare` envelope, proofs on create and update, `signer`, `require` | Generated tally and counter scripts give the recorded verdict and code on all 97 recorded cases (public vectors byte-identical); `diff` review against the hand-written files |
-| M3 | Generated tests: operators A1 to A16, F, S | For the tally and counter: generated matrix is a superset of the hand-written one by operator; every source mutation detected; a deliberately removed check in the generator template fails the run |
-| M4 | `v1` envelope, several circuits, `since`, named outputs, computed buffers, A17 to A19 | A 16-input test application passes its generated matrix; forced 512-byte buffers fail with 50 |
+| M3 | Generated tests: operators A1 to A16, F, S | For the tally and counter: generated matrix is a superset of the hand-written one by operator; every source mutation detected; a deliberately removed check in the generator template fails the run; application properties and circuit relation tests (section 8) run from their own files |
+| M4 | `v1` envelope, several circuits, `since`, named outputs, computed buffers, A17 to A19 | A 16-input test application passes its generated matrix; forced 512-byte buffers fail with 48 or 50 as section 4 states; named outputs enforce the Type and data policy |
 | M5 | Battleship from its spec (with R5) | A scripted full game, a timeout and a cancelled game on a local chain; generated matrix and mutations pass |
 | M6 | CLI and first-user path | A person who has not seen the repository follows one page from `noir-ckb new` to a testnet transaction; time recorded |
 | M7 | Shared mode and batching: the ballot box, the grant deliverable, with VoteSecure as first consumer | Ballot box spec generates; two voters' proofs made against the same state both land; a batch of 100 ballots is accepted in one transaction on a local chain; a second ballot with a used nullifier is rejected |
@@ -577,8 +672,8 @@ Each step ends with a command whose output decides pass or fail.
 
 | Risk | Consequence | Handling |
 | --- | --- | --- |
-| The linter is the trusted part: a missed rule yields a script that verifies proofs and binds too little | Silent loss of the main property | Negative spec corpus kept as a test (12 today); every reviewer finding becomes a case; the generated F and S families catch a missing check even when the linter is wrong |
-| The linter cannot see inside the circuit | A statement public input the circuit ignores is unconstrained (the Week 8 class of failure) | `noir-ckb test` proves with two different values for each statement input and requires the second proof to fail against the first vector; documented as a limit |
+| The linter is the trusted part: a missed rule yields a script that verifies proofs and binds too little | Silent loss of the main property | Negative spec corpus kept as a test (29 today, each checked for its reason); every reviewer finding becomes a case. The first external review found five holes the corpus had missed, so the corpus is evidence of the holes already found, not of their absence. The F and S families detect a check the generator dropped from a spec; they do not detect a rule the spec never stated (section 8) |
+| The linter cannot see inside the circuit | A statement public input the circuit ignores is unconstrained (the Week 8 class of failure) | Circuit relation tests supplied by the developer (section 8); documented as a limit: the toolkit cannot generate them |
 | The public-input slopes were measured off the pinned toolchain, and verification cost varies by up to 7M between binaries for an unknown reason | Budgets carry a range | Rerun `placement/run.sh` with the public-input part; investigate the spread before quoting cycle guarantees |
 | Spawn behaves differently on a node than in ckb-testtool | Fallback to linked: 113,500 CKB per application instead of about 41,900 | `verifier = "linked"` stays supported |
 | Relayer-open default surprises an integrator | A proof is replayed inside a transaction the user did not expect | Stated in 3.6; `tx_hash` opt-in; `check` prints which parts of the transaction are open |
@@ -590,11 +685,37 @@ Open: whether `noir-ckb new` should default to `tx_hash` for applications with a
 
 ## 13. External review
 
-Not done. An independent review was started and stopped before it reported. The findings and
-the responses to them belong here before the design is treated as final. The first thing
-to attack is the Type Script binding: sections 3.4 to 3.6 and 3.10, the Battleship spec,
-and whether any spec the linter accepts lets a prover or a third party change something
-the other party did not agree to.
+One review by an outside model, at commit `206df77`, covering this document, the spike and
+the five specs. It was a source and design review: finding 7 was reproduced by arithmetic,
+the rest were argued from the code and RFCs 0017, 0022 and 0050. No exploit transaction was
+built. Severities are the reviewer's and describe a generator built to the rules as they
+stood, not the deployed tally. All twelve findings were accepted; none was dismissed.
+
+| # | Severity | Finding | Response |
+| --- | --- | --- | --- |
+| 1 | High | The Lock and the capacity got a weaker analysis than data fields: being mentioned in any source, the context included, counted as bound, and the free-in-context rule covered data only | Accepted. Confirmed in `bindspec.py` (the separate Lock and capacity branches). Replaced by one analysis for all properties (rule 3.1.4, linter rules 4 and 5). Six new negative cases, all refused. Three supplied specs failed the corrected linter and were made explicit (section 3.12) |
+| 2 | High | "Pinned" and "proven" were syntactic: any equality pinned its left side, and one half of a 32-byte value marked the whole as proven | Accepted. An equality now pins only when its other side is anchored, resolved to a fixed point so chains work and cycles do not; both halves are required. Three new negative cases. Byte-level tracking inside a field was not added: a field is the unit, and a public input always covers a whole field or a declared half |
+| 3 | High | Battleship payouts fix a Lock hash and a capacity only. An output with the right Lock and a restrictive Type may be unspendable, and nothing stops the same output from also satisfying another script's obligation | Accepted. Format decision: a named output has no Type and empty data unless the spec states otherwise (section 3.4). Not implemented in the spike. Exclusivity against other scripts cannot be enforced by one script; it is recorded as an open item in `battleship.md` and as an application property to test |
+| 4 | High | Generated tests cannot find a rule the spec lacks; the proposed two-proof circuit test checked proof binding, not the circuit's relation | Accepted. Section 8 now says what the generated families do not show and adds developer-written application properties and circuit relation tests; the two-proof test and the sentence that F and S "catch a missing check even when the linter is wrong" were removed |
+| 5 | Medium | `signer` exempted a creation from the binding rules for any Lock; a matching Lock hash does not show that the Lock signs the outputs | Accepted. The exemption now needs `signer = "out.lock_hash"`, a Lock rule that pins the code, and a declared `signs = "transaction"` (rule 6). The declaration is an assumption the linter cannot check, and is printed as one. `signer` and `since` sources now go through the same source validation as the others. Two new negative cases |
+| 6 | Medium | The spawned-verifier interface was neither specified nor exercised by the spike; defaulting to spawn under `data1` is wrong | Accepted. Section 6.3 now states what the spike did not do and specifies the interface; M1 has to exercise it. `spawn` requires `data2` (rule 12, one negative case); the three draft specs for new applications say so and the two deployed profiles stay linked |
+| 7 | Medium | The envelope overhead is 25 bytes plus named outputs, not 12; a `v1` witness is 527 bytes at n = 10; sizing from n alone ignores other witness fields; the forced-512 test can fail with 48 before 50 | Accepted; the arithmetic was wrong. Sections 3.5, 4, 9 and M4 corrected |
+| 8 | Medium | The Battleship timeout is a competing action. After the wait both `turn` and `timeout` are valid; consensus does not prefer one (RFC 0017 gives a lower bound only) | Accepted. `battleship.md` no longer says a player who stops playing loses; it states the race and the monitoring assumption and adds a test for both orderings |
+| 9 | Medium | `open` sets `pending` to 255 and `join` keeps it; the `turn` circuit as described answers a shot on cells 0 to 99 and does not define 255 | Accepted. Recorded as an open item in `battleship.md` with the invariant to decide and three circuit tests. No circuit exists yet |
+| 10 | Medium | The linter did not enforce the 16-input ceiling, positive counts or the closed lists, and did not validate `signer` and `since` sources | Accepted. Rule 11 and five negative cases. A closed typed schema is M2 work and is stated as missing under section 3.10 |
+| 11 | Medium | "Verdict and error code on every recorded case" overstated a comparison that stops before the pairing; the reader's docstring claimed every rule | Accepted. D2, section 3.12, the spike README and the docstring now say "pre-pairing agreement on the recorded subset" and list what is not evaluated |
+| 12 | Low | The reader rejected at 64 Cells where the scripts accept 64 and reject the 65th; it accepted a signer at any input where the counter requires input 0 | Accepted. Confirmed against `count` in both scripts and `owned-counter/src/main.rs:115`. The reader now does both as the scripts do, the format defines `signer` as input 0, and operator A16 tests 64 and 65. Agreement stayed at 49/49 and 48/48, which confirms the reviewer's point that the recorded cases do not reach either boundary |
+
+The reviewer examined and reported no problem with: the tally's reconstruction of the public
+vector before verification; witness selection by position; Type ID as a creation anchor and
+the OutPoint as a consumption anchor; the domain separation given by script hash, action,
+network pin and OutPoint; the Battleship `turn` mapping accounting for every changed field
+(structure only, no circuit exists); verifier substitution under a fixed data hash; and the
+fixed-buffer paths rejecting oversized loads. These are the reviewer's statements within a
+review that ran no VM tests.
+
+Still unreviewed: the generator itself (it does not exist), the spawn interface in
+execution, and shared mode in execution.
 
 ## Sources
 

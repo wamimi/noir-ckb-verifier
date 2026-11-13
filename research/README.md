@@ -5,8 +5,10 @@ goal of the build: a developer takes their own Noir circuit to CKB testnet with 
 and gets a generated Type Script that binds each proof to **one exact state transition of
 one Cell**, with the tests that show it.
 
-**None of these documents has had an external review.** Each ends with the items a
-reviewer must examine. Spike numbers are from the pinned toolchain where marked "pinned";
+**External review so far:** R0 and R3 were each reviewed once by an outside model on
+11 November 2026; the findings (12 and 7, all accepted) and the responses are in R0
+section 13 and R3 section 12, and R5 lists the three Battleship items that stay open. R1,
+R2 and R4 have not been reviewed; each ends with the items a reviewer must examine. Spike numbers are from the pinned toolchain where marked "pinned";
 the rest are from Rust 1.97.0 and are marked.
 
 | Topic | Document | Spike (command in its README) |
@@ -25,10 +27,12 @@ the rest are from Rust 1.97.0 and are marked.
 | --- | --- | --- |
 | 1 | The claim is "one exact state transition of one Cell". Whole-transaction binding is an opt-in context item (`tx_hash`) | R0 3.6 |
 | 2 | Noir is the rule language. No Rust hooks. Proof-less actions get three declarative checks: equality with a constant, comparison with a constant, field from field | R0 3.1, 3.4 |
-| 3 | Changed fields must be proven, pinned, an effect target or declared free. Being in the context digest is not enough | R0 3.1, 3.10 |
+| 3 | Every changed property of the Cell (data field, Lock, capacity) must be proven, pinned by an anchored equality or the Lock rule, an effect target, or declared free and committed in the context. Being in the context digest is not enough. Widened from data fields to all properties after the external review | R0 3.1, 3.10, 13 |
 | 4 | The generator emits Rust source per application, Type Scripts only; Lock use cases go to zk-Lock | R0 6.1, 6.2 |
-| 5 | The verifier is spawned from a shared Cell by default; linked stays as a build option | R0 6.3 |
-| 6 | Buffers are sized from the spec; at most 16 public inputs | R0 4 |
+| 5 | New applications spawn the verifier from a shared Cell and are deployed under `data2`; the two deployed `data1` applications stay linked. The parent-to-child interface is specified and not yet run | R0 6.3 |
+| 6 | Buffers are sized from the Molecule schema plus a declared allowance for other witness fields; at most 16 public inputs | R0 4 |
+| 13 | `signer` exempts a creation from the binding rules only under a Lock rule that pins the code and declares that it signs the transaction. Named payout outputs have no Type and empty data unless the spec says otherwise | R0 3.4, 13 |
+| 14 | Generated tests show that a script does what its spec says. Whether the spec says enough is tested by developer-written application properties and circuit relation tests, which the toolkit runs and cannot generate | R0 8 |
 | 7 | Noir 1.0: add a decoder to the backend and keep its runtime; pin one release | R1 4 |
 | 8 | Shared state: one Cell with relayer batching, over sharding and over a Cell per note | R2 4 |
 | 9 | Many proofs: one randomized batch check per script run | R3 4 |
@@ -40,7 +44,8 @@ the rest are from Rust 1.97.0 and are marked.
 
 | Quantity | Value | Toolchain |
 | --- | --- | --- |
-| Spec reader against recorded CKB-VM cases | tally 49/49 (two runs), counter 48/48; 12/12 unsafe specs refused | n/a |
+| Spec reader against recorded CKB-VM cases, pre-pairing agreement on the recorded subset | tally 49/49 (two runs), counter 48/48 | n/a |
+| Unsafe or malformed specs refused by the linter for the expected reason | 29 of 29; the external review found five holes the first 12 cases had missed | n/a |
 | One verification, `groth16-ckb` benchmark, 1 / 64 public inputs | 99.8M / 118.5M cycles | pinned |
 | The same with single-product verification | 79.2M / 97.8M (20.66M saved) | pinned |
 | Recorded tally update, whole transaction | 115.6M | pinned |
@@ -48,7 +53,9 @@ the rest are from Rust 1.97.0 and are marked.
 | Cost of one more public input, small / full-width value | 0.28M / 2.82M | 1.97.0 |
 | Spawned verifier against linked | +144,943 cycles (0.13%); thin script 31,888 bytes against 103,560 | pinned |
 | Fee inputs left open | recorded proof accepted with another payer and with extra inputs; successor change rejected | pinned |
-| Batch verification | 79M + 19.9M per proof; 172 proofs in one block; 30 one by one | pinned |
+| Batch verification | 79M + 19.9M per proof; 172 repeated proof checks under 3.5B cycles in a script-only VM fixture (173 and 174 not run); 30 one by one | pinned, script before the review changes |
+| Batch rejection | 18 size-sweep rejections with exit code 51 after an accepted control; 39 of 39 adversarial cases as expected | 1.97.0, after the review |
+| `v1` envelope overhead | 25 bytes plus one per named output (an earlier figure of 12 was wrong); a `v1` witness is 527 bytes at 10 public inputs | computed |
 | Nullifier absent-then-insert, script side | 0.93M to 1.28M cycles | pinned |
 | Poseidon2 permutation, script side | 412,000 cycles | pinned |
 | Tree append, depth 20, one leaf / 64 leaves | 8.27M / 0.54M per leaf | pinned |
@@ -63,9 +70,9 @@ the rest are from Rust 1.97.0 and are marked.
 | Target | Result |
 | --- | --- |
 | Noir circuit to testnet in 15 minutes | Not measurable yet: the tool is not built. It is the acceptance test of milestone 7 |
-| 100+ proof checks per block | 172 for verification alone (pinned). About 160 complete ballots per block is an estimate from measured parts, not an end-to-end run |
+| 100+ proof checks per block | 172 repeated proof checks in a script-only VM fixture (pinned), not a relayable transaction. Complete ballots per block are not measured: 160 is the upper bound of a model that leaves 281,250 cycles per ballot for everything it omits; 100 leaves 14.3M per ballot and is the planning figure |
 | Browser proof under 10 s | Met for the tally on every device. A vote-sized proof on the entry-level phone is estimated at 9 to 10 s and is not measured |
-| Generated scripts pass an adversarial matrix nobody wrote by hand | Not built. The operators are defined and reproduce all 49 hand-written tally cases; the linter refused 12 unsafe specs, 3 of which earlier versions accepted |
+| Generated scripts pass an adversarial matrix nobody wrote by hand | Not built. The operators are defined and reproduce all 49 hand-written tally cases; the linter refused 29 unsafe specs, of which earlier versions accepted 3 and the version before the external review accepted further ones |
 
 ## Beliefs tested
 
@@ -80,15 +87,18 @@ the rest are from Rust 1.97.0 and are marked.
 
 | Risk | State |
 | --- | --- |
-| No external review of any design; the linter is the trusted part of the generator | Review prompts prepared; findings to be recorded in each document's last section |
+| The linter is the trusted part of the generator, and the first external review found five holes in it that its own negative tests had missed | R0 and R3 reviewed and corrected (R0 section 13, R3 section 12); R1, R2 and R4 not yet reviewed. The corrected linter has not been reviewed again |
+| A spec can lack a rule the application needs; generated tests cannot see that | Application properties and circuit relation tests written by the developer (R0 section 8); a limit of the approach, not a solved problem |
+| Battleship: payout exclusivity, the timeout as a race, and the first-turn sentinel are undecided | Open items in R5 |
 | The note scheme and the script-side Poseidon2 port are unreviewed drafts; the port was checked against one vector | Required milestones in R2; not needed for the ballot box's nullifier set, needed for the pool |
-| Batch soundness rests on a challenge derivation written in a spike | Spelled out with line numbers in R3 section 12 |
-| Relayers can be made to waste work by invalid or conflicting submissions | Rule written in R3 section 12; not built |
+| Batch soundness rests on a challenge derivation written in a spike | Reviewed without a finding on the equation, transcript or chunking; key validation and a bound on N were missing and were added. Soundness is about Q/2^128 for a prover who tries Q candidate batches |
+| The batch script changed after the pinned measurements | Rerun `spikes/throughput/run.sh` on the pinned toolchain |
+| Relayers can be made to waste work by invalid or conflicting submissions, and a batch can fail with every proof valid when the shared Cell was spent first | Rule rewritten in R3 section 12 with a failure classification; not built |
 | Shared mode, batching and effects exist only as specifications and spikes | Milestone 5 |
 | Vote-sized proving on low-end phones is at the edge of the target | Measure before claiming; fallbacks listed in R4 |
 | The same proof costs 108.5M to 115.6M cycles in different binaries for an unknown reason | Budgets carry a range |
 | Noir 1.0.0 final did not exist; results are for release candidates | Repeat R1's spike on the final release |
-| Spawned verifier measured in ckb-testtool only | One testnet transaction in milestone 2 |
+| Spawned verifier measured in ckb-testtool only, with a spike interface that is not the generator's | One testnet transaction and four interface tests in milestone 2 |
 
 ## Grant milestone plan
 
@@ -101,7 +111,7 @@ the judge's machine, as `try-the-counter` does today.
 | 2 | **Cheaper verification.** Single-product verifier and a shared spawned verifier on testnet | A testnet explorer link to a transaction verified through the shared verifier; `placement/run.sh` reproduces the cycle table locally | R0 M1, R3 T2 |
 | 3 | **Noir 1.0.** One named release supported next to beta.18 | `noir-ckb build` on a 1.0 copy of the tally prints the ceremony's R1CS hash; its proof is accepted by the tally already deployed on testnet | R1 N1 to N4 |
 | 4 | **Battleship.** Generated from its spec | Two browser windows play a full game on testnet; a second game is abandoned and the timeout pays the opponent | R0 M4, M5; R5 |
-| 5 | **Ballot box.** Shared mode, effects and batch verification in the generator | Local: one command casts 100 ballots in one transaction, then shows a second vote with a used nullifier rejected and two ballots proved against the same state both landing. Testnet: the judge is added to a voter list and votes | R0 M7; R2 S1 to S3; R3 T3 to T5 |
+| 5 | **Ballot box.** Shared mode, effects and batch verification in the generator | Local: one command casts 100 ballots in one transaction, then shows a second vote with a used nullifier rejected and two ballots proved against the same state both landing; the cycles per complete ballot are printed. Testnet: the judge is added to a voter list and votes | R0 M7; R2 S1 to S3; R3 T3 to T5 |
 | 6 | **Vote from a phone.** Browser proving with no wallet, through a relayer | The judge opens a page on their phone, votes in the testnet election, and sees the proof time and the transaction | R4 B1 to B3 |
 | 7 | **First-user path.** `noir-ckb new`, `check`, `build`, `test`, `prove`, `deploy`, one page of documentation | The judge follows the page with their own small circuit from `noir-ckb new` to a testnet transaction, with a timer; target 15 minutes | all above |
 | 8 | **Review.** Findings from an outside reviewer on the binding and the batch check, each with a response and a regression test | The findings document; `noir-ckb test` includes the regression cases | 1, 5 |

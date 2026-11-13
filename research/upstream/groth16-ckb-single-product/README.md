@@ -77,7 +77,7 @@ On the patched tree, on the pinned toolchain (11 November 2026):
 | `host` unit tests | 3 passed |
 | `host/tests/differential.rs` (agreement with `ark_groth16`, bit flips in proof, key and inputs) | 26 passed; the ignored 1,000-sample variant also passed with `--ignored` |
 | `host/tests/properties.rs` | 2 passed |
-| `host/tests/single_product.rs` (new) | 4 passed |
+| `host/tests/single_product.rs` (new) | 4 passed. Two tests were added afterwards (see below); all 6 passed on Rust 1.97.0 and the 2 new ones have not been run on the pinned toolchain |
 | `integration-tests/tests/verify.rs` (CKB-VM, script built with `scripts/build-ckb-script.sh`) | 8 passed |
 | `integration-tests/tests/cycles.rs` | passed; table above |
 
@@ -89,7 +89,21 @@ requires the same verdict in each case:
 - public input 0, 1, and a witness of −1;
 - 2, 4 and 16 public inputs, each input altered on its own, and two inputs exchanged;
 - proofs for neighbouring equations that a sign error would accept: A negated, C negated,
-  both negated, A and C exchanged; a valid proof under another key; a key with α negated.
+  both negated, A and C exchanged; a valid proof under another key; a key with α negated;
+- X equal to the identity (added after an external review pointed out that random inputs
+  never produce it). The key and proof are built from known scalars instead of a circuit:
+  IC₁ = t·G1 and IC₀ = −x·IC₁, so every key and proof point is a non-identity point and
+  X = IC₀ + x·IC₁ is the identity. Both verifiers accept it; another public input, a proof
+  made for another X and a negated C are rejected. Ten random instances;
+- a key with only the constant IC entry and an empty public-input vector, which is not the
+  same case as one public input of value zero: accepted when valid, rejected with a
+  negated C, with a proof for another X, and when one public input is supplied. Ten random
+  instances.
+
+The last two fixtures satisfy the verification equation by construction and are not proofs
+of any circuit. They test the arithmetic path; the wrapper's own rules (identity rejection
+for key and proof points, the count check) are exercised by the fact that the fixtures
+pass them. Raw `ark_groth16` does not apply those rules.
 
 ## To reproduce on the pinned toolchain
 
@@ -116,7 +130,8 @@ cargo test -p integration-tests --test cycles -- --ignored --nocapture    # afte
   tests instead of on arkworks' verifier. The differential tests keep arkworks as the
   reference.
 - **X can be the identity** for some public inputs. `multi_pairing` skips identity points,
-  as arkworks' own verifier does; the product is then over three pairs.
+  as arkworks' own verifier does; the product is then over three pairs. Covered by a test
+  since the review.
 - **An alternative with a further saving:** store e(α, β) in the key Cell (384 bytes more)
   and compare against it, removing one Miller loop. Not proposed here because it changes
   the key format.

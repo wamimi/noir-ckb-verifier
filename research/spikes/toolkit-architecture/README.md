@@ -6,19 +6,23 @@ Scripts, case by case?
 
 ## What it is
 
-- `bindspec.py`: a reference reader for the draft format (about 620 lines of Python, standard
+- `bindspec.py`: a reference reader for the draft format (about 700 lines of Python, standard
   library only; `tomli` is needed on Python 3.10 and older).
   - `lint` applies the format's rules to a spec.
   - `replay` evaluates a spec against recorded CKB-VM matrix cases: for each recorded
-    transaction it runs every check the spec implies, in the generated check order, and
-    compares its verdict and error code with what CKB-VM returned for the hand-written
-    script. It does not evaluate the pairing: a case that passes every binding check is
-    reported as `PAIRING` and matches a recorded acceptance or a recorded error 51.
+    transaction it runs the checks the two deployed applications use (shape, Type ID, Lock
+    rule, data layout, unchanged parts, `require`, `signer`, public vector, key
+    dependency), in the generated check order, and compares the result with what CKB-VM
+    returned for the hand-written script. It stops before the pairing: a case that passes
+    every binding check is reported as `PAIRING` and matches a recorded acceptance or a
+    recorded error 51 alike. The result is pre-pairing agreement on the recorded subset.
 - `specs/`: five draft specs. `private-tally.toml` and `owned-counter.toml` describe the
   deployed scripts. `battleship.toml` is a design inside generator version 2.
   `ballot-box.toml` and `shielded-pool.toml` use shared mode, which is specified and
   linted but outside generator version 2. Nothing was built for these three.
-- `negative_lint.py`: twelve deliberately unsafe edits of the specs; the linter must refuse all.
+- `negative_lint.py`: 29 deliberately unsafe or malformed edits of the specs. The linter must
+  refuse each one with an error containing the expected text; a refusal for another reason
+  fails the test.
 - `run.sh`: the whole spike in one command.
 - [`placement/`](placement/README.md): a separate spike on verifier placement and the cost
   of public inputs, with its own command.
@@ -33,7 +37,7 @@ It needs two recorded matrix runs under `target/` (not in Git). They are produce
 `scripts/check-private-tally.py` and `scripts/check-owned-counter.py`; other run
 directories can be given with `TALLY_RUN=` and `COUNTER_RUN=`.
 
-## Result (10 November 2026, Python 3.10.12, Linux aarch64)
+## Result (11 November 2026, Python 3.10.12, Linux aarch64)
 
 | Check | Result |
 | --- | --- |
@@ -42,7 +46,7 @@ directories can be given with `TALLY_RUN=` and `COUNTER_RUN=`.
 | Private tally, `target/tally-testnet/local/matrix` (ceremony key) | 49 of 49 cases agree |
 | Private tally, `target/private-tally-matrix-3` (development key) | 49 of 49 cases agree |
 | Owned counter, `target/week-15-guided-validation-20261009/matrix` | 48 of 48 cases agree; 2 of them were rejected by the secp256k1 Lock, which the spec does not describe |
-| Twelve unsafe spec edits (`negative_lint.py`) | 12 of 12 refused by the linter |
+| 29 unsafe or malformed spec edits (`negative_lint.py`) | 29 of 29 refused for the expected reason |
 
 "Agree" means: the same error code for every case the hand-written script rejected before
 the pairing, and `PAIRING` for every case it accepted or rejected with error 51.
@@ -52,6 +56,25 @@ tally contexts produced 13 mismatches, removing `nonzero` produced 2, and a wron
 `hash_type` produced 38, so agreement is not an artefact of a permissive comparison.
 
 ## What did not work or is not covered
+
+- An external review (11 November 2026, `toolkit-architecture.md` section 13) found holes
+  the twelve negative cases of the first version had not: the Lock and the capacity counted
+  as bound when the context merely named them; a free Lock or capacity was not required to
+  be in the context; any equality counted as pinning its left side, even against an
+  unconstrained field; one half of a 32-byte public input counted for the whole; `signer`
+  exempted a creation under any Lock; and sizes and closed lists were not checked. The
+  linter was rewritten around one analysis for data fields, Lock and capacity, and 17 cases
+  were added.
+- After that correction three of the five supplied specs failed and were edited:
+  `private-tally.toml` (`create`: the capacity was covered by the context only; now
+  `free = ["capacity"]`), `battleship.toml` (`open`: the same) and `owned-counter.toml`
+  (`create`: `signer` under a Lock rule without `signs = "transaction"`).
+  `ballot-box.toml` and `shielded-pool.toml` passed unchanged apart from the `data2` and
+  `verifier = "spawn"` lines that the new spawn rule requires. The edits state choices the
+  deployed scripts already make; replay agreement stayed at 49/49 and 48/48.
+- The reader differed from the deployed scripts in two places the recorded cases do not
+  reach: it refused 64 Cells where the scripts accept 64 and refuse the 65th, and it
+  accepted a signer at any input where the counter requires input 0. Both were aligned.
 
 - Negative tests found three holes in earlier versions of the linter, all now closed:
   - a public input of a shared action could read the running vote total, because any field

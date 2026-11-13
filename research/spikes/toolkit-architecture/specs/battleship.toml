@@ -11,7 +11,8 @@ format = 2
 profile = "noir-ckb/battleship/v1"
 placement = "type"
 envelope = "v1"
-hash_type = "data1"
+hash_type = "data2"      # the spawned verifier needs the data2 VM (RFC 0050)
+verifier = "spawn"
 
 [binding.circuit.board]
 package = "circuits/battleship/board"
@@ -69,7 +70,7 @@ require = [
   { left = "out.data.mover_lock", op = "eq", const = 0 },
   { left = "out.data.timeout", op = "ge", const = 10 },
 ]
-free = ["timeout", "waiter_lock"]     # the first player's choices; the context covers them
+free = ["capacity", "timeout", "waiter_lock"]     # the first player's choices (capacity is the stake); the context covers them
 public = { board = "out.data.waiter_board", ctx_lo = "context.lo", ctx_hi = "context.hi" }
 context = ["tag:noir-ckb/battleship/context/v1", "network", "profile", "script_hash", "args.id", "action", "out.data", "out.capacity"]
 

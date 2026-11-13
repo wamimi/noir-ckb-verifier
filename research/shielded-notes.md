@@ -202,7 +202,7 @@ leak listed in the tally's privacy section. Untested.
 | One join-split in its own transaction | about 131M cycles | estimate from measured parts |
 | One join-split inside a batch | about 23.3M cycles | estimate from measured parts |
 | One ballot inside a batch | about 21.1M cycles (19.9M + 1.2M) | estimate from measured parts |
-| Ballots per block | about 160 | computed from the row above and R3's fixed cost |
+| Ballots per block | not measured. 160 is the upper bound of this model and leaves 281,250 cycles per ballot for the public-vector rebuild, application checks and fee Lock it omits (R3 section 6); plan with 100 | computed from the row above and R3's fixed cost |
 | Witness bytes per join-split | 482 payload + about 1,100 set proof, less in a batch | computed and spike |
 | Pool Cell | about 2,200 CKB at depth 32 with a ring of 32 | computed |
 

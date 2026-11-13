@@ -11,6 +11,9 @@
 //! That is N + 3 Miller loops and one final exponentiation. `verifier-core` (ark-groth16)
 //! spends 4 Miller loops and 2 final exponentiations per proof: it computes e(α, β) as a
 //! pairing of its own.
+//!
+//! Exit codes: 41 args, 48 witness framing, 50 key (missing, malformed, no IC entry or an
+//! identity point), 51 proof or public input malformed or the pairing check failed.
 #![no_std]
 #![no_main]
 ckb_std::entry!(program_entry);
@@ -27,6 +30,11 @@ use ckb_std::{
     high_level::*,
     syscalls::{current_cycles, debug},
 };
+
+/// Largest batch the script parses. A block's cycle limit allows about 172.
+const MAX_BATCH: usize = 256;
+/// Smallest item: u32 length ‖ Groth16Witness with no public inputs (162 bytes).
+const MIN_ITEM: usize = 4 + 162;
 
 fn run() -> Result<(), i8> {
     let args = load_script().map_err(|_| 40)?.args().raw_data();
@@ -52,31 +60,47 @@ fn run() -> Result<(), i8> {
     }
     let n = u32::from_le_bytes(blob[..4].try_into().map_err(|_| 48)?) as usize;
     let mut rest = &blob[4..];
+    // The count is attacker-chosen: bound it by the bytes present and by a fixed maximum
+    // before it sizes any allocation.
+    if n == 0 || n > MAX_BATCH || n > rest.len() / MIN_ITEM {
+        return Err(48);
+    }
     let mut items = Vec::with_capacity(n);
     for _ in 0..n {
         if rest.len() < 4 {
             return Err(48);
         }
         let len = u32::from_le_bytes(rest[..4].try_into().map_err(|_| 48)?) as usize;
-        if rest.len() < 4 + len {
-            return Err(48);
-        }
-        items.push(wire_decode::decode_witness_to_arkworks(&rest[4..4 + len]).map_err(|_| 48)?);
-        rest = &rest[4 + len..];
+        let end = len.checked_add(4).filter(|end| *end <= rest.len()).ok_or(48)?;
+        items.push(wire_decode::decode_witness_to_arkworks(&rest[4..end]).map_err(|_| 48)?);
+        rest = &rest[end..];
     }
-    if n == 0 || !rest.is_empty() {
+    if !rest.is_empty() {
         return Err(48);
     }
     debug(format!("cycles before verification: {}", current_cycles()));
 
     if args[32] == 0 {
         for (proof, public) in &items {
-            verifier_core::verify(&vk_wire, proof, public).map_err(|_| 51)?;
+            verifier_core::verify(&vk_wire, proof, public)
+                .map_err(|e| if e == verifier_core::VerifyError::InvalidVk { 50 } else { 51 })?;
         }
         return Ok(());
     }
 
     let vk = VerifyingKey::<Bn254>::deserialize_compressed(&vk_wire[..]).map_err(|_| 50)?;
+    // The same key rules as `verifier-core`: at least the constant IC entry, and no identity
+    // point. An identity γ would make the public inputs irrelevant, an identity δ would make
+    // C irrelevant, an identity IC entry would drop one public input.
+    if vk.gamma_abc_g1.is_empty()
+        || vk.alpha_g1.is_zero()
+        || vk.beta_g2.is_zero()
+        || vk.gamma_g2.is_zero()
+        || vk.delta_g2.is_zero()
+        || vk.gamma_abc_g1.iter().any(|p| p.is_zero())
+    {
+        return Err(50);
+    }
     let inputs = vk.gamma_abc_g1.len() - 1;
     // Randomness: a hash of the key and of every proof and public input in the batch.
     let mut seed = ckb_hash::new_blake2b();
