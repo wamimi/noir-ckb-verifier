@@ -5,16 +5,17 @@ goal of the build: a developer takes their own Noir circuit to CKB testnet with 
 and gets a generated Type Script that binds each proof to **one exact state transition of
 one Cell**, with the tests that show it.
 
-**External review so far:** R0 and R3 were each reviewed once by an outside model on
-11 November 2026; the findings (12 and 7, all accepted) and the responses are in R0
-section 13 and R3 section 12, and R5 lists the three Battleship items that stay open. R1,
-R2 and R4 have not been reviewed; each ends with the items a reviewer must examine. Spike numbers are from the pinned toolchain where marked "pinned";
+**External review so far:** R0, R1, R2 and R3 were each reviewed once by an outside model
+(11 and 13 November 2026). The findings (12, 8, 13 and 7, all accepted) and the responses
+are in the last section of each document; R5 lists three Battleship items that stay open
+and R2 lists ten open items. R4 has not been reviewed. The corrections made after each
+review have not been reviewed again. Spike numbers are from the pinned toolchain where marked "pinned";
 the rest are from Rust 1.97.0 and are marked.
 
 | Topic | Document | Spike (command in its README) |
 | --- | --- | --- |
 | R0 Toolkit architecture | [toolkit-architecture.md](toolkit-architecture.md) | [spec reader](spikes/toolkit-architecture/README.md), [placement and public inputs](spikes/toolkit-architecture/placement/README.md) |
-| R1 Noir 1.x | [noir-1x.md](noir-1x.md) | [noir-1x](spikes/noir-1x/README.md) |
+| R1 Noir 1.x: decoder bridge for release candidates | [noir-1x.md](noir-1x.md) | [noir-1x](spikes/noir-1x/README.md) |
 | R2 Shielded notes | [shielded-notes.md](shielded-notes.md) | [shielded-notes](spikes/shielded-notes/README.md) |
 | R3 Throughput | [throughput.md](throughput.md) | [throughput](spikes/throughput/README.md) |
 | R4 Browser | [browser.md](browser.md) | [browser](spikes/browser/README.md) |
@@ -33,11 +34,12 @@ the rest are from Rust 1.97.0 and are marked.
 | 6 | Buffers are sized from the Molecule schema plus a declared allowance for other witness fields; at most 16 public inputs | R0 4 |
 | 13 | `signer` exempts a creation from the binding rules only under a Lock rule that pins the code and declares that it signs the transaction. Named payout outputs have no Type and empty data unless the spec says otherwise | R0 3.4, 13 |
 | 14 | Generated tests show that a script does what its spec says. Whether the spec says enough is tested by developer-written application properties and circuit relation tests, which the toolkit runs and cannot generate | R0 8 |
-| 7 | Noir 1.0: add a decoder to the backend and keep its runtime; pin one release | R1 4 |
+| 7 | Noir: the spike patch is a decoder bridge for one named release candidate and a validated instruction set, and is called that. Noir 1.x support is separate work: one pinned compiler/runtime pair with differential tests | R1 4, 10, 12 |
 | 8 | Shared state: one Cell with relayer batching, over sharding and over a Cell per note | R2 4 |
 | 9 | Many proofs: one randomized batch check per script run | R3 4 |
 | 10 | Single proofs: verify with one pairing product (proposed upstream) | R3 11 |
 | 11 | Browser: the pinned backend as wasm for the witness, snarkjs for the proof; CCC where a signature is needed; voters need no wallet | R4 4, 5 |
+| 15 | The ballot box script pins the empty nullifier set and zero totals at creation and bounds the vote choice to 0 or 1 itself. It claims one vote per enrolled secret and membership; it does not claim that omitted ballots are detectable | R2 11 |
 | 12 | Grant deliverable: the ballot box on the generator, VoteSecure as first consumer, with Battleship as the single-writer reference. The shielded pool is specified and costed for a later phase | R0 3.11, R2 |
 
 ## Measured numbers
@@ -61,7 +63,7 @@ the rest are from Rust 1.97.0 and are marked.
 | Tree append, depth 20, one leaf / 64 leaves | 8.27M / 0.54M per leaf | pinned |
 | Merkle membership, depth 16 / 20 / 32 | 11,459 / 14,323 / 22,915 constraints | pinned Nargo and backend |
 | Join-split 2-in 2-out, depth 20 / 32 | 37,862 / 55,046 constraints | pinned Nargo and backend |
-| Tally under Noir 1.0.0-rc.7 with the backend patch | frozen ceremony R1CS byte for byte; ceremony-key proof verified | backend built with 1.97.0 |
+| Tally compiled with Noir 1.0.0-rc.7, read through the decoder bridge | frozen ceremony R1CS byte for byte; ceremony-key proof verified. One circuit; not evidence of Noir 1.x support | backend built with 1.97.0 |
 | Browser proof, private tally | 0.12 s laptop; 1.8 s (first 2.7 s) entry-level phone; 0.76 s 2-core server | pinned build on the laptop |
 | Browser proof, vote-sized / join-split depth 32 | 3.9 s / 9.8 s on the server only | 1.97.0 |
 
@@ -69,7 +71,7 @@ the rest are from Rust 1.97.0 and are marked.
 
 | Target | Result |
 | --- | --- |
-| Noir circuit to testnet in 15 minutes | Not measurable yet: the tool is not built. It is the acceptance test of milestone 7 |
+| Noir circuit to testnet in 15 minutes | Not measurable yet: the tool is not built. It is the acceptance test of milestone 8 |
 | 100+ proof checks per block | 172 repeated proof checks in a script-only VM fixture (pinned), not a relayable transaction. Complete ballots per block are not measured: 160 is the upper bound of a model that leaves 281,250 cycles per ballot for everything it omits; 100 leaves 14.3M per ballot and is the planning figure |
 | Browser proof under 10 s | Met for the tally on every device. A vote-sized proof on the entry-level phone is estimated at 9 to 10 s and is not measured |
 | Generated scripts pass an adversarial matrix nobody wrote by hand | Not built. The operators are defined and reproduce all 49 hand-written tally cases; the linter refused 29 unsafe specs, of which earlier versions accepted 3 and the version before the external review accepted further ones |
@@ -80,24 +82,31 @@ the rest are from Rust 1.97.0 and are marked.
 | --- | --- |
 | "Verification costs about 117M cycles regardless of circuit size" | Broke: 79M to 186M depending on public inputs and on the verifier |
 | "The binding leaves fee inputs open so any relayer can pay safely" | Held for the tally in an experiment; for generated scripts it depends on the linter |
-| "The backend only needs small changes for Noir 1.x" | Held for the deployed circuits; broke for circuits with arrays, whose R1CS changes |
+| "The backend only needs small changes for Noir 1.x" | Held only for reading the deployed circuits' artifacts. Broke for circuits with arrays, whose R1CS changes, and broke in review: the backend's beta.19 VM executes some rc Brillig instructions differently, and the bridge admitted them |
+| "A wrong witness is refused before proving" | Broke: the check guarantees that the witness satisfies the R1CS, not that an unconstrained value is the intended one |
+| "The ballot box needs only the nullifier set and the generator" | Broke: it also needs a ballot circuit that does not exist, a defined rule for several effects in one transaction, and an upstream dependency issue resolved |
 | "Binds each proof to one exact transaction" | Broke as worded; reworded |
 
 ## Risks, most serious first
 
 | Risk | State |
 | --- | --- |
-| The linter is the trusted part of the generator, and the first external review found five holes in it that its own negative tests had missed | R0 and R3 reviewed and corrected (R0 section 13, R3 section 12); R1, R2 and R4 not yet reviewed. The corrected linter has not been reviewed again |
+| The linter is the trusted part of the generator, and the first external review found five holes in it that its own negative tests had missed | R0 to R3 reviewed and corrected; R4 not yet reviewed. The corrected linter has not been reviewed again |
+| A soundness issue in an upstream dependency, reported privately; the ballot box and shielded pool must not rely on multi-key SMT proofs until it is resolved | Prerequisite of milestone 6 (R2 S2b). No ballot box or pool deployment before it is resolved |
+| No ballot circuit exists; its budget is a placeholder from another circuit | Prerequisite of milestone 6 (R2 S2a) |
+| A relayer or miner can leave ballots out, and closing makes that final | Stated as an assumption; no detection is claimed |
+| The decoder bridge admits Brillig that the backend's VM executes differently, and several of its fail-closed claims did not hold | Bridge restricted to a validated instruction set (R1 N2); Noir 1.x support moved to its own milestone |
 | A spec can lack a rule the application needs; generated tests cannot see that | Application properties and circuit relation tests written by the developer (R0 section 8); a limit of the approach, not a solved problem |
 | Battleship: payout exclusivity, the timeout as a race, and the first-turn sentinel are undecided | Open items in R5 |
-| The note scheme and the script-side Poseidon2 port are unreviewed drafts; the port was checked against one vector | Required milestones in R2; not needed for the ballot box's nullifier set, needed for the pool |
+| The note scheme has open defects from review (nullifier scope, dummy inputs, tags, full tree, pool creation) and the script-side Poseidon2 port was checked against one vector | Ten open items in R2 section 11; needed for the pool, not for the ballot box |
 | Batch soundness rests on a challenge derivation written in a spike | Reviewed without a finding on the equation, transcript or chunking; key validation and a bound on N were missing and were added. Soundness is about Q/2^128 for a prover who tries Q candidate batches |
 | The batch script changed after the pinned measurements | Rerun `spikes/throughput/run.sh` on the pinned toolchain |
 | Relayers can be made to waste work by invalid or conflicting submissions, and a batch can fail with every proof valid when the shared Cell was spent first | Rule rewritten in R3 section 12 with a failure classification; not built |
-| Shared mode, batching and effects exist only as specifications and spikes | Milestone 5 |
+| Shared mode, batching and effects exist only as specifications and spikes | Milestone 6 |
 | Vote-sized proving on low-end phones is at the edge of the target | Measure before claiming; fallbacks listed in R4 |
 | The same proof costs 108.5M to 115.6M cycles in different binaries for an unknown reason | Budgets carry a range |
-| Noir 1.0.0 final did not exist; results are for release candidates | Repeat R1's spike on the final release |
+| Noir 1.0.0 final did not exist; results are for release candidates | A final release is a new pin and a new acceptance run (milestone 4), not covered by the bridge |
+| Several R1 statements had no archived evidence | Marked as observed, not archived; the acceptance run in R1 N1 archives everything it cites |
 | Spawned verifier measured in ckb-testtool only, with a spike interface that is not the generator's | One testnet transaction and four interface tests in milestone 2 |
 
 ## Grant milestone plan
@@ -109,12 +118,13 @@ the judge's machine, as `try-the-counter` does today.
 | --- | --- | --- | --- |
 | 1 | **Generator core.** Specs in, Type Script crate and test matrix out, for the two deployed applications | `noir-ckb test` on the counter and tally specs: the generated scripts give the recorded verdict on all 97 recorded cases, and every removed check is caught by a named test | R0 M2, M3 |
 | 2 | **Cheaper verification.** Single-product verifier and a shared spawned verifier on testnet | A testnet explorer link to a transaction verified through the shared verifier; `placement/run.sh` reproduces the cycle table locally | R0 M1, R3 T2 |
-| 3 | **Noir 1.0.** One named release supported next to beta.18 | `noir-ckb build` on a 1.0 copy of the tally prints the ceremony's R1CS hash; its proof is accepted by the tally already deployed on testnet | R1 N1 to N4 |
-| 4 | **Battleship.** Generated from its spec | Two browser windows play a full game on testnet; a second game is abandoned and the timeout pays the opponent | R0 M4, M5; R5 |
-| 5 | **Ballot box.** Shared mode, effects and batch verification in the generator | Local: one command casts 100 ballots in one transaction, then shows a second vote with a used nullifier rejected and two ballots proved against the same state both landing; the cycles per complete ballot are printed. Testnet: the judge is added to a voter list and votes | R0 M7; R2 S1 to S3; R3 T3 to T5 |
-| 6 | **Vote from a phone.** Browser proving with no wallet, through a relayer | The judge opens a page on their phone, votes in the testnet election, and sees the proof time and the transaction | R4 B1 to B3 |
-| 7 | **First-user path.** `noir-ckb new`, `check`, `build`, `test`, `prove`, `deploy`, one page of documentation | The judge follows the page with their own small circuit from `noir-ckb new` to a testnet transaction, with a timer; target 15 minutes | all above |
-| 8 | **Review.** Findings from an outside reviewer on the binding and the batch check, each with a response and a regression test | The findings document; `noir-ckb test` includes the regression cases | 1, 5 |
+| 3 | **Release-candidate bridge.** The backend reads artifacts of one named Noir release candidate, for a validated instruction set, next to beta.18. Not Noir 1.x support | `noir-ckb build` on a copy of the tally for that compiler prints the ceremony's R1CS hash and its proof is accepted by the tally already deployed on testnet; a run over the refusal list (other formats, relabelled artifacts, unlisted Brillig instructions, several functions) exits non-zero on any deviation | R1 N1 to N4 |
+| 4 | **Noir 1.x.** One pinned compiler and its matching runtime (the final 1.0.0 if it exists), with differential tests of every admitted instruction against Noir's own execution | A circuit with integers, shifts and an unconstrained hint, not written for the test, gives the same witness as `nargo execute`; the documentation names the supported pair | R1 N6; 3 |
+| 5 | **Battleship.** Generated from its spec | Two browser windows play a full game on testnet; a second game is abandoned and the timeout pays the opponent | R0 M4, M5; R5 open items |
+| 6 | **Ballot box.** Shared mode, effects and batch verification in the generator. Prerequisites, each with its own test: (a) the ballot circuit (membership, election-scoped nullifier, binary choice); (b) the upstream SMT dependency issue resolved, or nullifier-set updates that do not rely on multi-key proofs; (c) the spec fixes: empty set and zero totals pinned at creation (done), choice bounded in the script (done), a composition rule for several effects in one transaction | Local: one command casts 100 ballots in one transaction, then shows a second vote with a used nullifier rejected (also inside one batch), a ballot with choice 2 rejected, a box opened with a non-empty set rejected, and two ballots proved against the same state both landing; the cycles per complete ballot are printed. Testnet: the judge is added to a voter list and votes | R0 M7; R2 S2a, S2b, S3; R3 T3 to T5 |
+| 7 | **Vote from a phone.** Browser proving with no wallet, through a relayer | The judge opens a page on their phone, votes in the testnet election, and sees the proof time and the transaction | R4 B1 to B3; 6 |
+| 8 | **First-user path.** `noir-ckb new`, `check`, `build`, `test`, `prove`, `deploy`, one page of documentation | The judge follows the page with their own small circuit from `noir-ckb new` to a testnet transaction, with a timer; target 15 minutes | all above |
+| 9 | **Review.** Findings from an outside reviewer on the binding, the batch check and the corrected linter, each with a response and a regression test | The findings document; `noir-ckb test` includes the regression cases | 1, 6 |
 
-VoteSecure integration is the first use of milestone 5 outside this repository and is not
+VoteSecure integration is the first use of milestone 6 outside this repository and is not
 a milestone of its own, because its schedule is not controlled here.

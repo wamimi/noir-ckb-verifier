@@ -161,6 +161,12 @@ class Spec:
                     err.append(f"{n}: a field-from-field check supports only eq")
                 elif "right" in r and self.width(r["left"], data, args) != self.width(r["right"], data, args):
                     err.append(f"{n}: {r['left']} and {r['right']} differ in width")
+                elif r["op"] not in ("eq", "ne") and r["left"].startswith("public.") and "const" in r:
+                    # A bound on a public input the prover supplies ("choice is 0 or 1"): the
+                    # script reads the 32-byte value as an integer and requires the high 16
+                    # bytes to be zero before comparing.
+                    if not 0 <= r["const"] < 1 << 128:
+                        err.append(f"{n}: a bound on a public input must be below 2^128")
                 elif r["op"] not in ("eq", "ne") and self.width(r["left"], data, args) > 16:
                     err.append(f"{n}: ordering checks need an integer of at most 128 bits")
             if isinstance(a.get("signer"), str):

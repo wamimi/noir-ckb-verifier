@@ -195,7 +195,12 @@ a value of the consumed Cell, the args or a compiled pin; or another successor p
 is unchanged or already proven, pinned or an effect target. An equality with a witness
 value, a `free` property or a second unpinned property pins nothing, and the linter refuses
 the spec (two fields set equal to each other and to nothing else are the simplest case).
-Ordering checks do not pin a field and are not allowed on hashes or field elements. There is
+Ordering checks do not pin a field and are not allowed on hashes or stored field elements.
+One case was added after the R2 review: an ordering check against a constant below 2^128
+may name a public input the prover supplies (`public.choice` at most 1). The script reads
+the 32-byte value as an integer, requires its high 16 bytes to be zero and compares. It
+bounds a value that a script-side effect consumes, so the bound holds whatever the circuit
+does. There is
 no arithmetic and no conditional: anything beyond these three forms is a circuit rule.
 
 `signer` and what it does not prove. A matching Lock hash on an input shows that the Lock

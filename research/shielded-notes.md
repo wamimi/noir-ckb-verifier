@@ -1,6 +1,6 @@
 # R2. Shielded notes: commitments, membership, nullifiers, and shared state
 
-Status: **spiked; design chosen; external review not done.** Spike code and exact command:
+Status: **spiked; design chosen; one external review recorded in section 11, with open items that block the ballot box.** Spike code and exact command:
 [`spikes/shielded-notes`](spikes/shielded-notes/README.md). Constraint counts are from the
 pinned Nargo and backend; cycle counts are from the pinned toolchain (Rust 1.94.1, macOS
 ARM64, 11 November 2026).
@@ -33,11 +33,11 @@ once. On CKB this state has to live in Cells, and a Cell has one writer at a tim
 | Membership at depth 16 / 20 / 32 | 11,459 / 14,323 / 22,915 constraints | spike |
 | Spend one note at depth 16 / 20 / 32 | 14,619 / 17,483 / 26,075 | spike |
 | Join-split 2-in 2-out at depth 16 / 20 / 32 | 32,134 / 37,862 / 55,046 | spike |
-| Poseidon2 permutation in CKB-VM | 412,000 cycles | spike; port checked against one Noir test vector in the VM (review item 3) |
+| Poseidon2 permutation in CKB-VM | 412,000 cycles | spike; port checked against one Noir test vector in the VM, 8 bytes of two outputs (section 11, finding 9) |
 | Tree append, one leaf, depth 20 / 32 | 8.27M / 13.23M cycles | spike |
 | Tree append, 64 leaves, root once, depth 20 / 32 | 0.54M / 0.61M cycles per leaf | spike |
 | Nullifier set (BLAKE2b sparse Merkle tree): absent-then-insert, one key | 0.93M to 1.28M cycles for trees of 0 to 10,000 keys | spike |
-| The same, 32 keys in one proof | 1.13M per key | spike |
+| The same, 32 keys in one proof | 1.13M per key | spike. A cost measurement only: multi-key proofs must not be relied on (section 11, finding 1) |
 | Set proof size | 564 bytes for one key, 306 per key for 32 (10,000-key tree) | spike |
 
 Consequences:
@@ -69,6 +69,12 @@ CKB facts that decide this: a block holds 3.5B cycles; a Cell is consumed by one
 transaction; the pool accepts at most 25 unconfirmed ancestors by default
 (`ckb@v0.210.0`, `resource/ckb.toml`), which caps a chain of transactions each spending
 the previous output of the same Cell.
+
+The throughput rows of the table below are not established (section 11, finding 11): they
+sum component timings, use a batch model measured with four public inputs where a ballot
+has seven and a pool operation ten, give every design "the same" figure although several
+shard batches pay several fixed costs, and compare deposits with transfers. They are kept
+as conditional estimates until complete transactions are measured.
 
 Per-operation costs used below (measured parts, summed; the sums are estimates):
 join-split verified alone about 120M cycles (10 public inputs, R0 formula plus 3.5%);
@@ -102,13 +108,23 @@ Failure modes of A, found by analysis and not yet by experiment:
 - **A full pending chain.** Without batching, the 26th transaction in a chain is refused by
   default pool policy until earlier ones confirm.
 - **Stale roots.** A proof names a root; with a ring of R roots it survives R − 1 later
-  updates. With one batch per block and R = 32 a user has about 32 blocks to be included,
-  otherwise the proof must be made again. R is a spec constant; 128 costs 3 KB of Cell data.
-- **A relayer that stops.** Anyone can send a batch of one; the script does not know
-  relayers. Liveness needs one honest sender, not a trusted one.
-- **Withdrawals below a Cell's minimum** (61 CKB for a plain secp256k1 Cell) are impossible.
+  updates. That is a number of updates, not a time: several updates can land in one block,
+  anyone can cause them with zero-value operations at the cost of fees, and the spec does
+  not yet say whether a leaf, an operation or a batch rotates the ring. A proof whose root
+  has left the ring cannot be repaired by rebuilding the transaction; it must be made
+  again. R is a spec constant; 128 costs 3 KB of Cell data. (Finding 12.)
+- **A relayer that stops, or that leaves ballots out.** Anyone can send a batch of one; the
+  script does not know relayers. That gives a voter another way in. It does not make
+  omission visible and does not guarantee inclusion in time: nothing on chain records a
+  submitted ballot, a relayer or a miner chooses which votes precede `close`, and after
+  `close` an omitted ballot can never be cast. The ballot box makes no claim that selective
+  omission is prevented or detectable. (Finding 4.)
+- **Withdrawals below a Cell's minimum** (61 CKB for a plain secp256k1 Cell) fail under the
+  current exact payout rule. An externally funded top-up could allow them and is not
+  specified. (Finding 13.)
 - **Tree exhaustion.** Depth 20 holds 1,048,576 leaves, 524,288 join-splits. A full tree
-  freezes deposits and transfers. Depth 32 costs 17,184 more constraints per join-split
+  freezes deposits, transfers and also withdrawals, because every withdrawal appends two
+  commitments: owners would have no way out. (Finding 3.) Depth 32 costs 17,184 more constraints per join-split
   and about 5.0M more cycles per root computation.
 
 ## 5. The chosen design
@@ -123,7 +139,9 @@ nullifier  = H3(TAG_NULLIFIER, secret, position)             position = leaf ind
 
 H2 and H3 are Poseidon2 as in `noir-lang/poseidon` (state width 4, one permutation, at
 most 3 inputs per call, as the tally requires). Tags are the integers of distinct ASCII
-strings under a `noir-ckb/shielded-pool/v1/` prefix, as in the tally spec.
+strings under a `noir-ckb/shielded-pool/v1/` prefix, as in the tally spec. This is not yet
+a definition: the string for the nullifier tag is 35 bytes, 279 bits, above the BN254
+modulus, and the exact strings and any reduction are unspecified (finding 7).
 
 - **Why the position.** With a nullifier derived only from the note's content, a sender
   can create two identical notes for a recipient; they share a nullifier, so the second
@@ -172,14 +190,19 @@ Cell's own occupied capacity. Type args: version and Type ID.
 
 | Effect | Rule the script enforces | Helper data |
 | --- | --- | --- |
-| `set-insert` | The key is absent under `in.nullifiers`; `out.nullifiers` is the root with the key present (value `0x01` followed by 31 zero bytes). Tree: `sparse-merkle-tree` 0.6.1 rules, BLAKE2b with CKB's personalization | One compiled proof for all keys of the transaction |
+| `set-insert` | The key is absent under `in.nullifiers`; `out.nullifiers` is the root with the key present (value `0x01` followed by 31 zero bytes). Tree: `sparse-merkle-tree` 0.6.1 rules, BLAKE2b with CKB's personalization | One proof per key. An earlier version said one compiled proof for all keys of the transaction; see the note below |
 | `tree-append` | `out.frontier`, `out.leaves` and the newest entry of `out.roots` are the result of appending the leaves, in order, to the input tree; Poseidon2 as in section 5.1; older ring entries shift | none |
 | `capacity-add`, `capacity-sub` | `out.capacity = in.capacity ± value`, checked without overflow; the result must cover the Cell's occupied capacity | none |
 | `add` | `out.f = in.f + value`, no overflow | none |
 
-The R0 specs can now replace "free, to be fixed by R2" with constants: the empty
-nullifier root is 32 zero bytes, and the empty frontier and first root are the hashes of
-empty subtrees.
+The external review found a soundness issue in an upstream dependency, reported privately; the ballot box and shielded pool must not rely on multi-key SMT proofs until it is resolved. Until then a transaction with several insertions applies them one
+after another, each with its own single-key proof against the root left by the previous
+one. How several effects on one field compose is itself not yet defined (finding 5).
+
+The empty nullifier root is 32 zero bytes, and `ballot-box.toml` now requires it at
+creation. The empty frontier and first root are the hashes of empty subtrees; those
+constants are not computed yet and `shielded-pool.toml` still leaves the pool's initial
+state to its creator (finding 2).
 
 ### 5.5 Binding
 
@@ -189,17 +212,19 @@ and for a withdrawal the payout output's Lock hash, Type hash and data hash. It 
 OutPoint. Replay is stopped by the nullifiers; a third party cannot redirect a withdrawal
 because the payout is in the digest.
 
-The miner fee can come out of the pool (`capacity-sub` by the proven `fee`), so a relayer
+A fee allowance can come out of the pool (`capacity-sub` by the proven `fee`), so a relayer
 needs no CKB of its own and the user needs no visible fee Cell. This removes the fee-payer
-leak listed in the tally's privacy section. Untested.
+leak listed in the tally's privacy section. Untested. `fee` is an authorized amount of
+capacity leaving the pool, not a payment to the miner: no rule fixes where it goes, and a
+relayer can keep part of it (finding 13).
 
 ## 6. Budgets
 
 | Item | Budget | Basis |
 | --- | --- | --- |
-| Join-split circuit, depth 32 | 56,000 constraints; setup with a 2^16 powers-of-tau file | spike, rounded up |
-| Vote circuit (membership at depth 20, nullifier, choice) | 18,000 constraints | spike (spend-one-note) |
-| One join-split in its own transaction | about 131M cycles | estimate from measured parts |
+| Join-split circuit, depth 32 | 56,000 constraints; setup with a 2^16 powers-of-tau file | spike, rounded up, of a circuit that is not the specified one; to be re-measured (finding 10) |
+| Vote circuit (membership at depth 20, nullifier, choice) | 18,000 constraints | placeholder from a spend-one-note circuit; no ballot circuit exists (findings 8, 10) |
+| One join-split in its own transaction | about 131M cycles at depth 20; the same parts sum to 136M at depth 32 | estimate from measured parts (finding 11) |
 | One join-split inside a batch | about 23.3M cycles | estimate from measured parts |
 | One ballot inside a batch | about 21.1M cycles (19.9M + 1.2M) | estimate from measured parts |
 | Ballots per block | not measured. 160 is the upper bound of this model and leaves 281,250 cycles per ballot for the public-vector rebuild, application checks and fee Lock it omits (R3 section 6); plan with 100 | computed from the row above and R3's fixed cost |
@@ -235,15 +260,18 @@ from Noir's solver at v1.0.0-beta.19.
 | # | Step | Acceptance test |
 | --- | --- | --- |
 | S1 | Spike part 1 on the pinned toolchain | Done 11 November 2026 |
-| S2 | Poseidon2 and tree-append as a script library, with a differential test against Noir's own execution (review item 3) | At least 10,000 random states and 10,000 random two-input hashes give the same output in CKB-VM as `nargo execute` of `noir-lang/poseidon`; a deliberately altered round constant fails the test |
+| S2 | Poseidon2 and tree-append as a script library, with a differential test against Noir's own execution (finding 9) | At least 10,000 random states and 10,000 random two-input hashes give the same output in CKB-VM as `nargo execute` of `noir-lang/poseidon`; a deliberately altered round constant fails the test |
+| S2a | Ballot circuit: identity commitment, membership, election-scoped nullifier, `choice` constrained to 0 or 1, exact election encoding | Fresh-proof negative tests: `choice = 2`, a non-member, another nullifier for the same secret, a changed choice or context; constraint count measured |
+| S2b | Nullifier-set updates that do not depend on the affected upstream behaviour (finding 1), and a defined composition rule for several effects on one field (finding 5) | Single-key insertions against intermediate roots; full-root comparison with an independent implementation; a used nullifier is refused through the complete application, also inside one batch |
 | S3 | Effects in the generator (`set-insert`, `tree-append`, capacity) | Generated ballot box passes its matrix; two votes against one state both land |
 | S4 | Note scheme reviewed and frozen | Written review; vectors published |
 | S5 | Join-split circuit and development setup | Test plan item 2; constraint count within the budget |
 | S6 | Pool on a local chain | D4 and D5 |
 | S7 | Ceremony and testnet pool, only after S4 and an external look at S6 | Public transcript; a deposit, a transfer and a withdrawal by two outside accounts |
 
-The ballot box needs S1 to S3 only and is the grant deliverable. It exercises every
-shared-mode mechanism. S4 to S7 (the pool: note scheme, larger ceremony) are the next phase.
+The ballot box is the grant deliverable and needs S1, S2a, S2b and S3; it does not need
+Poseidon2 in the script (S2), only in the circuit. S4 to S7 (the pool: note scheme, larger
+ceremony) are the next phase.
 
 ## 10. Risks and open questions
 
@@ -256,30 +284,72 @@ shared-mode mechanism. S4 to S7 (the pool: note scheme, larger ceremony) are the
 | Poseidon2 in the script must match Noir's exactly, forever | Constants generated from Noir's source; vectors in CI; a library change in Noir is a new profile |
 | The Poseidon2 library pinned for beta.18 has a known fault for more than 3 inputs | Every call takes at most 3; the tally's static test is reused |
 | A pool is a target with real value; this is pre-audit software | Testnet only, as the rest of the project |
+| A soundness issue in an upstream dependency, reported privately; the ballot box and shielded pool must not rely on multi-key SMT proofs until it is resolved | S2b; no ballot box or pool deployment before it is resolved |
+| No ballot circuit exists; the binary choice was only a comment | The script now bounds `choice` to 0 or 1 itself; S2a for the circuit |
+| A relayer or miner can leave ballots out and `close` makes that final | Stated as an assumption; no detection is claimed. Receipts or a challenge period would be new design work |
+| An election can be opened with any voter list | By design: the script cannot judge a list. Clients must check `voter_root` against the published list |
 
 Open: ring size; depth 20 or 32 for the first pool.
 
 ## 11. External review
 
-Not done. Items a reviewer must examine, recorded so they are not lost:
+One review by an outside model, at commit `206df77`. Findings 1, 2, 3, 7, 8 and 10 were
+shown by a test or a source check in whole or in part; the rest were reasoned from the
+specs. No ballot or pool implementation exists, so nothing here concerns deployed code.
+All thirteen findings were accepted.
 
-1. **The Poseidon2 port in the script** (`spikes/shielded-notes/vm/contracts/crates/acc-bench/src/poseidon2.rs`).
-   It was checked against a single test vector, the all-zero state, comparing the first 8
-   bytes of two output elements. That does not exercise the round constants' interaction
-   with non-zero inputs, the third and fourth output elements, or the two-input hash
-   wrapper (`hash2`, with its length-dependent initial value). Milestone S2 requires a
-   differential test over many random inputs against Noir's own execution before any
-   script relies on it.
-2. **The note scheme of section 5.1 is a draft.** The position-based nullifier
-   `H3(TAG_NULLIFIER, secret, position)` was chosen in this document and has had no
-   cryptographic review. The precedent to compare against is Zcash Sapling, where the
-   nullifier is a PRF, under a nullifier key, of a value derived from the note commitment
-   and its position. Points to check: whether omitting the commitment from the nullifier
-   is safe given that the circuit ties position to commitment through the Merkle path;
-   whether one `secret` serving as both spending authority and nullifier key is
-   acceptable (Sapling separates them); domain separation between `owner`, `commitment`
-   and `nullifier`; behaviour when the same commitment appears at two positions; and what
-   a party who learns `secret` later can link.
-3. **The measured circuits are not the specified ones** (content-derived nullifier, no
-   dummy inputs, both inputs the same note). Constraint budgets must be re-measured on the
-   real circuit.
+| # | Severity | Blocks | Finding | Response |
+| --- | --- | --- | --- | --- |
+| 1 | Critical | ballot box, pool | A soundness issue in an upstream dependency, reported privately; the ballot box and shielded pool must not rely on multi-key SMT proofs until it is resolved | Accepted. Section 5.4 now specifies one proof per key; milestone S2b. No further detail is published here |
+| 2 | High | ballot box, pool | Creation left the accumulator state to the creator: a ballot box could open with a non-empty nullifier root, a pool with a root ring holding notes that were never funded | Accepted. Fixed for the ballot box: `open` requires the empty nullifier root and zero totals, and `nullifiers` is no longer free (linter passes). The voter root stays the creator's choice and is a client check. Pool: open item 1 |
+| 3 | High | pool | A full tree also blocks withdrawals; the batched append fails on the last leaf (shown at depth 2 with four leaves); a depth-32 leaf count does not fit the `u32` field | Accepted. Section 4 corrected. Open item 2 |
+| 4 | High | ballot box (the property) | Selective omission of ballots is neither prevented nor detectable, and `close` makes it final | Accepted. No such property is claimed: section 4 and the risk table state the assumption instead. The property was a question in the review brief, not a statement in this document |
+| 5 | Medium | ballot batching, pool | Several effects naming the same input and output field have no composition rule: two insertions, two capacity subtractions, batched counters | Accepted. Open item 3; part of S2b |
+| 6 | Medium | pool | Nullifiers are not scoped to a pool or network, so one secret used at one position in two pools links the spends; a zero-value dummy input with the same secret and position burns the real note's nullifier | Accepted. Open item 4 |
+| 7 | Medium | pool | The nullifier tag as specified is 279 bits, above the modulus; the exact tags are not defined | Accepted. Section 5.1 says so. Open item 5 |
+| 8 | Medium | ballot box | No ballot circuit exists; `choice = 2` would add 2 to `yes`; identity commitment and election encoding are undefined | Accepted. The spec now requires `public.choice` at most 1 in the script (R0 section 3.4 gained that check form). The circuit is milestone S2a |
+| 9 | Medium | ballot box validation | The accumulator test compares 4 bytes of each root, prints an accepted negative case without failing, and checks 8 bytes of two Poseidon2 outputs without calling `hash2`. The reviewer read the port against Noir's solver and found no mismatch, which is not a test | Accepted. Open item 6; S2 and S2b |
+| 10 | Medium | budgets | The measured join-split spends one note twice with equal nullifiers and lacks the dummy and non-zero rules; the 18,000 vote budget is from a note-spend circuit | Accepted. Section 6 marks both budgets as placeholders. Open item 7 |
+| 11 | Medium | performance claims | Component sums do not establish the throughput comparison: 136M not 131M at depth 32; empty-subtree hashes and non-empty frontiers not timed; four public inputs in the batch model; "the same 145" for every design unsupported | Accepted. Section 4 carries the caveat above its table; section 6 corrected. Open item 8 |
+| 12 | Medium | pool | The root ring bounds updates, not time; the rotation event is undefined | Accepted. Section 4 corrected. Open item 9 |
+| 13 | Low | pool | "The pool pays the miner fee" is not enforced; small withdrawals are refused by the exact payout rule, not impossible in principle | Accepted. Sections 4 and 5.5 reworded. Open item 10 |
+
+Examined by the reviewer without a finding, conditional on the implementation and on
+finding 1 being resolved: position-bound nullifiers give single use for non-zero notes
+within one tree; one secret with separate hash domains is acceptable but gives no separate
+viewing key and no forward privacy (whoever learns it can link that owner's nullifiers to
+positions); the three-input limit; the `0x01` value encoding; one vote per enrolled secret
+with an election-scoped nullifier; a relayer cannot change a bound choice or payout
+(choices are public, and a relayer also sees network metadata); `close` cannot be early and
+nothing reopens an election; capacity effects, once composed correctly, bound the pool's
+debit by `public_out + fee`; the 2,192-byte Cell.
+
+### Open items
+
+No code was written for these. The first is the pool's half of a fix already made for the
+ballot box; 3 and 6 are needed for the ballot box, the rest for the pool.
+
+1. **Pool creation.** Compute and pin the empty frontier, the initial root ring and the
+   empty nullifier root in `shielded-pool.toml`; require frontier and ring to agree.
+2. **Full tree.** Specify an exit that appends no leaves, or a migration that keeps notes
+   spendable and nullifiers valid; handle the last leaf in the batched append; widen the
+   leaf count for depth 32 and check overflow before the frontier is updated.
+3. **Composition of effects.** Define an ordered working state within a transaction, or
+   normalize to one set update, one ordered append list and one aggregate debit, with the
+   output checked once; say whether proofs refer to the original or the intermediate root.
+4. **Nullifier scope and dummies.** Put pool and network into the nullifier, and give dummy
+   inputs fresh independent secrets, or adopt a reviewed commitment-and-position
+   construction.
+5. **Tags.** Publish the exact numeric tags and their derivation; decide leaf and
+   internal-node domains for the tree.
+6. **Tests that check what they claim.** Compare full roots; make an accepted negative case
+   fail the run; differential Poseidon2 tests for all four outputs, `hash2` and `hash3`,
+   including a corrupted constant.
+7. **Budgets.** Re-measure the specified join-split and the real ballot circuit before the
+   18,000 and 56,000 figures or the 2^16 setup are relied on.
+8. **Throughput.** Compare the three designs on explicit workloads, depths and batch sizes
+   with complete capacity-valid transactions.
+9. **Root ring.** Define what rotates it and state retention in that unit; any time-based
+   promise needs an enforceable rule.
+10. **Fee and small withdrawals.** Call `fee` an allowance unless its destination is
+    enforced; specify a top-up if small withdrawals are wanted.

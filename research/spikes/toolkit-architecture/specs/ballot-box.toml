@@ -38,8 +38,11 @@ require = [
   { left = "out.data.status", op = "eq", const = 0 },
   { left = "out.data.yes", op = "eq", const = 0 },
   { left = "out.data.total", op = "eq", const = 0 },
+  { left = "out.data.nullifiers", op = "eq", const = 0 },   # the empty set: 32 zero bytes (R2 section 5.4)
 ]
-free = ["capacity", "close_after", "voter_root", "nullifiers"]   # nullifiers: must equal the empty-set root once R2 fixes it
+# The creator chooses the stake, the closing time and the voter list. Whoever relies on an
+# election must check voter_root against the published list: the script cannot.
+free = ["capacity", "close_after", "voter_root"]
 
 [[binding.action]]
 name = "vote"
@@ -48,10 +51,18 @@ shape = "update"
 shared = true            # many users act on the same Cell; the proof must survive another vote landing first
 circuit = "vote"
 proof = "input_type"
-require = [{ left = "in.data.status", op = "eq", const = 0 }]
+require = [
+  { left = "in.data.status", op = "eq", const = 0 },
+  # The script refuses any other value, whatever the circuit does: choice is added to `yes`.
+  { left = "public.choice", op = "le", const = 1 },
+]
 change = ["data.nullifiers", "data.yes", "data.total"]
 public = { voter_root = "in.data.voter_root", election_lo = "args.id:lo", election_hi = "args.id:hi", nullifier = "witness", choice = "witness", ctx_lo = "context.lo", ctx_hi = "context.hi" }
 # No OutPoint and no fee inputs: any relayer can assemble and pay. Replay is stopped by the nullifier.
+# A relayer or miner can leave a ballot out, and close makes that final: nothing here
+# detects or prevents it.
+# Each set-insert takes its own single-key proof; multi-key proofs must not be relied on
+# (research/shielded-notes.md, section 11, finding 1).
 context = ["tag:noir-ckb/ballot-box/context/v1", "network", "profile", "script_hash", "args.id", "action", "public.nullifier", "public.choice"]
 effects = [
   { op = "set-insert", in = "in.data.nullifiers", out = "out.data.nullifiers", key = "public.nullifier", proof = "aux.0" },
