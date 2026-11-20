@@ -1,0 +1,9 @@
+# noir-ckb/ballot-box/v1 vote circuit (circuits/ballot/README.md).
+# hashes: shared library: domain tags, identity commitment, voter tree, nullifier
+# vote:   the proved statement (private first, then public)
+# helper: prints the identity commitment, voter root and nullifier for given inputs; used by
+#         the differential check and, later, by a client
+# A workspace of its own: compiling it never touches circuits/private-tally-v2.
+[workspace]
+members = ["hashes", "vote", "helper"]
+default-member = "vote"

@@ -1,0 +1,7 @@
+[package]
+name = "ballot_vote"
+type = "bin"
+authors = []
+
+[dependencies]
+ballot_hashes = { path = "../hashes" }
