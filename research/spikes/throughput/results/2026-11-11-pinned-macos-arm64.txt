@@ -1,0 +1,17 @@
+Pinned toolchain (Rust 1.94.1 contracts, Rust 1.95.0 harness, clang 18), macOS ARM64, 11 November 2026.
+size verify-batch: 120400 bytes
+GROUP tally: 2 distinct proofs, payload 290 bytes
+BATCH tally n=1: separate Ok((114906306, "601 tx bytes")); batch Ok((93265649, "601 tx bytes"))
+BATCH tally n=2: separate Ok((226968383, "895 tx bytes")); batch Ok((122834394, "895 tx bytes"))
+BATCH tally n=4: separate Ok((453862661, "1483 tx bytes")); batch Ok((160346092, "1483 tx bytes"))
+BATCH tally n=8: separate Ok((907694597, "2659 tx bytes")); batch Ok((238731118, "2659 tx bytes"))
+BATCH tally n=16: separate Ok((1815287412, "5011 tx bytes")); batch Ok((398680509, "5011 tx bytes"))
+BATCH tally n=32: separate Err("ExceededMaximumCycles: expect cycles <= 3500000000 } }"); batch Ok((715730048, "9715 tx bytes"))
+BATCH tally n=64: separate Err("not run: exceeds a block"); batch Ok((1353053766, "19123 tx bytes"))
+BATCH tally n=128: separate Err("not run: exceeds a block"); batch Ok((2626770336, "37939 tx bytes"))
+BATCH tally n=160: separate Err("not run: exceeds a block"); batch Ok((3260552258, "47347 tx bytes"))
+BATCH tally n=172: separate Err("not run: exceeds a block"); batch Ok((3497943690, "50875 tx bytes"))
+BATCH tally n=175: separate Err("not run: exceeds a block"); batch Err("ExceededMaximumCycles: expect cycles <= 3500000000 } }")
+BATCH tally n=176: separate Err("not run: exceeds a block"); batch Err("ExceededMaximumCycles: expect cycles <= 3500000000 } }")
+With the last public input altered, separate and batch both rejected at every N (12 of 12).
+test result: ok. 1 passed; 0 failed

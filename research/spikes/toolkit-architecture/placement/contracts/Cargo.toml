@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = ["crates/verify-linked", "crates/verify-parent"]
+
+[workspace.package]
+edition = "2021"
+license = "Apache-2.0"
+
+# Same release profile as contracts/Cargo.toml in the repository root.
+[profile.release]
+overflow-checks = true
+strip = true
+codegen-units = 1
+debug = false
+opt-level = "z"
+lto = true
+panic = "abort"

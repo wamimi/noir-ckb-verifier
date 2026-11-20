@@ -1,0 +1,4 @@
+target/
+web/backend.wasm
+web/snarkjs.min.js
+web/circuits/

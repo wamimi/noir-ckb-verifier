@@ -1,0 +1,169 @@
+{
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+  "circuits": [
+    {
+      "name": "private-tally-v2",
+      "constraints": 3338,
+      "zkeyBytes": 1767656,
+      "filesFetchMs": 67.59999999997672,
+      "witnessMs": [
+        61.79999999998836,
+        15,
+        13.799999999988358
+      ],
+      "proveMs": [
+        916.0999999999767,
+        750.8000000000466,
+        776.1000000000349
+      ],
+      "witnessEqualsNativeBackend": [
+        true,
+        true,
+        true
+      ],
+      "verified": [
+        true,
+        true,
+        true
+      ],
+      "rejectsAlteredPublicInput": true,
+      "publicInputs": 4,
+      "publicInputsMatchKey": true,
+      "randomCalls": 0,
+      "randomBytes": 0,
+      "randomFailures": 0,
+      "witnessMedianMs": 15,
+      "proveFirstMs": 916,
+      "proveMedianMs": 776,
+      "firstUseMs": 1045,
+      "ok": true
+    },
+    {
+      "name": "spend-1-d20",
+      "constraints": 17483,
+      "zkeyBytes": 9862056,
+      "filesFetchMs": 1170.0999999999767,
+      "witnessMs": [
+        64.79999999998836,
+        77.70000000001164,
+        80.60000000003492
+      ],
+      "proveMs": [
+        3620.5,
+        3572.6999999999534,
+        3606.5
+      ],
+      "witnessEqualsNativeBackend": [
+        true,
+        true,
+        true
+      ],
+      "verified": [
+        true,
+        true,
+        true
+      ],
+      "rejectsAlteredPublicInput": true,
+      "publicInputs": 4,
+      "publicInputsMatchKey": true,
+      "randomCalls": 0,
+      "randomBytes": 0,
+      "randomFailures": 0,
+      "witnessMedianMs": 78,
+      "proveFirstMs": 3621,
+      "proveMedianMs": 3607,
+      "firstUseMs": 4855,
+      "ok": true
+    },
+    {
+      "name": "joinsplit-2x2-d20",
+      "constraints": 37862,
+      "zkeyBytes": 21008664,
+      "filesFetchMs": 904.5999999999767,
+      "witnessMs": [
+        125.09999999997672,
+        244.69999999995343,
+        147.39999999996508
+      ],
+      "proveMs": [
+        6862.799999999988,
+        6655.100000000035,
+        6467
+      ],
+      "witnessEqualsNativeBackend": [
+        true,
+        true,
+        true
+      ],
+      "verified": [
+        true,
+        true,
+        true
+      ],
+      "rejectsAlteredPublicInput": true,
+      "publicInputs": 10,
+      "publicInputsMatchKey": true,
+      "randomCalls": 0,
+      "randomBytes": 0,
+      "randomFailures": 0,
+      "witnessMedianMs": 147,
+      "proveFirstMs": 6863,
+      "proveMedianMs": 6655,
+      "firstUseMs": 7892,
+      "ok": true
+    },
+    {
+      "name": "joinsplit-2x2-d32",
+      "constraints": 55046,
+      "zkeyBytes": 28624056,
+      "filesFetchMs": 1080,
+      "witnessMs": [
+        256.9000000000233,
+        245.40000000002328,
+        204.40000000002328
+      ],
+      "proveMs": [
+        8140.700000000012,
+        8386.700000000012,
+        8300.099999999977
+      ],
+      "witnessEqualsNativeBackend": [
+        true,
+        true,
+        true
+      ],
+      "verified": [
+        true,
+        true,
+        true
+      ],
+      "rejectsAlteredPublicInput": true,
+      "publicInputs": 10,
+      "publicInputsMatchKey": true,
+      "randomCalls": 0,
+      "randomBytes": 0,
+      "randomFailures": 0,
+      "witnessMedianMs": 245,
+      "proveFirstMs": 8141,
+      "proveMedianMs": 8300,
+      "firstUseMs": 9478,
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "threads": 2,
+  "runs": 3,
+  "backendBytes": 4345117,
+  "backendFetchMs": 49,
+  "backendCompileMs": 16,
+  "backendInstantiateMs": 0,
+  "backendLoadMs": 65,
+  "randomSelfTest": {
+    "bytes": 131073,
+    "status": 0,
+    "lastChunkFilled": true,
+    "outsideMemoryStatus": 1,
+    "ok": true
+  },
+  "browserVersion": "153.0.8010.12"
+}

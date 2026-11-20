@@ -1,0 +1,50 @@
+GROUP tally: 2 distinct proofs, payload 290 bytes
+BATCH tally n=1: separate Ok((111505877, "601 tx bytes")); batch Ok((90956202, "601 tx bytes"))
+BATCH tally n=1: last public input altered: separate rejected, batch rejected
+BATCH tally n=2: separate Ok((220249766, "895 tx bytes")); batch Ok((119829396, "895 tx bytes"))
+BATCH tally n=2: last public input altered: separate rejected, batch rejected
+BATCH tally n=4: separate Ok((440432011, "1483 tx bytes")); batch Ok((156699354, "1483 tx bytes"))
+BATCH tally n=4: last public input altered: separate rejected, batch rejected
+BATCH tally n=8: separate Ok((880841864, "2659 tx bytes")); batch Ok((233617910, "2659 tx bytes"))
+BATCH tally n=8: last public input altered: separate rejected, batch rejected
+BATCH tally n=16: separate Ok((1761587243, "5011 tx bytes")); batch Ok((390541433, "5011 tx bytes"))
+BATCH tally n=16: last public input altered: separate rejected, batch rejected
+BATCH tally n=32: separate Err("ExceededMaximumCycles: expect cycles <= 3500000000 } }"); batch Ok((701624478, "9715 tx bytes"))
+BATCH tally n=32: last public input altered: separate rejected, batch rejected
+BATCH tally n=64: separate Err("not run: exceeds a block"); batch Ok((1326919964, "19123 tx bytes"))
+BATCH tally n=64: last public input altered: separate rejected, batch rejected
+BATCH tally n=128: separate Err("not run: exceeds a block"); batch Ok((2576609358, "37939 tx bytes"))
+BATCH tally n=128: last public input altered: separate rejected, batch rejected
+BATCH tally n=160: separate Err("not run: exceeds a block"); batch Ok((3198465216, "47347 tx bytes"))
+BATCH tally n=160: last public input altered: separate rejected, batch rejected
+BATCH tally n=172: separate Err("not run: exceeds a block"); batch Ok((3431400684, "50875 tx bytes"))
+BATCH tally n=172: last public input altered: separate rejected, batch rejected
+BATCH tally n=175: separate Err("not run: exceeds a block"); batch Ok((3491658697, "51757 tx bytes"))
+BATCH tally n=175: last public input altered: separate rejected, batch rejected
+BATCH tally n=176: separate Err("not run: exceeds a block"); batch Err("ExceededMaximumCycles: expect cycles <= 3500000000 } }")
+BATCH tally n=176: last public input altered: separate rejected, batch rejected
+GROUP n04-small: 1 distinct proofs, payload 290 bytes
+BATCH n04-small n=1: separate Ok((103540113, "601 tx bytes")); batch Ok((82972014, "601 tx bytes"))
+BATCH n04-small n=1: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=2: separate Ok((207015771, "895 tx bytes")); batch Ok((114131821, "895 tx bytes"))
+BATCH n04-small n=2: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=4: separate Ok((413964021, "1483 tx bytes")); batch Ok((150508060, "1483 tx bytes"))
+BATCH n04-small n=4: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=8: separate Ok((827905884, "2659 tx bytes")); batch Ok((229354693, "2659 tx bytes"))
+BATCH n04-small n=8: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=16: separate Ok((1655715283, "5011 tx bytes")); batch Ok((384530397, "5011 tx bytes"))
+BATCH n04-small n=16: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=32: separate Ok((3311344404, "9715 tx bytes")); batch Ok((696911704, "9715 tx bytes"))
+BATCH n04-small n=32: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=64: separate Err("not run: exceeds a block"); batch Ok((1321666078, "19123 tx bytes"))
+BATCH n04-small n=64: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=128: separate Err("not run: exceeds a block"); batch Ok((2570005730, "37939 tx bytes"))
+BATCH n04-small n=128: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=160: separate Err("not run: exceeds a block"); batch Ok((3192581577, "47347 tx bytes"))
+BATCH n04-small n=160: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=172: separate Err("not run: exceeds a block"); batch Ok((3427082122, "50875 tx bytes"))
+BATCH n04-small n=172: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=175: separate Err("not run: exceeds a block"); batch Ok((3487040752, "51757 tx bytes"))
+BATCH n04-small n=175: last public input altered: separate rejected, batch rejected
+BATCH n04-small n=176: separate Err("not run: exceeds a block"); batch Err("ExceededMaximumCycles: expect cycles <= 3500000000 } }")
+BATCH n04-small n=176: last public input altered: separate rejected, batch rejected

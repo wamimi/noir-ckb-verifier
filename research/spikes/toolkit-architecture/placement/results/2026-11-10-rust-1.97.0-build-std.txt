@@ -1,0 +1,25 @@
+size verify-linked: 76520 bytes
+size verify-parent: 19320 bytes
+CASE_TALLY_UPDATE: recorded transaction replayed: 115589109 cycles
+CASE_TALLY_UPDATE: linked: 104860094 cycles; cycles before verify: 60252; cycles after verify: 104853044
+CASE_TALLY_UPDATE: spawned: 105002719 cycles; parent cycles before spawn: 30634; cycles before verify: 196105; cycles after verify: 104988941; parent cycles after wait: 104998030
+CASE_TALLY_CREATE: recorded transaction replayed: 112801015 cycles
+CASE_TALLY_CREATE: linked: 102287071 cycles; cycles before verify: 60266; cycles after verify: 102280021
+CASE_TALLY_CREATE: spawned: 102429710 cycles; parent cycles before spawn: 30648; cycles before verify: 196133; cycles after verify: 102415932; parent cycles after wait: 102425021
+CASE_COUNTER_UPDATE: recorded transaction not replayed (it is stored unsigned)
+CASE_COUNTER_UPDATE: linked: 99755219 cycles; cycles before verify: 60252; cycles after verify: 99748200
+CASE_COUNTER_UPDATE: spawned: 99897813 cycles; parent cycles before spawn: 30634; cycles before verify: 196105; cycles after verify: 99884097; parent cycles after wait: 99893155
+CASE n01-full: linked: 99025865 cycles
+CASE n01-small: linked: 96487596 cycles
+CASE n02-full: linked: 101882832 cycles
+CASE n02-small: linked: 96759036 cycles
+CASE n04-full: linked: 107355844 cycles
+CASE n04-small: linked: 97261777 cycles
+CASE n06-full: linked: 113209741 cycles
+CASE n06-small: linked: 97817752 cycles
+CASE n08-full: linked: 118691747 cycles
+CASE n08-small: linked: 98338518 cycles
+CASE n16-full: linked: 141414297 cycles
+CASE n16-small: linked: 100552784 cycles
+CASE n32-full: linked: 186363736 cycles
+CASE n32-small: linked: 105146625 cycles

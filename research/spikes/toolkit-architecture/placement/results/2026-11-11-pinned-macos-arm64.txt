@@ -1,0 +1,17 @@
+Pinned toolchain (Rust 1.94.1 contracts, Rust 1.95.0 harness, clang 18), macOS ARM64, 11 November 2026.
+The public-input part (npub.py) was not run in this run.
+size verify-linked: 103560 bytes
+size verify-parent: 31888 bytes
+CASE_TALLY_UPDATE: recorded transaction replayed: 115589109 cycles
+CASE_TALLY_UPDATE: linked: 108502382 cycles; cycles before verify: 67363; cycles after verify: 108496034
+CASE_TALLY_UPDATE: spawned: 108647325 cycles; parent cycles before spawn: 33981; cycles before verify: 206168; cycles after verify: 108634860; parent cycles after wait: 108643229
+CASE_TALLY_CREATE: recorded transaction replayed: 112801015 cycles
+CASE_TALLY_CREATE: linked: 105835593 cycles; cycles before verify: 67377; cycles after verify: 105829245
+CASE_TALLY_CREATE: spawned: 105980550 cycles; parent cycles before spawn: 33995; cycles before verify: 206196; cycles after verify: 105968085; parent cycles after wait: 105976454
+CASE_COUNTER_UPDATE: recorded transaction not replayed (it is stored unsigned)
+CASE_COUNTER_UPDATE: linked: 103214503 cycles; cycles before verify: 67363; cycles after verify: 103208155
+CASE_COUNTER_UPDATE: spawned: 103359446 cycles; parent cycles before spawn: 33981; cycles before verify: 206168; cycles after verify: 103346981; parent cycles after wait: 103355350
+relayer_open: other payer and change: Some("accepted, 115589109 cycles")
+relayer_open: extra input and output: Some("accepted, 115591669 cycles")
+relayer_open: successor capacity changed (control): rejected
+test result: ok. 2 passed; 0 failed

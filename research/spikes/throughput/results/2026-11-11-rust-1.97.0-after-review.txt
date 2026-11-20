@@ -1,0 +1,76 @@
+Rust 1.97.0, LLVM 22.1.6, -Zbuild-std, ckb-testtool 1.1.1, Linux x86_64, 11 November 2026. Not the pinned toolchain.
+Script and harness as changed after the external review (key validation, bounded N, classified outcomes).
+size verify-batch: 90016 bytes
+GROUP tally: 2 distinct proofs, payload 290 bytes
+BATCH tally n=1 separate: valid Accepted(111505458); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=1 batch: valid Accepted(90952254); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=2 separate: valid Accepted(220249140); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=2 batch: valid Accepted(119824472); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=4 separate: valid Accepted(440430971); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=4 batch: valid Accepted(156692420); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=8 separate: valid Accepted(880839996); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=8 batch: valid Accepted(233606960); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=16 separate: valid Accepted(1761583719); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=16 batch: valid Accepted(390522476); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=32 separate: valid CycleLimit; last public input altered: CycleLimit (not shown: the valid batch exceeds the cycle limit)
+BATCH tally n=32 batch: valid Accepted(701589507); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=64 separate: not run
+BATCH tally n=64 batch: valid Accepted(1326852965); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=128 separate: not run
+BATCH tally n=128 batch: valid Accepted(2576478303); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=160 separate: not run
+BATCH tally n=160 batch: valid Accepted(3198302133); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=172 separate: not run
+BATCH tally n=172 batch: valid Accepted(3431225603); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=173 separate: not run
+BATCH tally n=173 batch: valid Accepted(3448827730); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=174 separate: not run
+BATCH tally n=174 batch: valid Accepted(3472907699); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=175 separate: not run
+BATCH tally n=175 batch: valid Accepted(3491480605); last public input altered: Exit(51) (rejected with 51)
+BATCH tally n=176 separate: not run
+BATCH tally n=176 batch: valid CycleLimit; last public input altered: CycleLimit (not shown: the valid batch exceeds the cycle limit)
+SUMMARY tally: 18 rejections shown after an accepted control, 2 not shown (cycle limit), 8 not run
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 108.20s
+ADVERSARIAL tally n=4: valid: separate Accepted(440430971), batch Accepted(156692420): as expected
+ADVERSARIAL tally n=4: valid, order reversed: separate Accepted(440430971), batch Accepted(156382870): as expected
+ADVERSARIAL tally n=4: valid, one proof four times (replay is an application rule, not a verification rule): separate Accepted(445826037), batch Accepted(156187872): as expected
+ADVERSARIAL tally n=4: public input altered at index 0: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: proof point C altered at index 0: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: public input altered at index 1: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: proof point C altered at index 1: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: public input altered at index 2: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: proof point C altered at index 2: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: public input altered at index 3: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: proof point C altered at index 3: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: public inputs altered at indices 0 and 3: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: identity proof point A at index 1: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: identity proof point B at index 1: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: identity proof point C at index 1: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: public input not below the field modulus at index 2: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: one public input too few at index 0: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: valid proofs under another circuit's key of the same arity: separate Exit(51), batch Exit(51): as expected
+ADVERSARIAL tally n=4: key with identity alpha: separate Exit(50), batch Exit(50): as expected
+ADVERSARIAL tally n=4: key with identity beta: separate Exit(50), batch Exit(50): as expected
+ADVERSARIAL tally n=4: key with identity gamma: separate Exit(50), batch Exit(50): as expected
+ADVERSARIAL tally n=4: key with identity delta: separate Exit(50), batch Exit(50): as expected
+ADVERSARIAL tally n=4: key with identity IC[0]: separate Exit(50), batch Exit(50): as expected
+ADVERSARIAL tally n=4: key with identity IC[last]: separate Exit(50), batch Exit(50): as expected
+ADVERSARIAL tally n=4: key with no IC entry: separate Exit(50), batch Exit(50): as expected
+ADVERSARIAL tally n=4: count 0 with no items: separate Exit(48), batch Exit(48): as expected
+ADVERSARIAL tally n=4: count 0 with four items present: separate Exit(48), batch Exit(48): as expected
+ADVERSARIAL tally n=4: count one more than the items present: separate Exit(48), batch Exit(48): as expected
+ADVERSARIAL tally n=4: count one fewer than the items present: separate Exit(48), batch Exit(48): as expected
+ADVERSARIAL tally n=4: count 257 (above the maximum): separate Exit(48), batch Exit(48): as expected
+ADVERSARIAL tally n=4: count 0xffffffff: separate Exit(48), batch Exit(48): as expected
+ADVERSARIAL tally n=4: one byte after the last item: separate Exit(48), batch Exit(48): as expected
+ADVERSARIAL tally n=4: last item truncated by one byte: separate Exit(48), batch Exit(48): as expected
+ADVERSARIAL tally n=4: first item length 0xffffffff: separate Exit(48), batch Exit(48): as expected
+ADVERSARIAL tally n=4: one byte appended inside the first item: separate Exit(48), batch Exit(48): as expected
+ADVERSARIAL tally n=5 (chunk boundary), batch: valid Accepted(174653063), index 0 altered Exit(51), last altered Exit(51): as expected
+ADVERSARIAL tally n=6 (chunk boundary), batch: valid Accepted(197869909), index 0 altered Exit(51), last altered Exit(51): as expected
+ADVERSARIAL tally n=13 (chunk boundary), batch: valid Accepted(330296068), index 0 altered Exit(51), last altered Exit(51): as expected
+ADVERSARIAL tally n=14 (chunk boundary), batch: valid Accepted(352987308), index 0 altered Exit(51), last altered Exit(51): as expected
+SUMMARY adversarial: 39 of 39 cases as expected
+test adversarial ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 15.82s

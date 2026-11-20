@@ -1,0 +1,17 @@
+[package]
+name = "verify-batch"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+ckb-std = "=1.1.0"
+ckb-hash = { version = "=1.1.0", default-features = false, features = ["ckb-contract"] }
+ark-bn254 = { version = "0.5", default-features = false, features = ["curve"] }
+ark-ec = { version = "0.5", default-features = false }
+ark-ff = { version = "0.5", default-features = false }
+ark-groth16 = { version = "0.5", default-features = false }
+ark-serialize = { version = "0.5", default-features = false }
+wire-decode = { git = "https://github.com/CECILIA-MULANDI/groth16-ckb", rev = "d64c769ffe2d2edb5eb308dc59058efda77c2f83" }
+verifier-core = { git = "https://github.com/CECILIA-MULANDI/groth16-ckb", rev = "d64c769ffe2d2edb5eb308dc59058efda77c2f83" }

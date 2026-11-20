@@ -1,0 +1,83 @@
+[
+  {
+    "circuit": "membership-d16",
+    "depth": 16,
+    "constraints": 11459,
+    "wires": 11477,
+    "private_inputs": 33,
+    "public_inputs": 1,
+    "witness_satisfies": true
+  },
+  {
+    "circuit": "spend-1-d16",
+    "depth": 16,
+    "constraints": 14619,
+    "wires": 14638,
+    "private_inputs": 35,
+    "public_inputs": 4,
+    "witness_satisfies": true
+  },
+  {
+    "circuit": "joinsplit-2x2-d16",
+    "depth": 16,
+    "constraints": 32134,
+    "wires": 32173,
+    "private_inputs": 76,
+    "public_inputs": 10,
+    "witness_satisfies": true
+  },
+  {
+    "circuit": "membership-d20",
+    "depth": 20,
+    "constraints": 14323,
+    "wires": 14345,
+    "private_inputs": 41,
+    "public_inputs": 1,
+    "witness_satisfies": true
+  },
+  {
+    "circuit": "spend-1-d20",
+    "depth": 20,
+    "constraints": 17483,
+    "wires": 17506,
+    "private_inputs": 43,
+    "public_inputs": 4,
+    "witness_satisfies": true
+  },
+  {
+    "circuit": "joinsplit-2x2-d20",
+    "depth": 20,
+    "constraints": 37862,
+    "wires": 37909,
+    "private_inputs": 92,
+    "public_inputs": 10,
+    "witness_satisfies": true
+  },
+  {
+    "circuit": "membership-d32",
+    "depth": 32,
+    "constraints": 22915,
+    "wires": 22949,
+    "private_inputs": 65,
+    "public_inputs": 1,
+    "witness_satisfies": true
+  },
+  {
+    "circuit": "spend-1-d32",
+    "depth": 32,
+    "constraints": 26075,
+    "wires": 26110,
+    "private_inputs": 67,
+    "public_inputs": 4,
+    "witness_satisfies": true
+  },
+  {
+    "circuit": "joinsplit-2x2-d32",
+    "depth": 32,
+    "constraints": 55046,
+    "wires": 55117,
+    "private_inputs": 140,
+    "public_inputs": 10,
+    "witness_satisfies": true
+  }
+]

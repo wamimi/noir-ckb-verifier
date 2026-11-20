@@ -1,0 +1,11 @@
+[package]
+name = "shielded-vm-harness"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dev-dependencies]
+ckb-testtool = "=1.1.1"
+sparse-merkle-tree = "=0.6.1"
