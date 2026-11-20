@@ -277,6 +277,16 @@ and must not be rejected, which the script does not do.
    exit code: a relayer bug; stop and report.
 4. *Retries* are bounded per batch and per item. An item that has gone through step 3(a)
    more than a set number of times is returned to its sender with the reason.
+5. *The voter's side* (added after the R4 review, finding 5). A relayer is not needed for
+   authorization: the proof is the authority and a relayer cannot change a bound ballot.
+   It is a privacy observer: it sees the submitting connection's IP address, the time of
+   submission, the nullifier and, with public choices, the choice. It is also an
+   availability dependency: it can drop or delay a ballot, and nothing in this rule stops
+   that or makes it visible. The client keeps the submitted ballot, watches the ballot box
+   for its nullifier, and resubmits through another relayer or a wallet-funded transaction
+   if it has not appeared by a deadline it chooses before `close_after`. That preserves the
+   right to submit, not the voting window: a ballot held back until after `close` cannot be
+   cast. Timely inclusion is an assumption of the ballot box, not a property (R2 section 4).
 
 The inclusion race in 3(a) cannot be removed by checking state late: with several relayers
 on one Cell, all but one lose each round. That is the single-Cell contention R2 section 4

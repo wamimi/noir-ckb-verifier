@@ -18,16 +18,20 @@ use std::cell::RefCell;
 // The dependency tree pulls in `getrandom` 0.4 (through the ECDSA black-box solvers), which
 // has no default backend on wasm32-unknown-unknown. Built with
 // `--cfg getrandom_backend="custom"`, it calls this function; randomness comes from the
-// host (`crypto.getRandomValues`). Witness solving for the circuits used here asks for none.
+// host. The host fills the buffer with `crypto.getRandomValues` in chunks of at most
+// 65,536 bytes (the Web Crypto limit per call) and returns 0, or returns a non-zero code
+// instead of throwing when it cannot. The page counts the calls per circuit.
 #[link(wasm_import_module = "env")]
 extern "C" {
-    fn host_random(ptr: *mut u8, len: usize);
+    fn host_random(ptr: *mut u8, len: usize) -> u32;
 }
 
 #[no_mangle]
 unsafe extern "Rust" fn __getrandom_v03_custom(dest: *mut u8, len: usize) -> Result<(), getrandom::Error> {
-    host_random(dest, len);
-    Ok(())
+    match host_random(dest, len) {
+        0 => Ok(()),
+        code => Err(getrandom::Error::new_custom(code.min(u16::MAX as u32) as u16)),
+    }
 }
 
 thread_local! {

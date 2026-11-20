@@ -223,7 +223,7 @@ relayer can keep part of it (finding 13).
 | Item | Budget | Basis |
 | --- | --- | --- |
 | Join-split circuit, depth 32 | 56,000 constraints; setup with a 2^16 powers-of-tau file | spike, rounded up, of a circuit that is not the specified one; to be re-measured (finding 10) |
-| Vote circuit (membership at depth 20, nullifier, choice) | 18,000 constraints | placeholder from a spend-one-note circuit; no ballot circuit exists (findings 8, 10) |
+| Vote circuit (membership at depth 20, election-scoped nullifier, binary choice) | 16,971 constraints, 16,993 wires, 7 public inputs; needs a powers-of-tau file of power 15 (power 14 at depth 19). It does not fit the tally's power-12 file at any depth above 2 | measured on the circuit built on 15 November 2026 ([`circuits/ballot`](../circuits/ballot/README.md)); it replaced an 18,000 placeholder taken from a note-spend circuit |
 | One join-split in its own transaction | about 131M cycles at depth 20; the same parts sum to 136M at depth 32 | estimate from measured parts (finding 11) |
 | One join-split inside a batch | about 23.3M cycles | estimate from measured parts |
 | One ballot inside a batch | about 21.1M cycles (19.9M + 1.2M) | estimate from measured parts |
@@ -261,7 +261,7 @@ from Noir's solver at v1.0.0-beta.19.
 | --- | --- | --- |
 | S1 | Spike part 1 on the pinned toolchain | Done 11 November 2026 |
 | S2 | Poseidon2 and tree-append as a script library, with a differential test against Noir's own execution (finding 9) | At least 10,000 random states and 10,000 random two-input hashes give the same output in CKB-VM as `nargo execute` of `noir-lang/poseidon`; a deliberately altered round constant fails the test |
-| S2a | Ballot circuit: identity commitment, membership, election-scoped nullifier, `choice` constrained to 0 or 1, exact election encoding | Fresh-proof negative tests: `choice = 2`, a non-member, another nullifier for the same secret, a changed choice or context; constraint count measured |
+| S2a | Ballot circuit: identity commitment, membership, election-scoped nullifier, `choice` constrained to 0 or 1, exact election encoding. Circuit, Noir tests and a differential check against the backend were written on 15 November 2026 with a throwaway key; open: a rerun on the pinned macOS toolchain, a review, the choice between depth 19 and 20, and a setup of power 14 or 15 | Fresh-proof negative tests: `choice = 2`, a non-member, another nullifier for the same secret, a changed choice or context; constraint count measured |
 | S2b | Nullifier-set updates that do not depend on the affected upstream behaviour (finding 1), and a defined composition rule for several effects on one field (finding 5) | Single-key insertions against intermediate roots; full-root comparison with an independent implementation; a used nullifier is refused through the complete application, also inside one batch |
 | S3 | Effects in the generator (`set-insert`, `tree-append`, capacity) | Generated ballot box passes its matrix; two votes against one state both land |
 | S4 | Note scheme reviewed and frozen | Written review; vectors published |
@@ -285,7 +285,7 @@ ceremony) are the next phase.
 | The Poseidon2 library pinned for beta.18 has a known fault for more than 3 inputs | Every call takes at most 3; the tally's static test is reused |
 | A pool is a target with real value; this is pre-audit software | Testnet only, as the rest of the project |
 | A soundness issue in an upstream dependency, reported privately; the ballot box and shielded pool must not rely on multi-key SMT proofs until it is resolved | S2b; no ballot box or pool deployment before it is resolved |
-| No ballot circuit exists; the binary choice was only a comment | The script now bounds `choice` to 0 or 1 itself; S2a for the circuit |
+| The ballot circuit is unreviewed and needs a setup larger than the tally's (power 14 or 15, not 12) | The circuit and the script both bound `choice` to 0 or 1; review and setup are part of S2a |
 | A relayer or miner can leave ballots out and `close` makes that final | Stated as an assumption; no detection is claimed. Receipts or a challenge period would be new design work |
 | An election can be opened with any voter list | By design: the script cannot judge a list. Clients must check `voter_root` against the published list |
 
@@ -345,8 +345,8 @@ ballot box; 3 and 6 are needed for the ballot box, the rest for the pool.
 6. **Tests that check what they claim.** Compare full roots; make an accepted negative case
    fail the run; differential Poseidon2 tests for all four outputs, `hash2` and `hash3`,
    including a corrupted constant.
-7. **Budgets.** Re-measure the specified join-split and the real ballot circuit before the
-   18,000 and 56,000 figures or the 2^16 setup are relied on.
+7. **Budgets.** Re-measure the specified join-split before the 56,000 figure or the 2^16
+   setup is relied on. The ballot circuit was measured on 15 November 2026 (section 6).
 8. **Throughput.** Compare the three designs on explicit workloads, depths and batch sizes
    with complete capacity-valid transactions.
 9. **Root ring.** Define what rotates it and state retention in that unit; any time-based

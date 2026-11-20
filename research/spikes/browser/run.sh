@@ -11,8 +11,14 @@
 # Needs: `rustup target add wasm32-unknown-unknown --toolchain 1.95.0`.
 # FULL=1 also prepares three note circuits (17k to 55k constraints); this generates a
 #   development 2^16 powers-of-tau file, which takes several minutes.
-# Open the printed URL in a browser. If Playwright is installed, the page is also measured in
-# headless Chromium and the JSON printed.
+#
+# MODE chooses what happens after the build:
+#   measure  measure the page in headless Chromium (needs Playwright), print the JSON, and exit
+#            non-zero if any check failed. The default without LAN=1.
+#   serve    serve the page until stopped with Ctrl-C; no measurement. Open the URL by hand.
+#   both     measure, then keep serving until stopped with Ctrl-C. The default with LAN=1, so
+#            that a phone can open the page after the headless run.
+# RESULTS=file also writes the measured JSON there. RUNS=N sets proofs per circuit (default 3).
 # The page is served on localhost only. LAN=1 serves it on every network interface so that
 #   a phone on the same network can open it; this exposes the page (including the
 #   development keys and artifacts, no secrets) to the local network while the script runs.
@@ -24,6 +30,14 @@ WORK="$ROOT/target/browser"
 CARGO=${CARGO:-cargo +1.95.0}
 PORT=${PORT:-8765}
 : "${BACKEND:?}" "${NARGO:?}" "${SNARKJS:?}"
+if [ "${LAN:-0}" = 1 ]; then MODE=${MODE:-both}; else MODE=${MODE:-measure}; fi
+case "$MODE" in measure|serve|both) ;; *) echo "MODE must be measure, serve or both" >&2; exit 2 ;; esac
+HAVE_PLAYWRIGHT=0
+node -e "require('playwright')" 2>/dev/null && HAVE_PLAYWRIGHT=1
+if [ "$MODE" = measure ] && [ "$HAVE_PLAYWRIGHT" = 0 ]; then
+  echo "MODE=measure needs Playwright (npm install playwright). Use MODE=serve to open the page by hand." >&2
+  exit 2
+fi
 mkdir -p "$WORK"
 
 # 1. The pinned backend, native (reference witnesses) and as wasm32.
@@ -52,20 +66,29 @@ fi
 python3 "$HERE/prepare.py" --repo "$ROOT" --nargo "$NARGO" --backend-cli "$WORK/backend/target/debug/noir-cli" \
   --snarkjs "$SNARKJS" --web "$WEB" ${EXTRA[@]+"${EXTRA[@]}"}
 
-# 3. Serve and measure.
+# 3. Serve, and measure according to MODE.
 BIND=127.0.0.1
 [ "${LAN:-0}" = 1 ] && BIND=0.0.0.0
-(cd "$WEB" && python3 -m http.server "$PORT" --bind "$BIND" > /dev/null 2>&1) &
+python3 -m http.server "$PORT" --bind "$BIND" --directory "$WEB" > /dev/null 2>&1 &
 SERVER=$!
 trap 'kill $SERVER 2>/dev/null' EXIT
+sleep 1
 echo "page: http://localhost:$PORT/   (add ?runs=5 for more runs, ?only=<circuit> for one circuit)"
 if [ "$BIND" = 0.0.0.0 ]; then
   ADDR=$(ipconfig getifaddr en0 2>/dev/null || hostname -I 2>/dev/null | awk '{print $1}' || true)
   echo "LAN=1: also reachable from this network at http://${ADDR:-THIS-MACHINE}:$PORT/ until this script stops"
 fi
-if node -e "require('playwright')" 2>/dev/null; then
-  node "$HERE/measure.cjs" "http://localhost:$PORT/" "${RUNS:-3}"
-else
-  echo "Playwright not found: open the page in a browser and read the table. Press Enter to stop the server."
-  read -r _
+STATUS=0
+if [ "$MODE" != serve ]; then
+  if [ "$HAVE_PLAYWRIGHT" = 1 ]; then
+    node "$HERE/measure.cjs" "http://localhost:$PORT/" "${RUNS:-3}" ${RESULTS:+"$RESULTS"} || STATUS=$?
+    [ "$STATUS" = 0 ] || echo "headless measurement FAILED (exit $STATUS)" >&2
+  else
+    echo "Playwright not found: no headless measurement." >&2
+  fi
 fi
+if [ "$MODE" = measure ]; then
+  exit "$STATUS"
+fi
+echo "serving until stopped (Ctrl-C)"
+wait "$SERVER"
